@@ -8,10 +8,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//Index:
+// Index:
 //  objType    r17  
 //  enumType   r74   
-//  dataModel  r100   
+//  dataModel  r106   
 
 
 // ***** Inizio objType *****
@@ -93,6 +93,12 @@ enum Ruolo {
   contractor
   raiderContractor
 }
+
+enum statoConsegna {
+  daRitirare
+  inConsegna
+  consegnato
+}
 // ***** Fine enumType *****
 
 
@@ -112,16 +118,15 @@ model User {
     updatedAt DateTime @updatedAt 
 }
 
-
 model Raider{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     user User @relation(fields: [userId], references: [id])
-    userId String @unique @db.ObjectId
+    userId String @unique @db.ObjectId    
     anagrafica AnagraficaRaiderType
     metodo MetodoConsegna
     stao StatoDisponibilita
     raiderPosition Cord
-    storicoConsegne String[] //reference consegna
+    storicoConsegne String[] //reference Delivery da aggiungere
     workTime Float
     preferiti String[] 
     blacklist String[]
@@ -135,7 +140,7 @@ model Contractor {
       userId String @unique @db.ObjectId
       anagrafica AnagraficaContractorType
       attivita PosizioneContractor[]
-      storicoConsegne String[] //reference consegna
+      storicoConsegne String[] //reference Delivery - da aggiungere
       preferiti String[]
       blacklist String[]
       createdAt DateTime @default(now())
@@ -155,5 +160,16 @@ model Order {
   identificaitvoMerce datiMerce
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  }
+
+  model Delivery {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    raiderID String //reference Raider da aggiungere
+    ordine String //reference Order da aggiungere
+    stato statoConsegna
+    oraRitiro DateTime
+    oraConsegna DateTime
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt        
   }
 // ***** Fine dataModel *****
