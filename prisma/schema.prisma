@@ -8,3 +8,145 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ***** Inizio modelType *****
+type Cord {
+  lat Float
+  long Float
+}
+
+type AnagraficaRaiderType {   
+  nome String
+  cognome String
+  dataNascita DateTime
+  codiceFiscla String
+  via String
+  provincia String
+  citta String
+  cap Int
+  tel String
+}
+
+type AnagraficaContractorType {   
+  nome String
+  cognome String
+  dataNascita DateTime
+  codiceFiscla String
+  via String
+  provincia String
+  citta String
+  cap Int
+  tel String
+  sede PosizioneContractor[]
+}
+
+type PosizioneContractor {
+  coordinate Cord
+  via String
+  provincia String
+  citta String
+  cap String
+  nomeAttivita String
+  partitaIva String
+  codiceFiscleAttivita String
+  }
+
+type Costo {
+  pagamentoAllaConsegna Boolean
+  quota Float
+}
+
+type datiMerce {
+  tipoMerce CategoriaMerce
+  nome String
+  volume Float
+  peso Float
+}
+
+// ***** Fine modelType *****
+
+// ***** Inizio enumType *****
+enum CategoriaMerce {
+  alimentare
+  materialiVari
+}
+
+enum StatoDisponibilita {
+  disponibile
+  occupato
+}
+
+enum MetodoConsegna {
+  bici  
+  auto
+  senzaVeicolo
+}
+
+enum Ruolo {
+  raider 
+  contractor
+  raiderContractor
+}
+// ***** Fine enumType *****
+
+// ***** Inizio dataModel *****
+model User {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    idSlug String
+    email String
+    usrenamen String
+    password String
+    role Ruolo
+    raiderId Raider?
+    contractorId Contractor?
+    orderId Order?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt 
+}
+
+
+model Raider{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    user User @relation(fields: [userId], references: [id])
+    userId String @unique @db.ObjectId
+    anagrafica AnagraficaRaiderType
+    metodo MetodoConsegna
+    stao StatoDisponibilita
+    raiderPosition Cord
+    storicoConsegne String[] //reference consegna
+    workTime Float
+    preferiti String[] 
+    blacklist String[]
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt    
+}
+
+model Contractor {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      user User @relation(fields: [userId], references: [id])
+      userId String @unique @db.ObjectId
+      anagrafica AnagraficaContractorType
+      attivita PosizioneContractor[]
+      storicoConsegne String[] //reference consegna
+      preferiti String[]
+      blacklist String[]
+      createdAt DateTime @default(now())
+      updatedAt DateTime @updatedAt            
+}
+
+model Order {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  user User @relation(fields: [userId], references: [id])
+  userId String @unique @db.ObjectId
+  hashQrFirma String
+  dataRitiro DateTime
+  dataConsegna DateTime
+  note String
+  quotaRider Float
+  quota Costo
+  identificaitvoMerce datiMerce
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  }
+
+
+// ***** Fine dataModel *****
