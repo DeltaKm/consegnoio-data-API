@@ -8,7 +8,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ***** Inizio modelType *****
+//Index:
+//  objType    r17  
+//  enumType   r74   
+//  dataModel  r100   
+
+
+// ***** Inizio objType *****
 type Cord {
   lat Float
   long Float
@@ -61,8 +67,9 @@ type datiMerce {
   volume Float
   peso Float
 }
+// ***** Fine objType *****
 
-// ***** Fine modelType *****
+
 
 // ***** Inizio enumType *****
 enum CategoriaMerce {
@@ -87,6 +94,8 @@ enum Ruolo {
   raiderContractor
 }
 // ***** Fine enumType *****
+
+
 
 // ***** Inizio dataModel *****
 model User {
@@ -147,6 +156,4 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   }
-
-
 // ***** Fine dataModel *****
