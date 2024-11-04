@@ -10,8 +10,8 @@ datasource db {
 
 // Index:
 //  objType    r17  
-//  enumType   r74   
-//  dataModel  r106   
+//  enumType   r79   
+//  dataModel  r112   
 
 
 // ***** Inizio objType *****
@@ -61,11 +61,16 @@ type Costo {
   quota Float
 }
 
-type datiMerce {
+type DatiMerce {
   tipoMerce CategoriaMerce
   nome String
   volume Float
   peso Float
+}
+
+type PreferenzeRaider {
+  zoneConsegna String[]
+  distanzaKM Int
 }
 // ***** Fine objType *****
 
@@ -125,7 +130,8 @@ model Raider{
     userId String @unique @db.ObjectId    
     anagrafica AnagraficaRaiderType
     metodo MetodoConsegna
-    stao StatoDisponibilita
+    stato StatoDisponibilita
+    preferenze PreferenzeRaider
     raiderPosition Cord
     storicoConsegne String[] //reference Delivery da aggiungere
     workTime Float
@@ -158,7 +164,7 @@ model Order {
   note String
   quotaRaider Float
   quota Costo
-  identificaitvoMerce datiMerce
+  identificaitvoMerce DatiMerce
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   }
