@@ -98,6 +98,7 @@ enum statoConsegna {
   daRitirare
   inConsegna
   consegnato
+  cancellato
 }
 // ***** Fine enumType *****
 
@@ -155,7 +156,7 @@ model Order {
   dataRitiro DateTime
   dataConsegna DateTime
   note String
-  quotaRider Float
+  quotaRaider Float
   quota Costo
   identificaitvoMerce datiMerce
   createdAt DateTime @default(now())
@@ -170,6 +171,13 @@ model Order {
     oraRitiro DateTime
     oraConsegna DateTime
     createdAt DateTime @default(now())
-    updateAt DateTime @updatedAt        
+    updateAt DateTime @updatedAt
   }
 // ***** Fine dataModel *****
+
+
+// Note:
+//  - validare con ZOD
+//  - aggiungere references
+//  - validazione comuni
+//  - valutare flag stato consegna per ordini cancellati
