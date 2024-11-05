@@ -120,7 +120,7 @@ model User {
     role RuoloEnum
     raiderId Raider?
     contractorId Contractor?
-    orderId Order?
+    
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     @@unique([idSlug, email, username]) 
@@ -147,6 +147,7 @@ model Contractor {
       id String @id @default(auto()) @map("_id") @db.ObjectId
       user User @relation(fields: [userId], references: [id])
       userId String @unique @db.ObjectId
+      orderId Order?
       posizioneSede PosizioneMapType[] // indirizzi sede
       storicoConsegne String[] //reference Delivery - da aggiungere
       preferiti String[]
@@ -157,8 +158,8 @@ model Contractor {
 
 model Order {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  user Contractor @relation(fields: [userId], references: [id])
-  userId String @unique @db.ObjectId
+  user Contractor @relation(fields: [contractorId], references: [id])
+  contractorId String @unique @db.ObjectId
   hashQrFirma String
   dataOreRitiroPrevisto DateTime
   dataOreConsegnaPrevista DateTime
@@ -210,7 +211,7 @@ model Order {
 
 // Note:
 //  - validare con ZOD
-//  - aggiungere references
+//  - add / fix references
 //  - valutare flag stato consegna per ordini cancellati
 //  - aggiungere sedi attvità
 //  - aggiungere work time per filtri di giorni
