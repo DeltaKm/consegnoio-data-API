@@ -169,6 +169,7 @@ model Order {
   quotaRaider Float
   quota CostoType
   identificaitvoMerce DatiMerceType
+  isActive Boolean
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   }
@@ -186,12 +187,19 @@ model Order {
 
   // protoripo 
   model DeletedDelivery {
-        id String @id @default(auto()) @map("_id") @db.ObjectId   
+        id String @id @default(auto()) @map("_id") @db.ObjectId
+        fromID String // reference to User
+        fromRuolo RuoloEnum 
+        createdAt DateTime @default(now())
+        updateAt DateTime @updatedAt 
   }
-  
+
   // protoripo 
   model DeletedOrder {
         id String @id @default(auto()) @map("_id") @db.ObjectId
+        contractorID String //reference to Contractor
+        createdAt DateTime @default(now())
+        updateAt DateTime @updatedAt
   }
 
 
@@ -224,4 +232,4 @@ model Order {
 //  - add / fix references
 //  - valutare flag stato consegna per ordini cancellati
 //  - aggiungere sedi attvità
-//  - aggiungere work time per filtri di giorni
+//  - aggiungere work time per filtri
