@@ -43,7 +43,6 @@ type AnagraficaUserType {
   residenza IndirizzoType 
   cittadinanza CittadinanzaEnum
   fiscalita DatiFiscaliType
-  email String
   tel String
 }
 
@@ -119,8 +118,7 @@ model User {
     password String
     role RuoloEnum
     raiderId Raider?
-    contractorId Contractor?
-    
+    contractorId Contractor?    
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     @@unique([idSlug, email, username]) 
@@ -135,7 +133,7 @@ model Raider{
     preferenze PreferenzeZonaRaiderType
     isOnWorkFlag Boolean // attivo se il raider ha preso in carico una consegna
     raiderPosition CordType
-    storicoConsegne String[] //reference Delivery da aggiungere
+    storicoConsegne String[] // add reference to Delivery 
     workTime Float //da definire per i filtri
     preferiti String[] 
     blacklist String[]
@@ -149,7 +147,7 @@ model Contractor {
       userId String @unique @db.ObjectId
       orderId Order?
       posizioneSede PosizioneMapType[] // indirizzi sede
-      storicoConsegne String[] //reference Delivery - da aggiungere
+      storicoConsegne String[] // add reference to Delivery
       preferiti String[]
       blacklist String[]
       createdAt DateTime @default(now())
@@ -176,8 +174,8 @@ model Order {
 
   model Delivery {
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    raiderID String //reference Raider da aggiungere
-    ordine String //reference Order da aggiungere
+    raiderID String // add reference to Raider 
+    ordine String // add reference to Order 
     stato StatoConsegnaEnum
     dataOraRitiroReale DateTime
     dataOraConsegnaReale DateTime
@@ -185,19 +183,19 @@ model Order {
     updateAt DateTime @updatedAt
   }
 
-  // protoripo 
+  
   model DeletedDelivery {
         id String @id @default(auto()) @map("_id") @db.ObjectId
-        fromID String // reference to User
+        fromID String // add reference to User
         fromRuolo RuoloEnum 
         createdAt DateTime @default(now())
         updateAt DateTime @updatedAt 
   }
 
-  // protoripo 
+  
   model DeletedOrder {
         id String @id @default(auto()) @map("_id") @db.ObjectId
-        contractorID String //reference to Contractor
+        contractorID String // add reference to Contractor
         createdAt DateTime @default(now())
         updateAt DateTime @updatedAt
   }

@@ -13,32 +13,15 @@ export const userSchema = z.object({
     usernname: z.string().min(5, alertMin + "5").max(10, alertMax + "10"),
     password: z.string().min(8, alertMin + "8").max(16, alertMax + "16"),
 });
-// da eseguire il merge dell' anagraficaType
-export const anagraficaRaiderType = z.object({
-    nome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-    cognome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-    dataNascita: z.number(),
-    codiceFiscale: z.string().min(16, alertMin + "16").max(16, alertMax + "16"),
-    via: z.string().min(8, alertMin + "8").max(25, alertMax + "25"),
-    provincia: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-    citta: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-    cap: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-    tel: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-});
 
-export const anagraficaContractorType = z.object({
+export const anagraficaUserType = z.object({
     nome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
     cognome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-    dataNascita: z.number(),
-    codiceFiscale: z.string().min(16, alertMin + "16").max(16, alertMax + "16"),
-    via: z.string().min(8, alertMin + "8").max(25, alertMax + "25"),
-    provincia: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-    citta: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-    cap: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-    tel: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    tel: z.string().min(8, alertMin + "8").max(8, alertMax + "20"),
 });
 
 
-export type AnagraficaRaiderType = z.infer<typeof anagraficaRaiderType>;
-export type AnagraficaContractorType = z.infer<typeof anagraficaContractorType>;
+
+
+export type AnagraficaRaiderType = z.infer<typeof anagraficaUserType>;
 export type UserSchema = z.infer<typeof userSchema>;
