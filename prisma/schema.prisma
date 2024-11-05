@@ -43,8 +43,11 @@ type AnagraficaUserType {
   residenza IndirizzoType 
   cittadinanza CittadinanzaEnum
   fiscalita DatiFiscaliType
+  email String
+  tel String
 }
 
+// merge in AnagraficaUserType
 type AnagraficaRaiderType {   
   nome String
   cognome String
@@ -57,6 +60,7 @@ type AnagraficaRaiderType {
   tel String
 }
 
+// merge in AnagraficaUserType
 type AnagraficaContractorType {   
   nome String
   cognome String
@@ -240,3 +244,6 @@ model Order {
 //  - validare con ZOD
 //  - aggiungere references
 //  - valutare flag stato consegna per ordini cancellati
+//  - fare il merge di anagraficaType
+//  - implementare indirizzoType con cordinate in Delivery & Order
+//  - aggiungere sedi attvità
