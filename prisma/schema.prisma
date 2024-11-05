@@ -184,6 +184,16 @@ model Order {
     updateAt DateTime @updatedAt
   }
 
+  // protoripo 
+  model DeletedDelivery {
+        id String @id @default(auto()) @map("_id") @db.ObjectId   
+  }
+  
+  // protoripo 
+  model DeletedOrder {
+        id String @id @default(auto()) @map("_id") @db.ObjectId
+  }
+
 
   model Comuni {
     id String @id @default(auto()) @map("_id") @db.ObjectId
