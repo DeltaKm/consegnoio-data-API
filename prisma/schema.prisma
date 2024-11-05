@@ -15,9 +15,19 @@ datasource db {
 
 
 // ***** Inizio objType *****
-type Cord {
+type CordType {
   lat Float
   long Float
+}
+
+type AnagraficaUserType {
+  nome String
+  cognome String
+  dataNascita DateTime
+  cittaNascita String
+  cittadinanza CittadinanzaEnum
+
+
 }
 
 type AnagraficaRaiderType {   
@@ -43,11 +53,11 @@ type AnagraficaContractorType {
   citta String
   cap Int
   tel String
-  sede PosizioneContractor[]
+  sede PosizioneContractorType[]
 }
 
-type PosizioneContractor {
-  coordinate Cord
+type PosizioneContractorType {
+  coordinate CordType
   via String
   provincia String
   citta String
@@ -57,19 +67,19 @@ type PosizioneContractor {
   codiceFiscleAttivita String
   }
 
-type Costo {
+type CostoType {
   pagamentoAllaConsegna Boolean
   quota Float
 }
 
-type DatiMerce {
-  tipoMerce CategoriaMerce
+type DatiMerceType {
+  tipoMerce CategoriaMerceEnum
   nome String
   volume Float
   peso Float
 }
 
-type PreferenzeRaider {
+type PreferenzeRaiderType {
   zoneConsegna String[]
   distanzaKM Int
 }
@@ -78,33 +88,38 @@ type PreferenzeRaider {
 
 
 // ***** Inizio enumType *****
-enum CategoriaMerce {
-  alimentare
-  materialiVari
+enum CittadinanzaEnum {
+  Italiana
+  Estera
 }
 
-enum StatoDisponibilita {
-  disponibile
-  occupato
+enum CategoriaMerceEnum {
+  Alimentare
+  MaterialiVari
 }
 
-enum MetodoConsegna {
-  bici  
-  auto
-  senzaVeicolo
+enum StatoDisponibilitaEnum {
+  Disponibile
+  Occupato
 }
 
-enum Ruolo {
-  raider 
-  contractor
-  raiderContractor
+enum MetodoConsegnaEnum {
+  Bici  
+  Auto
+  SenzaVeicolo
 }
 
-enum statoConsegna {
+enum RuoloEnum {
+  Raider 
+  CategoriaMerceontractor
+  RaiderContractor
+}
+
+enum StatoConsegnaEnum {
   daRitirare
   inConsegna
-  consegnato
-  cancellato
+  Consegnato
+  Cancellato
 }
 // ***** Fine enumType *****
 
@@ -117,7 +132,7 @@ model User {
     email String 
     username String 
     password String
-    role Ruolo
+    role RuoloEnum
     raiderId Raider?
     contractorId Contractor?
     orderId Order?
@@ -131,10 +146,10 @@ model Raider{
     user User @relation(fields: [userId], references: [id])
     userId String @unique @db.ObjectId    
     anagrafica AnagraficaRaiderType
-    metodo MetodoConsegna
-    stato StatoDisponibilita
-    preferenze PreferenzeRaider
-    raiderPosition Cord
+    metodo MetodoConsegnaEnum
+    stato StatoDisponibilitaEnum
+    preferenze PreferenzeRaiderType
+    raiderPosition CordType
     storicoConsegne String[] //reference Delivery da aggiungere
     workTime Float
     preferiti String[] 
@@ -148,7 +163,7 @@ model Contractor {
       user User @relation(fields: [userId], references: [id])
       userId String @unique @db.ObjectId
       anagrafica AnagraficaContractorType
-      attivita PosizioneContractor[]
+      attivita PosizioneContractorType[]
       storicoConsegne String[] //reference Delivery - da aggiungere
       preferiti String[]
       blacklist String[]
@@ -165,8 +180,8 @@ model Order {
   dataConsegna DateTime
   note String
   quotaRaider Float
-  quota Costo
-  identificaitvoMerce DatiMerce
+  quota CostoType
+  identificaitvoMerce DatiMerceType
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   }
@@ -175,7 +190,7 @@ model Order {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     raiderID String //reference Raider da aggiungere
     ordine String //reference Order da aggiungere
-    stato statoConsegna
+    stato StatoConsegnaEnum
     oraRitiro DateTime
     oraConsegna DateTime
     createdAt DateTime @default(now())
@@ -190,7 +205,7 @@ model Order {
     siglaProvincia String
     denominazioneProvincia String
     denominazioneRegione String
-    coordinate Cord
+    coordinate CordType
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
