@@ -24,7 +24,7 @@ type AnagraficaRaiderType {
   nome String
   cognome String
   dataNascita DateTime
-  codiceFiscla String
+  codiceFisclale String
   via String
   provincia String
   citta String
@@ -38,7 +38,8 @@ type AnagraficaContractorType {
   dataNascita DateTime
   codiceFiscla String
   via String
-  provincia String
+  denominazioneProvincia String
+  siglaProvincia String
   citta String
   cap Int
   tel String
@@ -208,5 +209,4 @@ model Order {
 // Note:
 //  - validare con ZOD
 //  - aggiungere references
-//  - validazione comuni
 //  - valutare flag stato consegna per ordini cancellati

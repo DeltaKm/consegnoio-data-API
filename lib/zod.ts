@@ -1,9 +1,9 @@
-import { string, z } from "zod"
+import { z } from "zod"
 
 const alertMin = "La lunghezza deve essere di almeno caratteri "
 const alertMax = "La lunghezza massima non deve superare caratteri "
 
-
+// Validazione input utente
 export const userSchema = z.object({
     idSlug: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
     email: z.string()
@@ -14,5 +14,31 @@ export const userSchema = z.object({
     password: z.string().min(8, alertMin + "8").max(16, alertMax + "16"),
 });
 
+export const anagraficaRaiderType = z.object({
+    nome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    cognome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    dataNascita: z.number(),
+    codiceFiscale: z.string().min(16, alertMin + "16").max(16, alertMax + "16"),
+    via: z.string().min(8, alertMin + "8").max(25, alertMax + "25"),
+    provincia: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    citta: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    cap: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    tel: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+});
 
+export const anagraficaContractorType = z.object({
+    nome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    cognome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    dataNascita: z.number(),
+    codiceFiscale: z.string().min(16, alertMin + "16").max(16, alertMax + "16"),
+    via: z.string().min(8, alertMin + "8").max(25, alertMax + "25"),
+    provincia: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    citta: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    cap: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    tel: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+});
+
+
+export type AnagraficaRaiderType = z.infer<typeof anagraficaRaiderType>;
+export type AnagraficaContractorType = z.infer<typeof anagraficaContractorType>;
 export type UserSchema = z.infer<typeof userSchema>;
