@@ -179,6 +179,17 @@ model Order {
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+
+  model Comuni {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    codiceIstat Int
+    denominazioneIta String
+    cap Int
+    siglaProvincia String
+    denominazioneProvincia String
+    denominazioneRegione String
+    coordinate Cord
+  }
 // ***** Fine dataModel *****
 
 
