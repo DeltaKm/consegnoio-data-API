@@ -113,15 +113,16 @@ enum statoConsegna {
 model User {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     idSlug String
-    email String
-    usrenamen String
+    email String 
+    username String 
     password String
     role Ruolo
     raiderId Raider?
     contractorId Contractor?
     orderId Order?
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt 
+    updatedAt DateTime @updatedAt
+    @@unique([idSlug, email, username]) 
 }
 
 model Raider{
