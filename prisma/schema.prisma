@@ -20,14 +20,29 @@ type CordType {
   long Float
 }
 
+type DatiFiscaliType {
+  codiceFisclale String
+  ragioneSociale String
+  partitaIva String
+  codiceSDI String
+  pec String
+}
+
+type IndirizzoType {
+  via String
+  numero Int
+  provincia String
+  citta String
+  cap Int
+}
+
 type AnagraficaUserType {
   nome String
   cognome String
-  dataNascita DateTime
-  cittaNascita String
+  domicilio IndirizzoType
+  residenza IndirizzoType 
   cittadinanza CittadinanzaEnum
-
-
+  fiscalita DatiFiscaliType
 }
 
 type AnagraficaRaiderType {   
