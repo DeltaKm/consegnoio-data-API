@@ -23,14 +23,14 @@ type CordType {
 type DatiFiscaliType {
   codiceFisclale String
   ragioneSociale String
-  partitaIva String
+  partitaIVA String
   codiceSDI String
   pec String
 }
 
 type IndirizzoType {
   via String
-  numero Int
+  numeroCivio Int
   provincia String
   citta String
   cap Int
@@ -47,43 +47,9 @@ type AnagraficaUserType {
   tel String
 }
 
-// merge in AnagraficaUserType
-type AnagraficaRaiderType {   
-  nome String
-  cognome String
-  dataNascita DateTime
-  codiceFisclale String
-  via String
-  provincia String
-  citta String
-  cap Int
-  tel String
-}
-
-// merge in AnagraficaUserType
-type AnagraficaContractorType {   
-  nome String
-  cognome String
-  dataNascita DateTime
-  codiceFiscla String
-  via String
-  denominazioneProvincia String
-  siglaProvincia String
-  citta String
-  cap Int
-  tel String
-  sede PosizioneContractorType[]
-}
-
-type PosizioneContractorType {
+type PosizioneMapType {
   coordinate CordType
-  via String
-  provincia String
-  citta String
-  cap String
-  nomeAttivita String
-  partitaIva String
-  codiceFiscleAttivita String
+  indirizzo IndirizzoType
   }
 
 type CostoType {
@@ -98,7 +64,7 @@ type DatiMerceType {
   peso Float
 }
 
-type PreferenzeRaiderType {
+type PreferenzeZonaRaiderType {
   zoneConsegna String[]
   distanzaKM Int
 }
@@ -130,7 +96,7 @@ enum MetodoConsegnaEnum {
 
 enum RuoloEnum {
   Raider 
-  CategoriaMerceontractor
+  Contractor
   RaiderContractor
 }
 
@@ -164,13 +130,13 @@ model Raider{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     user User @relation(fields: [userId], references: [id])
     userId String @unique @db.ObjectId    
-    anagrafica AnagraficaRaiderType
     metodo MetodoConsegnaEnum
     stato StatoDisponibilitaEnum
-    preferenze PreferenzeRaiderType
+    preferenze PreferenzeZonaRaiderType
+    isOnWorkFlag Boolean // attivo se il raider ha preso in carico una consegna
     raiderPosition CordType
     storicoConsegne String[] //reference Delivery da aggiungere
-    workTime Float
+    workTime Float //da definire per i filtri
     preferiti String[] 
     blacklist String[]
     createdAt DateTime @default(now())
@@ -181,8 +147,7 @@ model Contractor {
       id String @id @default(auto()) @map("_id") @db.ObjectId
       user User @relation(fields: [userId], references: [id])
       userId String @unique @db.ObjectId
-      anagrafica AnagraficaContractorType
-      attivita PosizioneContractorType[]
+      posizioneSede PosizioneMapType[] // indirizzi sede
       storicoConsegne String[] //reference Delivery - da aggiungere
       preferiti String[]
       blacklist String[]
@@ -192,11 +157,13 @@ model Contractor {
 
 model Order {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  user User @relation(fields: [userId], references: [id])
+  user Contractor @relation(fields: [userId], references: [id])
   userId String @unique @db.ObjectId
   hashQrFirma String
-  dataRitiro DateTime
-  dataConsegna DateTime
+  dataOreRitiroPrevisto DateTime
+  dataOreConsegnaPrevista DateTime
+  indirizzoRitiro PosizioneMapType
+  indirizzoConsegna PosizioneMapType
   note String
   quotaRaider Float
   quota CostoType
@@ -210,11 +177,12 @@ model Order {
     raiderID String //reference Raider da aggiungere
     ordine String //reference Order da aggiungere
     stato StatoConsegnaEnum
-    oraRitiro DateTime
-    oraConsegna DateTime
+    dataOraRitiroReale DateTime
+    dataOraConsegnaReale DateTime
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+
 
   model Comuni {
     id String @id @default(auto()) @map("_id") @db.ObjectId
@@ -244,6 +212,5 @@ model Order {
 //  - validare con ZOD
 //  - aggiungere references
 //  - valutare flag stato consegna per ordini cancellati
-//  - fare il merge di anagraficaType
-//  - implementare indirizzoType con cordinate in Delivery & Order
 //  - aggiungere sedi attvità
+//  - aggiungere work time per filtri di giorni
