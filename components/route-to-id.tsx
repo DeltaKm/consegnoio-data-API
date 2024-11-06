@@ -15,7 +15,7 @@ import styles from '@/components/styles/Home.module.css';
 
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
-import { ToastCord } from './get';
+import { ToastDemo } from './get';
 
 export default function RouteToID() {
   const [lat, setLat] = useState(41.59288);
@@ -66,7 +66,7 @@ export default function RouteToID() {
       </div>
 
       <div className="fixed top-8 left-[50%] right-0 bg-white shadow-md pb-1">
-      <ToastCord lat={lat} long={lng}/>
+      <ToastDemo lat={lat} long={lng}/>
         </div>
   
       <GoogleMap

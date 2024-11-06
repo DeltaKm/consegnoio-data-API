@@ -60,7 +60,11 @@ type CostoType {
 type DatiMerceType {
   tipoMerce CategoriaMerceEnum
   nome String
-  volume Float
+  altezza Float
+  larghezza Float
+  lunghezza Float
+  densita Float
+  pesoVolumetrico Float
   peso Float
 }
 

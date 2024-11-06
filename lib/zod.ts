@@ -3,7 +3,7 @@ import { z } from "zod"
 const alertMin = "La lunghezza deve essere di almeno caratteri "
 const alertMax = "La lunghezza massima non deve superare caratteri "
 
-// Validazione input utente
+// Validazione input utente dataModel
 export const userSchema = z.object({
     idSlug: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
     email: z.string()
@@ -14,12 +14,7 @@ export const userSchema = z.object({
     password: z.string().min(8, alertMin + "8").max(16, alertMax + "16"),
 });
 
-export const anagraficaUserType = z.object({
-    nome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-    cognome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
-    tel: z.string().min(8, alertMin + "8").max(8, alertMax + "20"),
-});
-
+// Validazione input utente objType 
 export const cordTypeSchema = z.object({
     lat: z.number().finite(),
     long: z.number().finite(),
@@ -36,7 +31,8 @@ export const datiFiscaliSchema = z.object({
     .refine((e) => e === "[email protetta]", "Questa email non è nel database"),
 });
 
-export const indirizzoType = z.object({
+
+export const indirizzoTypeSchema = z.object({
     via: z.string().min(2, alertMin + "2").max(30, alertMax + "30"),
     numeroCivico: z.string().min(1, alertMin + "1").max(5, alertMax + "5"),
     provincia: z.string().min(2, alertMin + "2").max(12, alertMax + "12"),
@@ -46,10 +42,34 @@ export const indirizzoType = z.object({
 });
 
 
-export type AnagraficaUserType = z.infer<typeof anagraficaUserType>;
+export const anagraficaUserTypeSchema = z.object({
+    nome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    cognome: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    tel: z.string().min(8, alertMin + "8").max(8, alertMax + "20"),
+});
+
+export const costoTypeSchema = z. object({
+    pagamentoAllaConsegna: z.boolean(),
+    quota: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
+});
+
+
+export const datiMerceTypeSchema = z.object({
+    nome: z.string().min(5, alertMin + "5").max(5, alertMax + "5"),
+    volume: z.number().min(5, alertMin + "5").max(5, alertMax + "5"),
+    peso: z.number().min(5, alertMin + "5").max(5, alertMax + "5"),
+});
+
+
+
+
+
+
+
+export type AnagraficaUserTypeSchema = z.infer<typeof anagraficaUserTypeSchema>;
 export type UserSchema = z.infer<typeof userSchema>;
 
 export const schemas = {
     userSchema,
-    anagraficaUserType,
+    anagraficaUserTypeSchema,
 };
