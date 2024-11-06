@@ -192,7 +192,8 @@ model Order {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     placeId String
     indirizzo PosMapType 
-    
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
   }
 
   
@@ -210,6 +211,11 @@ model Order {
         contractorID String // add reference to Contractor
         createdAt DateTime @default(now())
         updateAt DateTime @updatedAt
+  }
+
+  // prototipo
+  model storicoConsegne {
+     id String @id @default(auto()) @map("_id") @db.ObjectId    
   }
 
 
