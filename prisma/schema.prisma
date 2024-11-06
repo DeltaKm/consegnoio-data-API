@@ -60,12 +60,12 @@ type CostoType {
 type DatiMerceType {
   tipoMerce CategoriaMerceEnum
   nome String
+  peso Float
   altezza Float
   larghezza Float
   lunghezza Float
   densita Float
   pesoVolumetrico Float
-  peso Float
 }
 
 type PreferenzeZonaRaiderType {
