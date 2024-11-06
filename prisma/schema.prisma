@@ -30,8 +30,9 @@ type DatiFiscaliType {
 
 type IndirizzoType {
   via String
-  numeroCivio Int
+  numeroCivio String
   provincia String
+  provinciaSigla String
   citta String
   cap Int
 }
