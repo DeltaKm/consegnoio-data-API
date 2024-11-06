@@ -1,3 +1,8 @@
+
+// Index:
+//  zVal objType    r13    
+//  zVal dataModel  r66
+
 import { z } from "zod"
 
 
@@ -5,7 +10,7 @@ const alertMin = "La lunghezza deve essere di almeno caratteri "
 const alertMax = "La lunghezza massima non deve superare caratteri "
 
 
-// Validazione input utente objType 
+// ***** Inizio validazione objType *****
 export const cordTypeSchema = z.object({
     lat: z.number().finite(),
     long: z.number().finite(),
@@ -54,8 +59,11 @@ export const datiMerceTypeSchema = z.object({
     densita: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
     pesoVolumetico: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
 });
+// ***** Fine validazione objType *****
 
-// Validazione input utente dataModel
+
+
+// ***** Inizio validazione dataModel *****
 export const userSchema = z.object({
     idSlug: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
     email: z.string()
@@ -94,6 +102,7 @@ export const nazioniSchema = z.object({
    codiceBelfiore: z.number().min(4, alertMin + "4").max(4, alertMax + "4"),
    denominazioneNazione: z.number().min(1, alertMin + "1").max(20, alertMax + "20"), 
 });
+// ***** Fine validazione dataModel *****
 
 
 export type AnagraficaUserTypeSchema = z.infer<typeof anagraficaUserTypeSchema>;

@@ -1,4 +1,9 @@
 
+// Index:
+//  objType    r17  
+//  enumType   r79   
+//  dataModel  r117
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,11 +12,6 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-
-// Index:
-//  objType    r17  
-//  enumType   r74   
-//  dataModel  r112   
 
 
 // ***** Inizio objType *****
@@ -186,6 +186,13 @@ model Order {
     dataOraConsegnaReale DateTime
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
+  }
+
+  model GooglePosMap {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    placeId String
+    indirizzo PosMapType 
+    
   }
 
   
