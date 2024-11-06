@@ -1,4 +1,5 @@
 import { z } from "zod"
+import pesoVolumetico from "./pesovolumetrico";
 
 const alertMin = "La lunghezza deve essere di almeno caratteri "
 const alertMax = "La lunghezza massima non deve superare caratteri "
@@ -55,9 +56,13 @@ export const costoTypeSchema = z. object({
 
 
 export const datiMerceTypeSchema = z.object({
-    nome: z.string().min(5, alertMin + "5").max(5, alertMax + "5"),
-    volume: z.number().min(5, alertMin + "5").max(5, alertMax + "5"),
-    peso: z.number().min(5, alertMin + "5").max(5, alertMax + "5"),
+    nome: z.string().min(1, alertMin + "5").max(5, alertMax + "30"),
+    peso: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
+    altezza: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
+    larghezza: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
+    lunghezza: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
+    densita: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
+    pesoVolumetico: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
 });
 
 
