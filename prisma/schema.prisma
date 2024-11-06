@@ -221,9 +221,9 @@ model Order {
 
   model Nazioni {
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    siglaNazionale String
+    siglaNazione String
     codiceBelfiore String
-    denominazioneNazionale String
+    denominazioneNazione String
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }

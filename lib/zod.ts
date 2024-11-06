@@ -75,6 +75,25 @@ export const orderSchema = z.object({
     isActive: z.boolean(),
 });
 
+export const deliverySchema = z.object({
+    daraOraRitiroReale: z.date(),
+    dataOraRitiroReale: z .date(),    
+});
+
+export const comuniSchema = z.object({
+    codiceIstat: z.number().min(5, alertMin + "5").max(5, alertMax + "5"),
+    denominazioneIta: z.string().min(2, alertMin + "2").max(8, alertMax + "20"),
+    cap: z.number().min(5, alertMin + "5").max(5, alertMax + "5"),
+    siglaProvincia: z.number().min(2, alertMin + "2").max(2, alertMax + "2"),
+    denominazioneProvincia: z.number().min(2, alertMin + "2").max(20, alertMax + "20"),
+    denominazioneRegione: z.number().min(2, alertMin + "2").max(20, alertMax + "20"),
+});
+
+export const nazioniSchema = z.object({
+   siglaNazione: z.number().min(3, alertMin + "3").max(3, alertMax + "3"),
+   codiceBelfiore: z.number().min(4, alertMin + "4").max(4, alertMax + "4"),
+   denominazioneNazione: z.number().min(1, alertMin + "1").max(20, alertMax + "20"), 
+});
 
 
 export type AnagraficaUserTypeSchema = z.infer<typeof anagraficaUserTypeSchema>;
