@@ -47,7 +47,7 @@ type AnagraficaUserType {
   tel String
 }
 
-type PosizioneMapType {
+type PosMapType {
   coordinate CordType
   indirizzo IndirizzoType
   }
@@ -151,7 +151,7 @@ model Contractor {
       user User @relation(fields: [userId], references: [id])
       userId String @unique @db.ObjectId
       orderId Order?
-      posizioneSede PosizioneMapType[] // indirizzi sede
+      posizioneSede PosMapType[] // indirizzi sede
       storicoConsegne String[] // add reference to Delivery
       preferiti String[]
       blacklist String[]
@@ -166,8 +166,8 @@ model Order {
   hashQrFirma String
   dataOreRitiroPrevisto DateTime
   dataOreConsegnaPrevista DateTime
-  indirizzoRitiro PosizioneMapType
-  indirizzoConsegna PosizioneMapType
+  indirizzoRitiro PosMapType
+  indirizzoConsegna PosMapType
   note String
   quotaRaider Float
   quota CostoType
@@ -231,7 +231,6 @@ model Order {
 
 
 // Note:
-//  - validare con ZOD
 //  - add / fix references
 //  - valutare flag stato consegna per ordini cancellati
 //  - aggiungere sedi attvità
