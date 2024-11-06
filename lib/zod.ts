@@ -23,5 +23,10 @@ export const anagraficaUserType = z.object({
 
 
 
-export type AnagraficaRaiderType = z.infer<typeof anagraficaUserType>;
+export type AnagraficaUserType = z.infer<typeof anagraficaUserType>;
 export type UserSchema = z.infer<typeof userSchema>;
+
+export const schemas = {
+    userSchema,
+    anagraficaUserType,
+};

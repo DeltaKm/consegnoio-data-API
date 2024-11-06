@@ -13,9 +13,16 @@ import usePlacesAutocomplete, {
 } from 'use-places-autocomplete';
 import styles from '@/components/styles/Home.module.css';
 
+import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
+import { ToastCord } from './get';
+
 export default function RouteToID() {
   const [lat, setLat] = useState(41.59288);
   const [lng, setLng] = useState(14.336474839024133);
+
+
+
 
 
   const libraries = useMemo(() => ['places'], []);
@@ -40,9 +47,12 @@ export default function RouteToID() {
   }
 
   return (
+    
     <div className={styles.homeWrapper}>
+
       <div className={styles.sidebar}>
-       
+      
+
         <PlacesAutocomplete
           onAddressSelect={(address) => {
             getGeocode({ address: address }).then((results) => {
@@ -54,6 +64,11 @@ export default function RouteToID() {
           }}
         />
       </div>
+
+      <div className="fixed top-8 left-[50%] right-0 bg-white shadow-md pb-1">
+      <ToastCord lat={lat} long={lng}/>
+        </div>
+  
       <GoogleMap
         options={mapOptions}
         zoom={14}
@@ -69,6 +84,7 @@ export default function RouteToID() {
 
         {[1000, 2500].map((radius, idx) => {
           return (
+            
             <CircleF
               key={idx}
               center={mapCenter}
@@ -80,9 +96,11 @@ export default function RouteToID() {
                 strokeOpacity: 0.8,
               }}
             />
+            
           );
         })}
       </GoogleMap>
+      
     </div>
   );
 };
@@ -128,7 +146,9 @@ const PlacesAutocomplete = ({
   };
 
   return (
+    
     <div className={styles.autocompleteWrapper}>
+      
       <input
         value={value}
         className={styles.autocompleteInput}
@@ -140,7 +160,9 @@ const PlacesAutocomplete = ({
       {status === 'OK' && (
         <ul className={styles.suggestionWrapper}>{renderSuggestions()}</ul>
       )}
+      
     </div>
+    
   );
 };
 

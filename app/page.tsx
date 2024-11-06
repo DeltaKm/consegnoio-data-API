@@ -1,4 +1,5 @@
 import CreateList from "@/components/create-list";
+import { ToastDemo } from "@/components/get";
 import List from "@/components/list";
 import RouteToID from "@/components/route-to-id";
 
@@ -11,8 +12,10 @@ export default function Home() {
         <h1 className="text-4x1 font-bold">Test Maps Route</h1>
         {/* <CreateList />       */}
         <RouteToID />
+        {/* <ToastDemo /> */}
+        
       </div>     
-      <List />
+      {/* <List /> */}
     </div>
   );
 }
