@@ -224,7 +224,7 @@ model Order {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     codiceIstat Int
     denominazioneIta String
-    cap Int
+    cap String
     siglaProvincia String
     denominazioneProvincia String
     denominazioneRegione String

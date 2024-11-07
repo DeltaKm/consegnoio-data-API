@@ -18,8 +18,7 @@ export default function DeleteComuni({ id } : { id : string }) {
             console.error("Errore eliminazione lista")
         }        
     };
-    return(        
-        
+    return(         
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <form onSubmit={handleDelete}> {/** da seguire check */}
         <Button
