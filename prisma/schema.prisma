@@ -190,7 +190,7 @@ model Order {
 
   model GooglePosMap {
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    placeId String
+    placeId String @unique
     indirizzo PosMapType 
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
