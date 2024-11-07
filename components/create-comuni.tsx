@@ -33,9 +33,12 @@ export default function CreateList() {
     const form = useForm<ComuniSchema>({
         resolver: zodResolver(comuniSchema),
         defaultValues: {
-            title: "",
-            description: "",
-            isCompleted: false,
+            codiceIstat: "",
+            denominazioneIta: "",
+            cap: "",
+            siglaProvincia: "",
+            denominazioneProvincia: "",
+            denominazioneRegione: "",            
         },
     });
 
@@ -70,12 +73,12 @@ export default function CreateList() {
     return (
         <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-                <Button>Aggiungi lista</Button>
+                <Button>Aggiungi Comune</Button>
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-[425px] bg-white">
                 <DialogHeader>
-                    <DialogTitle>Crea una nuova lista</DialogTitle>
+                    <DialogTitle>Crea nuova scheda</DialogTitle>
                 </DialogHeader>
 
                 {errorMessage && (
@@ -88,7 +91,7 @@ export default function CreateList() {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
                             control={form.control}
-                            name="title"
+                            name="codiceIstat"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Titolo</FormLabel>
@@ -101,7 +104,7 @@ export default function CreateList() {
                         />
                         <FormField
                             control={form.control}
-                            name="description"
+                            name="denominazioneIta"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Descrizione</FormLabel>
@@ -114,18 +117,10 @@ export default function CreateList() {
                         />
                         <FormField
                             control={form.control}
-                            name="isCompleted"
+                            name="cap"
                             render={({ field }) => (
                                 <FormItem className="flex items-center space-x-3">                                    
-                                    <FormControl>
-                                        <Checkbox 
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
-                                        />
-                                    </FormControl>
-                                    <div className=" leading-none translate-y-[-4px]">
-                                        <FormLabel>Completata</FormLabel>
-                                    </div>
+             
                                 </FormItem>
                             )}
                         />
@@ -139,7 +134,7 @@ export default function CreateList() {
                                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                 </div>
                             )}
-                            Crea lista
+                            Crea scheda
                         </Button>
                     </form>
                 </Form>

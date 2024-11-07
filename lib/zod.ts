@@ -100,7 +100,7 @@ export const comuniSchema = z.object({
 export const nazioniSchema = z.object({
    siglaNazione: z.string().min(3, alertMin + "3").max(3, alertMax + "3"),
    codiceBelfiore: z.string().min(4, alertMin + "4").max(4, alertMax + "4"),
-   denominazioneNazione: z.string().min(1, alertMin + "1").max(20, alertMax + "20"), 
+   denominazioneNazione: z.number().min(1, alertMin + "1").max(20, alertMax + "20"), 
 });
 // ***** Fine validazione dataModel *****
 
