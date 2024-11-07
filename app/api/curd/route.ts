@@ -35,23 +35,49 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({message: "inpunt non valido", errors: result.error.errors}, {status: 400});
         }
 
-        const listData = result.data;
+        const data = result.data;
 
         const newList= await prisma.comuni.create({
             data: {
-                codiceIstat: listData.codiceIstat,
-                denominazioneIta: listData.denominazioneIta,
-                cap: listData.cap,
-                siglaProvincia: listData.siglaProvincia,
-                denominazioneProvincia: listData.denominazioneProvincia,
-                denominazioneRegione: listData.denominazioneProvincia,
+                codiceIstat: data.codiceIstat,
+                denominazioneIta: data.denominazioneIta,
+                cap: data.cap,
+                siglaProvincia: data.siglaProvincia,
+                denominazioneProvincia: data.denominazioneProvincia,
+                denominazioneRegione: data.denominazioneProvincia,
             },
         });
 
         return NextResponse.json(newList, {status: 201});
         
     } catch (error) {
-        console.error("Errore aggiunta lista", error);
+        console.error("Errore caricamento dati", error);
         return NextResponse.json({message: "Errore inatteso"}, {status: 500});
     }    
 }
+
+
+export async function DELETE(request: NextRequest) {
+    try {
+
+        const id = request.nextUrl.searchParams.get("id");
+
+        if (!id) {
+            return NextResponse.json({message: "id richiesto"}, {status: 400});
+        }
+  
+
+        const deleteList= await prisma.comuni.delete({
+          where: { id },
+        });
+
+        if(!deleteList) {
+            return NextResponse.json({ message: "Lista non trovata"}, {status: 400});
+        }
+        
+    } catch (error) {
+        console.error("Errore eliminazione lista", error);
+        return NextResponse.json({message: "Errore inatteso"}, {status: 500});
+    }    
+}
+

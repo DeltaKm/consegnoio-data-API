@@ -215,7 +215,8 @@ model Order {
 
   // prototipo
   model storicoConsegne {
-     id String @id @default(auto()) @map("_id") @db.ObjectId    
+     id String @id @default(auto()) @map("_id") @db.ObjectId 
+     idDelivery String[] // // add reference to Delivery
   }
 
 
