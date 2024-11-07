@@ -22,4 +22,3 @@ export async function GET() {
         return NextResponse.json({message: "errore in fase di fetching"}, {status:500});
     }
 }
-

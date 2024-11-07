@@ -227,7 +227,7 @@ model Order {
     siglaProvincia String
     denominazioneProvincia String
     denominazioneRegione String
-    coordinate CordType
+    // coordinate CordType
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
