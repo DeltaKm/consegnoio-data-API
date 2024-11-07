@@ -45,10 +45,10 @@ export default function FetchComuni() {
   return (
 <>
    
-       <h1 className="text-4x1 font-bold my-4 pl-">Test REST API GET</h1>
+       <h1 className="text-4x1 font-bold my-4 pl-2">Test REST API GET</h1>
 
    { view.map((e) =>  (
-            <Card className="group relative" key={e.id}>
+            <Card className="group relative mx-5 my-8 max-w-[80%]" key={e.id}>
                 <CardHeader>
                 <CardTitle>
                     {e.denominazioneIta}

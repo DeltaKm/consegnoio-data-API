@@ -90,11 +90,11 @@ export const deliverySchema = z.object({
 
 export const comuniSchema = z.object({
     codiceIstat: z.number().min(5, alertMin + "5").max(5, alertMax + "5"),
-    denominazioneIta: z.string().min(2, alertMin + "2").max(8, alertMax + "20"),
+    denominazioneIta: z.string().min(2, alertMin + "2").max(20, alertMax + "20"),
     cap: z.number().min(5, alertMin + "5").max(5, alertMax + "5"),
-    siglaProvincia: z.number().min(2, alertMin + "2").max(2, alertMax + "2"),
-    denominazioneProvincia: z.number().min(2, alertMin + "2").max(20, alertMax + "20"),
-    denominazioneRegione: z.number().min(2, alertMin + "2").max(20, alertMax + "20"),
+    siglaProvincia: z.string().min(2, alertMin + "2").max(2, alertMax + "2"),
+    denominazioneProvincia: z.string().min(2, alertMin + "2").max(20, alertMax + "20"),
+    denominazioneRegione: z.string().min(2, alertMin + "2").max(20, alertMax + "20"),
 });
 
 export const nazioniSchema = z.object({
@@ -107,6 +107,7 @@ export const nazioniSchema = z.object({
 
 export type AnagraficaUserTypeSchema = z.infer<typeof anagraficaUserTypeSchema>;
 export type UserSchema = z.infer<typeof userSchema>;
+export type ComuniSchema = z.infer<typeof comuniSchema>;
 
 export const schemas = {
     userSchema,

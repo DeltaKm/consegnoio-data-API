@@ -5,7 +5,9 @@ import RouteToID from "@/components/route-to-id";
 
 
 export default function Home() {
-  return (    
+  return ( 
+ 
         <FetchComuni />  
+  
   );
 }
