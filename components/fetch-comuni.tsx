@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import DeleteComuni from "./delete-comuni";
 
 
 
@@ -20,7 +21,7 @@ export default function FetchComuni() {
      data: comuniData,
      error, 
      isLoading,
-  } = useSWR<Comuni[]>("/api/curd", fetcher);
+  } = useSWR<Comuni[]>("/api/crud", fetcher);
 
   console.log(comuniData)
 
@@ -41,14 +42,18 @@ export default function FetchComuni() {
 
     const view = comuniData || []
     
-    view.map((e) =>  e.cap )
+
   return (
 <>
    
-       <h1 className="text-4x1 font-bold my-4 pl-2">Test REST API GET</h1>
+      <h1 className="text-4x1 font-bold my-4 pl-2">Test REST API GET</h1>
 
    { view.map((e) =>  (
+   
             <Card className="group relative mx-5 my-8 max-w-[80%]" key={e.id}>
+              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <DeleteComuni id={e.id} />
+            </div>
                 <CardHeader>
                 <CardTitle>
                     {e.denominazioneIta}
