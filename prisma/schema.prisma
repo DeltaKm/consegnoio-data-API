@@ -222,7 +222,7 @@ model Order {
 
   model Comuni {
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    codiceIstat Int
+    codiceIstat String
     denominazioneIta String
     cap String
     siglaProvincia String

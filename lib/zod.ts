@@ -89,7 +89,7 @@ export const deliverySchema = z.object({
 });
 
 export const comuniSchema = z.object({
-    codiceIstat: z.number().min(5, alertMin + "5").max(5, alertMax + "5"),
+    codiceIstat: z.string().min(5, alertMin + "5").max(5, alertMax + "5"),
     denominazioneIta: z.string().min(2, alertMin + "2").max(20, alertMax + "20"),
     cap: z.string().min(5, alertMin + "5").max(5, alertMax + "5"),
     siglaProvincia: z.string().min(2, alertMin + "2").max(2, alertMax + "2"),
@@ -98,9 +98,9 @@ export const comuniSchema = z.object({
 });
 
 export const nazioniSchema = z.object({
-   siglaNazione: z.number().min(3, alertMin + "3").max(3, alertMax + "3"),
-   codiceBelfiore: z.number().min(4, alertMin + "4").max(4, alertMax + "4"),
-   denominazioneNazione: z.number().min(1, alertMin + "1").max(20, alertMax + "20"), 
+   siglaNazione: z.string().min(3, alertMin + "3").max(3, alertMax + "3"),
+   codiceBelfiore: z.string().min(4, alertMin + "4").max(4, alertMax + "4"),
+   denominazioneNazione: z.string().min(1, alertMin + "1").max(20, alertMax + "20"), 
 });
 // ***** Fine validazione dataModel *****
 
