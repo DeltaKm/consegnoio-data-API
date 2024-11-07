@@ -7,13 +7,13 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET() {
 
     try{
-        const todos = await prisma.comuni.findMany({
+        const comuniData = await prisma.comuni.findMany({
 
             orderBy: {
                 createdAt: 'desc',
             },
         });
-        return NextResponse.json(todos);
+        return NextResponse.json(comuniData);
 
     } catch (error) {
 

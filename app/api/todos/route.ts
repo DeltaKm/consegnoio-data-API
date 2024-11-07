@@ -1,6 +1,5 @@
 import { listSchema } from "@/lib/zod";
 import prisma from "../../lib/prisma";
-import RouteToID from "@/components/route-to-id";
 
 import { NextRequest, NextResponse } from "next/server";
 
