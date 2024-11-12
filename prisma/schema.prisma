@@ -72,11 +72,21 @@ type PreferenzeZonaRaiderType {
   zoneConsegna String[]
   distanzaKM Int
 }
+
+//prototipo
+type WorkTime {
+  data DateTime
+  oreTotali Float
+}
 // ***** Fine objType *****
 
 
 
 // ***** Inizio enumType *****
+enum StatusCodes {
+  NotFound 
+ 
+}
 enum CittadinanzaEnum {
   Italiana
   Estera
@@ -214,7 +224,7 @@ model Order {
   }
 
   // prototipo
-  model storicoConsegne {
+  model StoricoConsegne {
      id String @id @default(auto()) @map("_id") @db.ObjectId 
      idDelivery String[] // // add reference to Delivery
      createdAt DateTime @default(now())

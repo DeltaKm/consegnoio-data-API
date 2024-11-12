@@ -25,7 +25,7 @@ import { Checkbox } from "./ui/checkbox";
 import { useState } from "react";
 import { mutate } from "swr";
 
-export default function CreateList() {
+export default function CreateComuni() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [isDialogOpen, setDialogOpen] = useState(false);
@@ -78,7 +78,7 @@ export default function CreateList() {
 
             <DialogContent className="sm:max-w-[425px] bg-white">
                 <DialogHeader>
-                    <DialogTitle>Crea nuova scheda</DialogTitle>
+                    <DialogTitle>Iserisci Comune</DialogTitle>
                 </DialogHeader>
 
                 {errorMessage && (
@@ -94,7 +94,7 @@ export default function CreateList() {
                             name="codiceIstat"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Titolo</FormLabel>
+                                    <FormLabel>Codice ISTAT</FormLabel>
                                     <FormControl>
                                         <Input {...field} />
                                     </FormControl>
@@ -107,7 +107,7 @@ export default function CreateList() {
                             name="denominazioneIta"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Descrizione</FormLabel>
+                                    <FormLabel>Denominazione ITA</FormLabel>
                                     <FormControl>
                                         <Textarea className="resize-none" {...field} />
                                     </FormControl>

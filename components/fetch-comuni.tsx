@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import DeleteComuni from "./delete-comuni";
+import CreateComuni from "./create-comuni";
 
 
 
@@ -64,6 +65,9 @@ export default function FetchComuni() {
               </CardContent>
               </Card>
             ) )}
+            <div className="pl-5">
+            <CreateComuni />
+            </div>
   </>
   
 

@@ -4,6 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { comuniSchema } from "@/lib/zod";
 
 
+enum StatusCodes {
+    NotFound = 404,
+    Success = 200,
+    Accepted = 202,
+    BadRequest = 400
+  }
 
 export async function GET() {
 
@@ -63,7 +69,7 @@ export async function DELETE(request: NextRequest) {
         const id = request.nextUrl.searchParams.get("id");
 
         if (!id) {
-            return NextResponse.json({message: "id richiesto"}, {status: 400});
+            return NextResponse.json({message: "id richiesto"}, {status: StatusCodes.BadRequest});
         }
   
 
@@ -72,7 +78,7 @@ export async function DELETE(request: NextRequest) {
         });
 
         if(!deleteList) {
-            return NextResponse.json({ message: "Lista non trovata"}, {status: 400});
+            return NextResponse.json({ message: "Lista non trovata"}, {status: StatusCodes.BadRequest});
         }
         
     } catch (error) {
