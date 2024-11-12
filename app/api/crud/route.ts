@@ -7,8 +7,10 @@ import { comuniSchema } from "@/lib/zod";
 enum StatusCodes {
     NotFound = 404,
     Success = 200,
+    Created = 201,
     Accepted = 202,
-    BadRequest = 400
+    BadRequest = 400,
+    InternalServerError = 500,
   }
 
 export async function GET() {
@@ -26,7 +28,7 @@ export async function GET() {
 
         console.log("errore in fase di fetching", error);
 
-        return NextResponse.json({message: "errore in fase di fetching"}, {status:500});
+        return NextResponse.json({message: "errore in fase di fetching"}, {status: StatusCodes.InternalServerError});
     }
 }
 
@@ -38,7 +40,7 @@ export async function POST(request: NextRequest) {
         const result = comuniSchema.safeParse(body);
 
         if (!result.success) {
-            return NextResponse.json({message: "inpunt non valido", errors: result.error.errors}, {status: 400});
+            return NextResponse.json({message: "inpunt non valido", errors: result.error.errors}, {status: StatusCodes.BadRequest});
         }
 
         const data = result.data;
@@ -54,11 +56,11 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        return NextResponse.json(newList, {status: 201});
+        return NextResponse.json(newList, {status: StatusCodes.Created});
         
     } catch (error) {
         console.error("Errore caricamento dati", error);
-        return NextResponse.json({message: "Errore inatteso"}, {status: 500});
+        return NextResponse.json({message: "Errore inatteso"}, {status: StatusCodes.InternalServerError});
     }    
 }
 
@@ -83,7 +85,7 @@ export async function DELETE(request: NextRequest) {
         
     } catch (error) {
         console.error("Errore eliminazione lista", error);
-        return NextResponse.json({message: "Errore inatteso"}, {status: 500});
+        return NextResponse.json({message: "Errore inatteso"}, {status: StatusCodes.InternalServerError});
     }    
 }
 
