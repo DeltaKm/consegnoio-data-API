@@ -109,21 +109,65 @@ export default function CreateComuni() {
                                 <FormItem>
                                     <FormLabel>Denominazione ITA</FormLabel>
                                     <FormControl>
-                                        <Textarea className="resize-none" {...field} />
+                                        <Input className="resize-none" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <FormField
+                            <FormField
                             control={form.control}
                             name="cap"
                             render={({ field }) => (
-                                <FormItem className="flex items-center space-x-3">                                    
-             
+                                <FormItem>
+                                    <FormLabel>CAP</FormLabel>
+                                    <FormControl>
+                                        <Input className="resize-none" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
+                           <FormField
+                            control={form.control}
+                            name="siglaProvincia"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Sigla Provincia</FormLabel>
+                                    <FormControl>
+                                        <Input className="resize-none" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                                                    <FormField
+                            control={form.control}
+                            name="denominazioneProvincia"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Denominazione Provincia</FormLabel>
+                                    <FormControl>
+                                        <Input className="resize-none" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                                                    <FormField
+                            control={form.control}
+                            name="denominazioneRegione"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Denominazione Regione</FormLabel>
+                                    <FormControl>
+                                        <Input className="resize-none" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+   
                         <Button 
                             disabled={isSubmitting}
                             className="w-full relative"
