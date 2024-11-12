@@ -217,6 +217,8 @@ model Order {
   model storicoConsegne {
      id String @id @default(auto()) @map("_id") @db.ObjectId 
      idDelivery String[] // // add reference to Delivery
+     createdAt DateTime @default(now())
+     updateAt DateTime @updatedAt
   }
 
 
@@ -247,4 +249,4 @@ model Order {
 //  - add / fix references
 //  - valutare flag stato consegna per ordini cancellati
 //  - aggiungere sedi attvità
-//  - aggiungere work time per filtri
+//  - aggiungere work time per filtri chiedere a fausto
