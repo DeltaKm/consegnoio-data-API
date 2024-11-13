@@ -13,9 +13,7 @@ enum StatusCodes {
     Unauthorized = 401,
     InternalServerError = 500,
   }
-  type responeData = {
-    message: string
-  }
+ 
 
 export async function GET() {
 
@@ -26,7 +24,7 @@ export async function GET() {
                 createdAt: 'desc',
             },
         });
-        return NextResponse.json(comuniData);
+        return NextResponse.json(JSON.stringify(comuniData, null, 2));
 
     } catch (error) {
 
@@ -59,6 +57,7 @@ export async function POST(request: NextRequest) {
                 denominazioneRegione: data.denominazioneProvincia,
             },
         });
+     
 
         return NextResponse.json(newList, {status: StatusCodes.Created});
         
@@ -67,6 +66,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({message: "Errore inatteso"}, {status: StatusCodes.InternalServerError});
     }    
 }
+
+
 
 
 export async function DELETE(request: NextRequest) {

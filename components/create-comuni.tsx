@@ -169,19 +169,16 @@ export default function CreateComuni() {
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />
-   
+                        />   
                         <Button 
                             disabled={isSubmitting}
                             className="w-full relative"
                             variant="outline"
                             
                             type="submit"
-                            onSubmit={() => {
-                                
+                            onSubmit={() => {                                
                                 toast({
-                                  description: "Scheda caricata",
-                                  
+                                  description: "Scheda caricata",                                  
                                 })
                               }}
                         >
