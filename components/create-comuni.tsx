@@ -144,7 +144,7 @@ export default function CreateComuni() {
                                 </FormItem>
                             )}
                         />
-                                                    <FormField
+                              <FormField
                             control={form.control}
                             name="denominazioneProvincia"
                             render={({ field }) => (
@@ -169,14 +169,13 @@ export default function CreateComuni() {
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />   
+                        />   <div className="pl-5">
                         <Button 
                             disabled={isSubmitting}
                             className="w-full relative"
-                            variant="outline"
-                            
+                            variant='outline'                            
                             type="submit"
-                            onSubmit={() => {                                
+                            onClick={() => {                                
                                 toast({
                                   description: "Scheda caricata",                                  
                                 })
@@ -188,7 +187,7 @@ export default function CreateComuni() {
                                 </div>
                             )}
                             Crea scheda
-                        </Button>
+                        </Button></div>
                     </form>
                 </Form>
             </DialogContent>

@@ -51,7 +51,7 @@ export default function FetchComuni() {
 
    { view.map((e) =>  (
    
-            <Card className="group relative mx-5 my-8 max-w-[80%]" key={e.id}>
+            <Card className="group relative mx-5 my-8 max-w-[70%]" key={e.id}>
               <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <DeleteComuni id={e.id} />
             </div>
