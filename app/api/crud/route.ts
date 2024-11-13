@@ -24,7 +24,7 @@ export async function GET() {
                 createdAt: 'desc',
             },
         });
-        return NextResponse.json(JSON.stringify(comuniData, null, 2));
+        return NextResponse.json(comuniData);
 
     } catch (error) {
 
