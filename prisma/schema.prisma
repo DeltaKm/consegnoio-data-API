@@ -252,6 +252,12 @@ model Order {
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+
+  // prototipo
+  model RaiderWorkTime {
+        id String @id @default(auto()) @map("_id") @db.ObjectId
+        hours WorkTime    
+  }
 // ***** Fine dataModel *****
 
 
