@@ -13,6 +13,9 @@ enum StatusCodes {
     Unauthorized = 401,
     InternalServerError = 500,
   }
+  type responeData = {
+    message: string
+  }
 
 export async function GET() {
 
@@ -89,6 +92,23 @@ export async function DELETE(request: NextRequest) {
         return NextResponse.json({message: "Errore inatteso"}, {status: StatusCodes.InternalServerError});
     }    
 }
+// Patch => DataUpdate
+export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+	try {
+		const id = params.id;
 
+		const updated = await prisma.comuni.update({
+			where: { id },
+			data: {
+				denominazioneIta: 'Caserta',
+				denominazioneRegione: 'Campania',
+				cap: '00000',
+			},
+		});
 
+		return NextResponse.json(updated);
+	} catch (error) {
+		console.log('error');
+	}
+}
 
