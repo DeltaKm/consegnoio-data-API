@@ -78,6 +78,26 @@ type WorkTime {
   data DateTime
   oreTotali Float
 }
+
+// ----- INIZIO DistanceMatrixType vTEST ----
+type Distance {
+  text String
+  value Float
+}
+
+type Duration {
+  text String
+  value Float
+}
+
+type DistanceMatrixType {
+  destinazione String
+  origine String
+  distanza Distance
+  durata Duration
+  status String
+}
+// ----- FINE DistanceMatrixType vTEST  ----
 // ***** Fine objType *****
 
 
