@@ -26,7 +26,7 @@ export default function FetchComuni() {
   } = useSWR<Comuni[]>("/api/crud", fetcher);
 
   console.log(comuniData)
-  console.log(JSON.stringify(DistanceMatrix()))
+  
 
 
 

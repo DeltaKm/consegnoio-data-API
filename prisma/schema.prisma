@@ -89,7 +89,7 @@ type Duration {
   text String
   value Float
 }
-
+//unitParam: imperial= miles / yard, metric=km / meters
 type DistanceMatrixType {
   destinazione String
   origine String
@@ -277,6 +277,12 @@ model Order {
   model RaiderWorkTime {
         id String @id @default(auto()) @map("_id") @db.ObjectId
         hours WorkTime    
+  }
+
+  // prototipo google DistanceMatrix => wsRouteDistance
+  model DistanceMatrix {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    matrix DistanceMatrixType
   }
 // ***** Fine dataModel *****
 
