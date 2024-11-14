@@ -89,7 +89,11 @@ type Duration {
   text String
   value Float
 }
+<<<<<<< HEAD
 //unitParam: imperial= miles / yard, metric=km / meters
+=======
+
+>>>>>>> refs/remotes/origin/main
 type DistanceMatrixType {
   destinazione String
   origine String
