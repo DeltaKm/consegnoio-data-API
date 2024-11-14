@@ -101,7 +101,7 @@ type DistanceMatrixType {
 // ----- FINE DistanceMatrixType vTEST  ----
 
 // ----- INIZIO GeocodingType vTEST ----
-type PulsCode {
+type PulsCodeType {
   compoundCode String
   globalCode String
 }
@@ -109,7 +109,7 @@ type GoogleAddressComponentType {
   formattedAddress String
   cord CordType
   palceId String
-  code PulsCode
+  code PulsCodeType
 }
 
 // ----- FINE GeocodingType vTEST  ----
@@ -261,7 +261,7 @@ model Order {
   // prototipo
   model StoricoConsegne {
      id String @id @default(auto()) @map("_id") @db.ObjectId 
-     idDelivery String[] // // add reference to Delivery
+     idDelivery String[] // add reference to Delivery
      createdAt DateTime @default(now())
      updateAt DateTime @updatedAt
   }
@@ -306,7 +306,9 @@ model Order {
 // prototipo google Gecoding => wsGecodingService
   model Geocoding {
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    googleAddress GoogleAddressComponentType    
+    googleAddress GoogleAddressComponentType
+    cratedAt DateTime @default(now())
+    updateAt DateTime @updatedAt 
   }
 // ***** Fine dataModel *****
 
