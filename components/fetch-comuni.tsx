@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import DeleteComuni from "./delete-comuni";
 import CreateComuni from "./create-comuni";
+import DistanceMatrix from "./distance-matrix";
 
 
 
@@ -25,6 +26,7 @@ export default function FetchComuni() {
   } = useSWR<Comuni[]>("/api/crud", fetcher);
 
   console.log(comuniData)
+  console.log(JSON.stringify(DistanceMatrix()))
 
 
 
@@ -42,9 +44,10 @@ export default function FetchComuni() {
     if(error) return <div>Errore di caricamento</div>;
 
     const view = comuniData || []
-    
+   
 
   return (
+    
 <>
    
       <h1 className="text-4x1 font-bold my-4 pl-2">Test REST API GET</h1>
@@ -55,6 +58,7 @@ export default function FetchComuni() {
               <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <DeleteComuni id={e.id} />
             </div>
+           
                 <CardHeader>
                 <CardTitle>
                     {e.denominazioneIta}
@@ -68,6 +72,7 @@ export default function FetchComuni() {
             <div className="pl-5">
             <CreateComuni />
             </div>
+            
   </>
   
 

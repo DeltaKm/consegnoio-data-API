@@ -73,7 +73,7 @@ type PreferenzeZonaRaiderType {
   distanzaKM Int
 }
 
-//prototipo
+// prototipo
 type WorkTime {
   data DateTime
   oreTotali Float
