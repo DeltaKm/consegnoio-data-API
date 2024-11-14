@@ -1,8 +1,8 @@
 
 // Index:
 //  objType    r17  
-//  enumType   r85   
-//  dataModel  r127
+//  enumType   r121  
+//  dataModel  r163
 
 generator client {
   provider = "prisma-client-js"
@@ -99,6 +99,20 @@ type DistanceMatrixType {
   statusDD String
 }
 // ----- FINE DistanceMatrixType vTEST  ----
+
+// ----- INIZIO GeocodingType vTEST ----
+type PulsCode {
+  compoundCode String
+  globalCode String
+}
+type GoogleAddressComponentType {
+  formattedAddress String
+  cord CordType
+  palceId String
+  code PulsCode
+}
+
+// ----- FINE GeocodingType vTEST  ----
 
 // ***** Fine objType *****
 
@@ -281,12 +295,18 @@ model Order {
         updateAt DateTime @updatedAt
   }
 
-  // prototipo google DistanceMatrix => wsRouteDistance
+  // prototipo google DistanceMatrix => wsRouteDistanceService
   model DistanceMatrix {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     matrix DistanceMatrixType
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
+  }
+
+// prototipo google Gecoding => wsGecodingService
+  model Geocoding {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    googleAddress GoogleAddressComponentType    
   }
 // ***** Fine dataModel *****
 
@@ -296,4 +316,3 @@ model Order {
 //  - valutare flag stato consegna per ordini cancellati
 //  - aggiungere sedi attvità
 //  - aggiungere work time per filtri chiedere a fausto
-
