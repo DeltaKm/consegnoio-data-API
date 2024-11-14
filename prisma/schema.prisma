@@ -93,11 +93,13 @@ type Duration {
 type DistanceMatrixType {
   destinazione String
   origine String
+  statusDO String
   distanza Distance
   durata Duration
-  status String
+  statusDD String
 }
 // ----- FINE DistanceMatrixType vTEST  ----
+
 // ***** Fine objType *****
 
 
@@ -225,7 +227,6 @@ model Order {
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
-
   
   model DeletedDelivery {
         id String @id @default(auto()) @map("_id") @db.ObjectId
@@ -251,7 +252,6 @@ model Order {
      updateAt DateTime @updatedAt
   }
 
-
   model Comuni {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     codiceIstat String
@@ -276,13 +276,17 @@ model Order {
   // prototipo
   model RaiderWorkTime {
         id String @id @default(auto()) @map("_id") @db.ObjectId
-        hours WorkTime    
+        hours WorkTime
+        cratedAt DateTime @default(now())
+        updateAt DateTime @updatedAt
   }
 
   // prototipo google DistanceMatrix => wsRouteDistance
   model DistanceMatrix {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     matrix DistanceMatrixType
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
   }
 // ***** Fine dataModel *****
 
@@ -292,3 +296,4 @@ model Order {
 //  - valutare flag stato consegna per ordini cancellati
 //  - aggiungere sedi attvità
 //  - aggiungere work time per filtri chiedere a fausto
+
