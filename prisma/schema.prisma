@@ -187,6 +187,7 @@ model Raider{
     workTime Float //da definire per i filtri
     preferiti String[] 
     blacklist String[]
+    rating Float
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt    
 }
@@ -309,6 +310,7 @@ model Order {
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt 
   }
+  
 // ***** Fine dataModel *****
 
 

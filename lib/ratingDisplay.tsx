@@ -22,6 +22,7 @@ const RatingDisplay: React.FC = () => {
       } catch (err: any) {
         console.error("Errore nel recupero dei dati:", err.message);
         setError(err.message || "Errore sconosciuto");
+        
       }
     };
 
@@ -37,6 +38,6 @@ const RatingDisplay: React.FC = () => {
   }
 
   return <p>Punteggio medio utente: {averageRating}</p>;
-};
+  };
 
 export default RatingDisplay;
