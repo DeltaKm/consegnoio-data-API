@@ -113,6 +113,25 @@ type GoogleAddressComponentType {
 }
 // ----- FINE GeocodingType vTEST  ----
 
+// ----- INIZIO DirectionType vTEST ----
+//prototipo
+type DirectionType {
+origin CordType
+destination CordType
+travelMode MetodoConsegnaEnum
+transitOptions String
+drivingOptions String
+unitSystem String
+waypoints String[]
+optimizeWaypoints Boolean
+provideRouteAlternatives Boolean
+avoidFerries Boolean
+avoidHigways Boolean
+avoidTolls Boolean
+region String
+}
+// ----- FINE DirectionType vTEST  ----
+
 // ***** Fine objType *****
 
 
@@ -136,7 +155,7 @@ enum StatoDisponibilitaEnum {
   Disponibile
   Occupato
 }
-
+//da effettuare il refactor per google
 enum MetodoConsegnaEnum {
   Bici  
   Auto
@@ -310,7 +329,8 @@ model Order {
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt 
   }
-  
+
+
 // ***** Fine dataModel *****
 
 
