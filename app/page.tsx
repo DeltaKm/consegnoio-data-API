@@ -10,12 +10,12 @@ import RatingDisplay from "@/lib/ratingDisplay";
 export default function Home() {
   return ( 
  
-        // <FetchComuni />
+        <FetchComuni />
 
-        <div>
-        <h1>Valutazioni Utenti</h1>
-        <RatingDisplay />
-        </div>       
+        // <div>
+        // <h1>Valutazioni Utenti</h1>
+        // <RatingDisplay />
+        // </div>       
        
   );
 }
