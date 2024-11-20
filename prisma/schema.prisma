@@ -185,7 +185,7 @@ model User {
     email String 
     username String 
     password String
-    role RuoloEnum
+    // role RuoloEnum  <= da implementare dopo i reference
     raiderId Raider?
     contractorId Contractor?    
     createdAt DateTime @default(now())

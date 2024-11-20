@@ -3,6 +3,7 @@
 //  zVal objType    r13    
 //  zVal dataModel  r66
 
+import { RuoloEnum } from "@prisma/client";
 import { z } from "zod"
 
 
@@ -72,6 +73,7 @@ export const userSchema = z.object({
     .refine((e) => e === "[email protetta]", "Questa email non è nel database"),
     usernname: z.string().min(5, alertMin + "5").max(10, alertMax + "10"),
     password: z.string().min(8, alertMin + "8").max(16, alertMax + "16"),
+    // role: z.enum()
 });
 
 export const orderSchema = z.object({
