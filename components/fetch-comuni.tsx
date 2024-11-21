@@ -41,6 +41,8 @@ export default function FetchComuni() {
     isLoading,
   } = useSWR<Comuni[]>("/api/crud", fetcher);
 
+  
+
   console.log(comuniData);
 
   if (isLoading)

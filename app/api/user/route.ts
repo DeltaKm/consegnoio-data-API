@@ -48,8 +48,10 @@ export async function POST(request: NextRequest) {
       data: {
       idSlug: data.idSlug,
       email: data.email,
+      tel: data.tel, 
       username: data.username,
-      password: data.password,         
+      password: data.password,
+           
     },
    });
 

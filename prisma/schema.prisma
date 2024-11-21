@@ -183,12 +183,12 @@ model User {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     idSlug String
     email String
-    tel String 
+    tel String
     username String 
     password String
     // role RuoloEnum  <= da implementare dopo i reference
-    raiderId Raider?
-    contractorId Contractor?    
+    // raiderId Raider?
+    // contractorId Contractor?    
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     @@unique([idSlug, email, username]) 
@@ -196,7 +196,7 @@ model User {
 
 model Raider{
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    user User @relation(fields: [userId], references: [id])
+    // user User @relation(fields: [userId], references: [id])
     userId String @unique @db.ObjectId    
     metodo MetodoConsegnaEnum
     stato StatoDisponibilitaEnum
@@ -214,7 +214,7 @@ model Raider{
 
 model Contractor {
       id String @id @default(auto()) @map("_id") @db.ObjectId
-      user User @relation(fields: [userId], references: [id])
+      // user User @relation(fields: [userId], references: [id])
       userId String @unique @db.ObjectId
       orderId Order?
       posizioneSede PosMapType[] // indirizzi sede
@@ -346,6 +346,16 @@ model Order {
     note String
     raiderId String // add reference
     createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
+  // prototipo
+  model Wallet {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String // reference
+    tokenName String // enum
+    valueEur Float
+    tokenAmmount Float
+    cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
 
