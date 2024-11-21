@@ -1,14 +1,13 @@
 "use client";
 
-
-import { useToast } from "@/hooks/use-toast"
 import { Button } from "./ui/button";
 import { 
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogTrigger
+    DialogTrigger,
+    DialogDescription
 } from "./ui/dialog";
 import { 
     Form,
@@ -31,7 +30,7 @@ export default function CreateComuni() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [isDialogOpen, setDialogOpen] = useState(false);
-    const { toast } = useToast()
+ 
 
     const form = useForm<ComuniSchema>({
         resolver: zodResolver(comuniSchema),
@@ -82,6 +81,7 @@ export default function CreateComuni() {
             <DialogContent className="sm:max-w-[425px] bg-white">
                 <DialogHeader>
                     <DialogTitle>Iserisci Comune</DialogTitle>
+                    <DialogDescription />
                 </DialogHeader>
 
                 {errorMessage && (
@@ -175,11 +175,6 @@ export default function CreateComuni() {
                             className="w-full relative"
                             variant='outline'                            
                             type="submit"
-                            onClick={() => {                                
-                                toast({
-                                  description: "Scheda caricata",                                  
-                                })
-                              }}
                         >
                             {isSubmitting && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-primary/50 rounded-md">

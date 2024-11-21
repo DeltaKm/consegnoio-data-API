@@ -8,7 +8,8 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogTrigger
+    DialogTrigger,
+    DialogDescription
 } from "./ui/dialog";
 import { 
     Form,
@@ -85,6 +86,7 @@ export default function CreateUser() {
             <DialogContent className="sm:max-w-[425px] bg-white">
                 <DialogHeader>
                     <DialogTitle>Iserisci User</DialogTitle>
+                    <DialogDescription />
                 </DialogHeader>
 
                 {errorMessage && (
