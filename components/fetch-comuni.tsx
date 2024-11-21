@@ -12,6 +12,7 @@ import {
 import DeleteComuni from "./delete-comuni";
 import CreateComuni from "./create-comuni";
 import DistanceMatrix from "./distance-matrix";
+import CreateUser from "./create-user";
 
 
 const fetcher = async (url: string) => {
@@ -75,7 +76,8 @@ export default function FetchComuni() {
         </Card>
       ))}
       <div className="pl-5">
-        <CreateComuni />
+        {/* <CreateComuni /> */}
+        <CreateUser />
       </div>
     </>
   );

@@ -66,13 +66,13 @@ export const datiMerceTypeSchema = z.object({
 
 // ***** Inizio validazione dataModel *****
 export const userSchema = z.object({
-    idSlug: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
+    idSlug: z.string().min(8, alertMin + "8").max(8, alertMax + "16"),
     email: z.string()
     .min(1, { message: "Questo capodo deve essere riempito" })
-    .email("Email non valida")
-    .refine((e) => e === "[email protetta]", "Questa email non è nel database"),
-    usernname: z.string().min(5, alertMin + "5").max(10, alertMax + "10"),
-    password: z.string().min(8, alertMin + "8").max(16, alertMax + "16"),   
+    .email("Email non valida"),
+    username: z.string().min(5, alertMin + "5").max(10, alertMax + "10"),
+    password: z.string().min(8, alertMin + "8").max(16, alertMax + "16"),
+    tel: z.string().min(8, alertMin + "8").max(16, alertMax + "16"),   
     // role: z.enum()
 });
 
@@ -106,7 +106,8 @@ export const nazioniSchema = z.object({
 });
 
 export const CustomerSchema = z.object({
-    name: z.string().min(2, alertMin + "2").max(16, alertMax + "16")
+    name: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    tel: z.string().min(5, alertMin + "5").max(16, alertMax + "16")
 });
 
 export const CustomerNoteSchema = z.object({

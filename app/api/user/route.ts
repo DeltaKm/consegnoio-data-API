@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       data: {
       idSlug: data.idSlug,
       email: data.email,
-      username: data.usernname,
+      username: data.username,
       password: data.password,         
     },
    });
