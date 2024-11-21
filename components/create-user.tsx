@@ -42,15 +42,20 @@ export default function CreateUser() {
         },
     });
 
-    const onSubmit = async (data: UserSchema) => {
-        const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+    const onSubmit = async (data: UserSchema) => {        
         setIsSubmitting(true);
-        setErrorMessage(""); // Azzera l'errore all'inizio
+        setErrorMessage("");
+
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+        const headers = {
+            "Content-Type": "application/json",
+            ...(apiKey && { "x-api-key": apiKey }), 
+          };
 
         try {
             const response = await fetch("/api/user", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "x-api-key": apiKey,},
+                headers,                
                 body: JSON.stringify(data),
             });
 
@@ -134,7 +139,7 @@ export default function CreateUser() {
                             name="username"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>username</FormLabel>
+                                    <FormLabel>Username</FormLabel>
                                     <FormControl>
                                         <Input className="resize-none" {...field} />
                                     </FormControl>
@@ -161,11 +166,6 @@ export default function CreateUser() {
                             className="w-full relative"
                             variant='outline'                            
                             type="submit"
-                            onClick={() => {                                
-                                toast({
-                                  description: "Scheda caricata",                                  
-                                })
-                              }}
                         >
                             {isSubmitting && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-primary/50 rounded-md">

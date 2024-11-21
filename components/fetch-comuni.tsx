@@ -75,10 +75,9 @@ export default function FetchComuni() {
           </CardContent>
         </Card>
       ))}
-      <div className="pl-5">
-        {/* <CreateComuni /> */}
-        <CreateUser />
-      </div>
+      <div className="px-5">
+        <CreateComuni /> <CreateUser />
+       </div>
     </>
   );
 }
