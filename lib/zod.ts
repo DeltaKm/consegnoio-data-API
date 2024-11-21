@@ -1,7 +1,7 @@
 
 // Index:
-//  zVal objType    r13    
-//  zVal dataModel  r66
+//  zVal objType    r14    
+//  zVal dataModel  r67
 
 import { RuoloEnum } from "@prisma/client";
 import { z } from "zod"
@@ -104,6 +104,14 @@ export const nazioniSchema = z.object({
    codiceBelfiore: z.string().min(4, alertMin + "4").max(4, alertMax + "4"),
    denominazioneNazione: z.number().min(1, alertMin + "1").max(20, alertMax + "20"), 
 });
+
+export const CustomerSchema = z.object({
+    name: z.string().min(2, alertMin + "2").max(16, alertMax + "16")
+});
+
+export const CustomerNoteSchema = z.object({
+    note: z.string().min(2, alertMin + "2").max(64, alertMax + "64")
+}); 
 // ***** Fine validazione dataModel *****
 
 

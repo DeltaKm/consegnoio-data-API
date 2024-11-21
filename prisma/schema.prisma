@@ -1,8 +1,8 @@
 
 // Index:
 //  objType    r17  
-//  enumType   r121  
-//  dataModel  r163
+//  enumType   r139  
+//  dataModel  r181
 
 generator client {
   provider = "prisma-client-js"
@@ -226,6 +226,7 @@ model Contractor {
 
 model Order {
   id String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId String
   user Contractor @relation(fields: [contractorId], references: [id])
   contractorId String @unique @db.ObjectId
   hashQrFirma String
@@ -333,7 +334,8 @@ model Order {
   model Customer { 
     id String @id @default(auto()) @map("_id") @db.ObjectId
     name String
-    address IndirizzoType
+    tel String
+    address PosMapType
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
@@ -345,7 +347,6 @@ model Order {
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
-
 
 // ***** Fine dataModel *****
 
