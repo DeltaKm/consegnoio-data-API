@@ -329,6 +329,22 @@ model Order {
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt 
   }
+  // prototipo
+  model Customer { 
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+    address IndirizzoType
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
+  // prototipo
+  model CustomerNote {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    note String
+    raiderId String // add reference
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
 
 
 // ***** Fine dataModel *****
