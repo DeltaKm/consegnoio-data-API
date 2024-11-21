@@ -157,9 +157,9 @@ enum StatoDisponibilitaEnum {
 }
 //da effettuare il refactor per google
 enum MetodoConsegnaEnum {
-  Bici  
-  Auto
-  SenzaVeicolo
+  Driving  
+  Walking
+  bicycling
 }
 
 enum RuoloEnum {
@@ -182,7 +182,8 @@ enum StatoConsegnaEnum {
 model User {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     idSlug String
-    email String 
+    email String
+    tel String 
     username String 
     password String
     // role RuoloEnum  <= da implementare dopo i reference
@@ -218,8 +219,8 @@ model Contractor {
       orderId Order?
       posizioneSede PosMapType[] // indirizzi sede
       storicoConsegne String[] // add reference to Delivery
-      preferiti String[]
-      blacklist String[]
+      preferitiId String[]
+      blacklistId String[]
       createdAt DateTime @default(now())
       updatedAt DateTime @updatedAt            
 }

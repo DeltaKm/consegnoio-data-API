@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       idSlug: data.idSlug,
       email: data.email,
       username: data.usernname,
-      password: data.password,    
+      password: data.password,         
     },
    });
 
