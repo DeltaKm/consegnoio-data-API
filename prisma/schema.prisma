@@ -53,8 +53,9 @@ type PosMapType {
   }
 
 type CostoType {
-  pagamentoAllaConsegna Boolean
+  freeDelivery Boolean
   quota Float
+  pagamento metodoPagamento
 }
 
 type DatiMerceType {
@@ -137,9 +138,13 @@ region String
 
 
 // ***** Inizio enumType *****
+enum metodoPagamento {
+  cashOnDelivery
+  paid  
+}
+
 enum StatusCodes {
-  NotFound 
- 
+  NotFound  
 }
 enum CittadinanzaEnum {
   Italiana
@@ -159,7 +164,7 @@ enum StatoDisponibilitaEnum {
 enum MetodoConsegnaEnum {
   Driving  
   Walking
-  bicycling
+  Bicycling
 }
 
 enum RuoloEnum {
