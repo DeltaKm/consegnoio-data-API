@@ -102,7 +102,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 			where: { id },
 			data: {
 				denominazioneIta: 'Caserta',
-				denominazioneRegione: 'Campania',
+				denominazioneRegione: 'Campania',  
 				cap: '00000',
 			},
 		});

@@ -5,13 +5,9 @@ import FetchComuni from "@/components/fetch-comuni";
 
 
 
-
-
 export default function Home() {
-  return ( 
- 
-        <FetchComuni />
-       
+  return (  
+        <FetchComuni />       
   );
 }
 

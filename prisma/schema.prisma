@@ -1,8 +1,8 @@
 
 // Index:
 //  objType    r17  
-//  enumType   r139  
-//  dataModel  r181
+//  enumType   r140  
+//  dataModel  r186
 
 generator client {
   provider = "prisma-client-js"
@@ -240,6 +240,7 @@ model Order {
   dataOreConsegnaPrevista DateTime
   indirizzoRitiro PosMapType
   indirizzoConsegna PosMapType
+  distanza String
   note String
   quotaRaider Float
   quota CostoType

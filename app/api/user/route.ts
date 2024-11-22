@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
            
     },
    });
-
+   
     return NextResponse.json(newUser, { status: StatusCodes.Created });
   } catch (error) {
     console.error("Errore durante la creazione dell'utente", error);
