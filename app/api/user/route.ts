@@ -2,6 +2,7 @@ import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { userSchema,type UserSchema } from "@/lib/zod";
 import { RuoloEnum } from "@prisma/client";
+import { hash, compare } from "@/lib/hash";
 
 
 
@@ -44,13 +45,14 @@ export async function POST(request: NextRequest) {
     }
 
     const data = result.data;
+
     const newUser = await prisma.user.create({ 
       data: {
       idSlug: data.idSlug,
       email: data.email,
       tel: data.tel, 
       username: data.username,
-      password: data.password,
+      password: await hash(data.password),
            
     },
    });

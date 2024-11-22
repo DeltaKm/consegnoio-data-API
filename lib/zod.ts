@@ -72,7 +72,8 @@ export const userSchema = z.object({
     .email("Email non valida"),
     username: z.string().min(5, alertMin + "5").max(10, alertMax + "10"),
     password: z.string().min(8, alertMin + "8").max(16, alertMax + "16"),
-    tel: z.string().min(8, alertMin + "8").max(16, alertMax + "16"),   
+    tel: z.string().min(8, alertMin + "8").max(16, alertMax + "16"), 
+      
     // role: z.enum()
 });
 
