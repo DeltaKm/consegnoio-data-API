@@ -20,9 +20,8 @@ export async function GET() {
     const users = await prisma.user.findMany({
       orderBy: { createdAt: "desc" },
     });
-    
 
-    return NextResponse.json(users , { status: StatusCodes.Success });
+    return NextResponse.json(users, { status: StatusCodes.Success });
   } catch (error) {
     console.error("Errore durante il fetch degli utenti", error);
     return NextResponse.json(
