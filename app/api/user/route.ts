@@ -20,8 +20,9 @@ export async function GET() {
     const users = await prisma.user.findMany({
       orderBy: { createdAt: "desc" },
     });
+    
 
-    return NextResponse.json(users, { status: StatusCodes.Success });
+    return NextResponse.json(users , { status: StatusCodes.Success });
   } catch (error) {
     console.error("Errore durante il fetch degli utenti", error);
     return NextResponse.json(
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const result = userSchema.safeParse(body);
+     
 
     if (!result.success) {
       return NextResponse.json(
@@ -52,8 +54,7 @@ export async function POST(request: NextRequest) {
       email: data.email,
       tel: data.tel, 
       username: data.username,
-      password: await hash(data.password),
-           
+      password: await hash(data.password),           
     },
    });
    
