@@ -3,7 +3,7 @@
 //  zVal objType    r14    
 //  zVal dataModel  r67
 
-import { RuoloEnum } from "@prisma/client";
+import { RuoloEnum, PosMapType, Customer } from "@prisma/client";
 import { z } from "zod"
 
 
@@ -107,8 +107,8 @@ export const nazioniSchema = z.object({
 });
 
 export const CustomerSchema = z.object({
-    name: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
-    tel: z.string().min(5, alertMin + "5").max(16, alertMax + "16")
+    name: z.string().min(2, alertMin + "2").max(20, alertMax + "20"),
+    tel: z.string().min(2, alertMin + "2").max(20, alertMax + "20"),
 });
 
 export const CustomerNoteSchema = z.object({
@@ -124,12 +124,11 @@ export const WalletSchema = z.object({
 // ***** Fine validazione dataModel *****
 
 
-export type AnagraficaUserTypeSchema = z.infer<typeof anagraficaUserTypeSchema>;
 export type UserSchema = z.infer<typeof userSchema>;
 export type ComuniSchema = z.infer<typeof comuniSchema>;
-export type CustomerSchema = z.infer<typeof customerSchema>;
+export type CustomerSchema = z.infer<typeof customerSchema>; //<= da fixare
 
 export const schemas = {
     userSchema,
-    anagraficaUserTypeSchema,
+    CustomerSchema // da fixare
 };

@@ -1,6 +1,6 @@
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { customerSchema,type CustomerSchema } from "@/lib/zod";
+import { customerSchema,type CustomerSchema } from "@/lib/zod"; // dafixare
 
 
 
