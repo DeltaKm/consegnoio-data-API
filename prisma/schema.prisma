@@ -364,7 +364,6 @@ model Order {
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
-
 // ***** Fine dataModel *****
 
 

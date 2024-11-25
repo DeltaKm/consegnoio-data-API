@@ -127,6 +127,7 @@ export const WalletSchema = z.object({
 export type AnagraficaUserTypeSchema = z.infer<typeof anagraficaUserTypeSchema>;
 export type UserSchema = z.infer<typeof userSchema>;
 export type ComuniSchema = z.infer<typeof comuniSchema>;
+export type CustomerSchema = z.infer<typeof customerSchema>;
 
 export const schemas = {
     userSchema,
