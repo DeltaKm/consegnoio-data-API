@@ -9,8 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import DeleteComuni from "./delete-comuni";
-import CreateComuni from "./create-comuni";
+import DeleteUser from "./delete-user";
 import CreateUser from "./create-user";
 
 
@@ -68,7 +67,7 @@ export default function FetchUser() {
       {view.map((e) => (
         <Card className="group relative mx-5 my-8 max-w-[100%]" key={e.id}>
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <DeleteComuni id={e.id} />
+            <DeleteUser id={e.id} />
           </div>
 
           <CardHeader>
