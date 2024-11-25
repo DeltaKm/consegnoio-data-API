@@ -7,13 +7,13 @@ import { mutate } from "swr"
 export default function DeleteComuni({ id } : { id : string }) {
 
     const handleDelete = async () => {
-        const response = await fetch(`/api/crud?id=${id}`, {
+        const response = await fetch(`/api/v1/crud?id=${id}`, {
             method: "DELETE",
         });
 
         if(response.ok) {
             console.log("Collezione eliminata");
-            mutate("/api/crud");
+            mutate("/api/v1/crud");
         } else {
             console.error("Errore eliminazione lista")
         }        

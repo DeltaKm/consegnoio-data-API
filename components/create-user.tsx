@@ -54,7 +54,7 @@ export default function CreateUser() {
           };
 
         try {
-            const response = await fetch("/api/user", {
+            const response = await fetch("/api/v1/user", {
                 method: "POST",
                 headers,                
                 body: JSON.stringify(data),
@@ -65,7 +65,7 @@ export default function CreateUser() {
                 throw new Error(responseData.message || "Errore di caricamento");
             }
 
-            await mutate("/api/user");
+            await mutate("/api/v1/user");
             form.reset();
             setDialogOpen(false);
 

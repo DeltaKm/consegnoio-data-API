@@ -40,7 +40,7 @@ export default function FetchUser() {
     data: userData,
     error,
     isLoading,
-  } = useSWR<User[]>("/api/user", fetcher);
+  } = useSWR<User[]>("/api/v1/user", fetcher);
 
   
 

@@ -12,9 +12,6 @@ import usePlacesAutocomplete, {
   getLatLng,
 } from 'use-places-autocomplete';
 import styles from '@/components/styles/Home.module.css';
-
-import { useToast } from "@/hooks/use-toast"
-import { Button } from "@/components/ui/button"
 import { ToastDemo } from './get';
 
 export default function RouteToID() {

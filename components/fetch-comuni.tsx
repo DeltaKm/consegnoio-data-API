@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import DeleteComuni from "./delete-comuni";
 import CreateComuni from "./create-comuni";
-import DistanceMatrix from "./distance-matrix";
 import CreateUser from "./create-user";
 
 
@@ -39,7 +38,7 @@ export default function FetchComuni() {
     data: comuniData,
     error,
     isLoading,
-  } = useSWR<Comuni[]>("/api/crud", fetcher);
+  } = useSWR<Comuni[]>("/api/v1/crud", fetcher);
 
   
 

@@ -11,7 +11,7 @@ export default function DeleteUser({ id } : { id : string }) {
         ...(apiKey && { "x-api-key": apiKey }), 
       };
     const handleDelete = async () => {
-        const response = await fetch(`/api/user?id=${id}`, {
+        const response = await fetch(`/api/v1/user?id=${id}`, {
             method: "DELETE",
             headers            
         });
