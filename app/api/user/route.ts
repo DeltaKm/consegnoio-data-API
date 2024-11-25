@@ -1,7 +1,6 @@
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { userSchema,type UserSchema } from "@/lib/zod";
-import { RuoloEnum } from "@prisma/client";
 import { hash, compare } from "@/lib/hash";
 
 
