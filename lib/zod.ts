@@ -113,7 +113,14 @@ export const CustomerSchema = z.object({
 
 export const CustomerNoteSchema = z.object({
     note: z.string().min(2, alertMin + "2").max(64, alertMax + "64")
-}); 
+});
+
+export const WalletSchema = z.object({
+    userId: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    tokenName: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    valueEur: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
+    tokenAmmount: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
+})
 // ***** Fine validazione dataModel *****
 
 
