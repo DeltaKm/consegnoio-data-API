@@ -168,9 +168,11 @@ enum MetodoConsegnaEnum {
 }
 
 enum RuoloEnum {
+  SuperAdmin
   Raider 
   Contractor
   RaiderContractor
+  BusinessAdmin
 }
 
 enum StatoConsegnaEnum {
@@ -423,7 +425,7 @@ model Order {
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
-//prototipo raider profile
+// prototipo raider profile
   model ViewRaider {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     raiderId String // reference
@@ -433,7 +435,7 @@ model Order {
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
-
+// prototitpo contractor profile
   model ViewContractor {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     contractorId String //reference
