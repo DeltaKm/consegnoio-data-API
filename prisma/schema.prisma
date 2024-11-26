@@ -187,8 +187,13 @@ enum StatoConsegnaEnum {
 model User {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     idSlug String
-    email String
+    name String?
+    email String? @unique
     tel String
+    image String?
+    accounts Account[]
+    sessions Session[]
+    Authenticator Authenticator[]
     username String 
     password String
     // role RuoloEnum  <= da implementare dopo i reference
@@ -198,34 +203,90 @@ model User {
     updatedAt DateTime @updatedAt
     @@unique([idSlug, email, username]) 
 }
+ 
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+}
+ 
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@unique([identifier, token])
+}
+ 
+
+model Authenticator {
+  credentialID         String  @id @map("_id")
+  userId               String  @db.ObjectId
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String? 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([userId, credentialID])
+}
 
 model Raider{
-    id String @id @default(auto()) @map("_id") @db.ObjectId
-    metodo MetodoConsegnaEnum
-    stato StatoDisponibilitaEnum
-    preferenze PreferenzeZonaRaiderType
-    isOnWorkFlag Boolean // attivo se il raider ha preso in carico una consegna
-    raiderPosition CordType
-    storicoConsegne String[] // add reference to Delivery 
-    workTime Float //da definire per i filtri
-    preferiti String[] 
-    blacklist String[]
-    rating Float
-    createdAt DateTime @default(now())
-    updateAt DateTime @updatedAt    
+ id String @id @default(auto()) @map("_id") @db.ObjectId
+ metodo MetodoConsegnaEnum
+ stato StatoDisponibilitaEnum
+ preferenze PreferenzeZonaRaiderType
+ isOnWorkFlag Boolean // attivo se il raider ha preso in carico una consegna
+ raiderPosition CordType
+ storicoConsegne String[] // add reference to Delivery 
+ workTime Float //da definire per i filtri
+ preferiti String[] 
+ blacklist String[]
+ rating Float
+ createdAt DateTime @default(now())
+ updateAt DateTime @updatedAt    
 }
 
 model Contractor {
-      id String @id @default(auto()) @map("_id") @db.ObjectId
-      // user User @relation(fields: [userId], references: [id])
-      userId String @unique @db.ObjectId
-      orderId Order?
-      posizioneSede PosMapType[] // indirizzi sede
-      storicoConsegne String[] // add reference to Delivery
-      preferitiId String[]
-      blacklistId String[]
-      createdAt DateTime @default(now())
-      updatedAt DateTime @updatedAt            
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+   // user User @relation(fields: [userId], references: [id])
+  userId String @unique @db.ObjectId
+  orderId Order?
+  posizioneSede PosMapType[] // indirizzi sede
+  storicoConsegne String[] // add reference to Delivery
+  preferitiId String[]
+  blacklistId String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt            
 }
 
 model Order {
@@ -371,6 +432,7 @@ model Order {
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+
 
 
 // ***** Fine dataModel *****
