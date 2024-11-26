@@ -362,6 +362,17 @@ model Order {
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+//prototipo raider profile
+  model ViewRaider {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    raiderId String // reference
+    numeroConsegne Int
+    areaConsegna String[]
+    cratedAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
+
+
 // ***** Fine dataModel *****
 
 
