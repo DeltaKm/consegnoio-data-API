@@ -28,7 +28,6 @@ export async function GET() {
       { status: StatusCodes.InternalServerError }
     );
   }
-}
 
 // POST: Crea un nuovo utente
 export async function POST(request: NextRequest) {
