@@ -71,13 +71,13 @@ export default function FetchUser() {
           </div>
 
           <CardHeader>
-            <CardTitle>{e.username}</CardTitle>
+            <CardTitle>User: {e.username}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="truncate">{e.password}</p>
+          <p>Hashed PWD:</p>            
           </CardContent>
           <CardContent >
-            <p>Match:</p>
+          <p className="truncate">{e.password}</p>            
           </CardContent>
         </Card>
       ))}

@@ -193,7 +193,7 @@ model User {
     password String
     // role RuoloEnum  <= da implementare dopo i reference
     // raiderId Raider?
-    // contractorId Contractor?    
+    // contractorId Contractor?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     @@unique([idSlug, email, username]) 
@@ -201,8 +201,6 @@ model User {
 
 model Raider{
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    // user User @relation(fields: [userId], references: [id])
-    userId String @unique @db.ObjectId    
     metodo MetodoConsegnaEnum
     stato StatoDisponibilitaEnum
     preferenze PreferenzeZonaRaiderType
