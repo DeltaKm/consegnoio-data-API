@@ -429,12 +429,19 @@ model Order {
     raiderId String // reference
     numeroConsegne Int
     areaConsegna String[]
+    rating String // reference
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
 
-
-
+  model ViewContractor {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    contractorId String //reference
+    areaCosnegna String[]
+    rating String // reference
+    cratedAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
 // ***** Fine dataModel *****
 
 
