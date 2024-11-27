@@ -109,7 +109,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
 		return NextResponse.json(updated);
 	} catch (error) {
-		console.log('error');
+		console.log(error);
 	}
 }
 

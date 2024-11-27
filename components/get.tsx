@@ -4,8 +4,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 
 type ToastProps = {
-    lat: Number
-    long: Number
+    lat: number
+    long: number
 }
 
 export const ToastDemo = ({lat, long}: ToastProps) => {

@@ -1,7 +1,7 @@
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { userSchema,type UserSchema } from "@/lib/zod";
-import { hash, compare } from "@/lib/hash";
+import { userSchema } from "@/lib/zod";
+import { hash } from "@/lib/hash";
 
 
 
