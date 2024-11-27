@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(req: NextRequest) {
 
-  // if(req.method === 'OPTIONS'){
-  //   return NextResponse.json({status : 200})
-  // }
+  if(req.method === 'OPTIONS'){
+    return NextResponse.json({status : 200})
+  }
   const apiKeyHeader = req.headers.get('x-api-key'); 
   const apiKeyQuery = req.nextUrl.searchParams.get('apiKey'); 
 
