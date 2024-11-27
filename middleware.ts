@@ -6,7 +6,7 @@ export function middleware(req: NextRequest) {
 
   const apiKey = apiKeyHeader || apiKeyQuery; 
 
-  if (!apiKey || apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
+  if (!apiKey || apiKey !== process.env.API_KEY) {
     return NextResponse.json(
       { error: "Non autorizzato: API Key non valida" },
       { status: 401 }
@@ -14,7 +14,7 @@ export function middleware(req: NextRequest) {
     );
   }
   // debug
-console.log(process.env.NEXT_PUBLIC_API_KEY)
+console.log(process.env.API_KEY)
   return NextResponse.next();
 }
 
