@@ -189,13 +189,13 @@ enum StatoConsegnaEnum {
 model User {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     idSlug String
-    name String?
-    email String? @unique
+    name String
+    email String
     tel String
-    image String?
-    accounts Account[]
-    sessions Session[]
-    Authenticator Authenticator[]
+    // image String?
+    // accounts Account[]
+    // sessions Session[]
+    // Authenticator Authenticator[]
     username String 
     password String
     // role RuoloEnum  <= da implementare dopo i reference
@@ -206,61 +206,61 @@ model User {
     @@unique([idSlug, email, username]) 
 }
  
-model Account {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String  @db.ObjectId
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.String
-  access_token      String? @db.String
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.String
-  session_state     String?
+// model Account {
+//   id                String  @id @default(auto()) @map("_id") @db.ObjectId
+//   userId            String  @db.ObjectId
+//   type              String
+//   provider          String
+//   providerAccountId String
+//   refresh_token     String? @db.String
+//   access_token      String? @db.String
+//   expires_at        Int?
+//   token_type        String?
+//   scope             String?
+//   id_token          String? @db.String
+//   session_state     String?
  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
  
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
  
-  @@unique([provider, providerAccountId])
-}
+//   @@unique([provider, providerAccountId])
+// }
  
-model Session {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  sessionToken String   @unique
-  userId       String   @db.ObjectId
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+// model Session {
+//   id           String   @id @default(auto()) @map("_id") @db.ObjectId
+//   sessionToken String   @unique
+//   userId       String   @db.ObjectId
+//   expires      DateTime
+//   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
  
-model VerificationToken {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifier String
-  token      String
-  expires    DateTime
+// model VerificationToken {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   identifier String
+//   token      String
+//   expires    DateTime
  
-  @@unique([identifier, token])
-}
+//   @@unique([identifier, token])
+// }
  
 
-model Authenticator {
-  credentialID         String  @id @map("_id")
-  userId               String  @db.ObjectId
-  providerAccountId    String
-  credentialPublicKey  String
-  counter              Int
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String? 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+// model Authenticator {
+//   credentialID         String  @id @map("_id")
+//   userId               String  @db.ObjectId
+//   providerAccountId    String
+//   credentialPublicKey  String
+//   counter              Int
+//   credentialDeviceType String
+//   credentialBackedUp   Boolean
+//   transports           String? 
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
  
-  @@unique([userId, credentialID])
-}
+//   @@unique([userId, credentialID])
+// }
 
 model Raider{
  id String @id @default(auto()) @map("_id") @db.ObjectId
