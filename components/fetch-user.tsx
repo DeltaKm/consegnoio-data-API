@@ -1,6 +1,6 @@
 "use client";
 
-import { Comuni, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import useSWR from "swr";
 
 import {
