@@ -13,6 +13,7 @@ export function middleware(req: NextRequest) {
       
     );
   }
+  // debug
 console.log(process.env.NEXT_PUBLIC_API_KEY)
   return NextResponse.next();
 }
