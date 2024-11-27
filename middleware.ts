@@ -13,8 +13,7 @@ export function middleware(req: NextRequest) {
       
     );
   }
-  // debug
-console.log(process.env.API_KEY)
+
   return NextResponse.next();
 }
 
