@@ -35,9 +35,10 @@ export default function CreateUser() {
         defaultValues: {
             idSlug: "",
             email: "",
+            tel: "",
             username: "",
             password: "",
-            tel: ""           
+                       
         },
     });
 

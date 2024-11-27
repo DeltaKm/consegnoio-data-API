@@ -189,7 +189,6 @@ enum StatoConsegnaEnum {
 model User {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     idSlug String
-    name String
     email String
     tel String
     // image String?
