@@ -10,9 +10,10 @@ export function middleware(req: NextRequest) {
     return NextResponse.json(
       { error: "Non autorizzato: API Key non valida" },
       { status: 401 }
+      
     );
   }
-
+console.log(process.env.NEXT_PUBLIC_API_KEY)
   return NextResponse.next();
 }
 
