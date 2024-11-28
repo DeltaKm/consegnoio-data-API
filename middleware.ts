@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// **** INIZIO CORS POLICY => da implementare
+const allowedOrigins = ['https://acme.com', 'https://my-app.org']
+ 
+const corsOptions = {
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+}
+// *** FINE CORS POLICY
+
 export function middleware(req: NextRequest) {
 
   if(req.method === 'OPTIONS'){
-    return NextResponse.json({status : 200})
+    return NextResponse.json({status: 200})
   }
+  
   const apiKeyHeader = req.headers.get('x-api-key'); 
   const apiKeyQuery = req.nextUrl.searchParams.get('apiKey'); 
 
