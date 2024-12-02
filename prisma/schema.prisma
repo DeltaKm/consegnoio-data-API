@@ -486,6 +486,18 @@ model ClientMobileConfig {
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
 }
+
+// prototipo chat rapida Contractor <=> Raider
+model ChatLog {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  presetMesagge String [] @db.ObjectId
+  textMessage String [] @db.ObjectId
+  raiderId String @db.ObjectId // reference
+  contractorId String @db.ObjectId // reference
+  ttl DateTime
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+}
 // ***** Fine dataModel *****
 
 
