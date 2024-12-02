@@ -470,6 +470,22 @@ model Order {
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+
+// prototipo
+  model ClientDashBoardConfig {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    path String[] @db.ObjectId
+    crertedAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
+
+// protitipo
+model ClientMobileConfig {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  path String[] @db.ObjectId
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+}
 // ***** Fine dataModel *****
 
 
