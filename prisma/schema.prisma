@@ -498,6 +498,16 @@ model ChatLog {
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
 }
+
+// protitipo
+ model FirebaseNotification {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  config String [] @db.ObjectId
+  message String [] @db.ObjectId
+  schedule String [] @db.ObjectId
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+ }
 // ***** Fine dataModel *****
 
 
