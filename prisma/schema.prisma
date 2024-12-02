@@ -443,6 +443,33 @@ model Order {
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+
+  model CorsConfig {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    methods String []
+    cotent String @db.ObjectId
+    log String @db.ObjectId
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
+
+  model CoreConfig {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    ModileClientParam String @db.ObjectId
+    DashBoardParam String  @db.ObjectId
+    SeviceParam String @db.ObjectId
+    CloudParam String @db.ObjectId
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
+
+  model VercelConfig {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    amazonUrl String
+    googleUrl String
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
 // ***** Fine dataModel *****
 
 
