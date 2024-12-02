@@ -480,7 +480,7 @@ model Order {
   }
 
 // protitipo
-model ClientMobileConfig {
+  model ClientMobileConfig {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   path String[] @db.ObjectId
   createdAt DateTime @default(now())
@@ -500,7 +500,7 @@ model ChatLog {
 }
 
 // protitipo
- model FirebaseNotification {
+model FirebaseNotification {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   config String [] @db.ObjectId
   message String [] @db.ObjectId
@@ -508,6 +508,17 @@ model ChatLog {
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
  }
+
+ // protitipo
+ model PrevDDSconfig {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  url String
+  cloudflareConfig String [] @db.ObjectId
+  tpcFirewall String [] @db.ObjectId
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+ }
+
 // ***** Fine dataModel *****
 
 
