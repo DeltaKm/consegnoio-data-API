@@ -19,12 +19,13 @@ type CordType {
   lat Float
   long Float
 }
-
+// Token metaData standard ERC20 => da implementare in model
 type Token {
-    Name String
-    Slug String
-    deciaml Int
-    valueEur Float
+  tokenName String
+  tokenSumbol String
+  decimalPlaces Int
+  totalSupply Float
+  eurValue Float
   }
 
 type DatiFiscaliType {

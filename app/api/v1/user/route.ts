@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       email: data.email,
       tel: data.tel, 
       username: data.username,
-      password: await hash(data.password),           
+      password: await hash(data.password),       
     },
    });
    
