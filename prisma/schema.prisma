@@ -199,6 +199,7 @@ model User {
     idSlug String
     email String
     tel String
+    profileImg String @default("/asset/img/logoconsegnoio.svg")
     // image String?
     // accounts Account[]
     // sessions Session[]
@@ -518,6 +519,24 @@ model FirebaseNotification {
   updateAt DateTime @updatedAt
  }
 
+ model FirebaseRaiderNotification {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  presetMessage String []
+  message String
+  ttl DateTime
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+ }
+
+ model FirebaseContractorNotification {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  presetMessage String []
+  message String
+  ttl DateTime
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+ }
+
  // protitipo
  model PrevDDSconfig {
   id String @id @default(auto()) @map("_id") @db.ObjectId
@@ -547,6 +566,9 @@ model TrackingRaider {
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
 }
+
+
+
 // ***** Fine dataModel *****
 
 
