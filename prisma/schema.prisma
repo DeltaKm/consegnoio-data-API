@@ -2,7 +2,7 @@
 // Index:
 //  objType    r17  
 //  enumType   r140  
-//  dataModel  r186
+//  dataModel  r196
 
 generator client {
   provider = "prisma-client-js"
@@ -551,7 +551,7 @@ model FirebaseNotification {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   addressCompare GoogleAddressComponentType []
   addressSetMultyDelivert GoogleAddressComponentType []
-  isActive Boolean
+  isActive Boolean @default(false)
   ttl DateTime
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
@@ -561,14 +561,20 @@ model TrackingRaider {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   lastPosition PosMapType []
   livePosition PosMapType []
-  isTracking Boolean
+  isTracking Boolean @default(false)
   ttl DateTime
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
 }
 
-
-
+model DeliveryArea {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  radiusRangeCord CordType []
+  location GoogleAddressComponentType []
+  creatdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  }
 // ***** Fine dataModel *****
 
 
