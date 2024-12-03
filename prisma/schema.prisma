@@ -144,7 +144,7 @@ enum metodoPagamento {
 }
 
 enum StatusCodes {
-  NotFound  
+  NotFound
 }
 enum CittadinanzaEnum {
   Italiana
@@ -180,6 +180,14 @@ enum StatoConsegnaEnum {
   inConsegna
   Consegnato
   Cancellato
+}
+
+enum presetMesagge {
+  Type1
+  Type2
+  Type3
+  Type4
+  Type5
 }
 // ***** Fine enumType *****
 
@@ -505,6 +513,7 @@ model FirebaseNotification {
   config String [] @db.ObjectId
   message String [] @db.ObjectId
   schedule String [] @db.ObjectId
+  ttl DateTime
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
  }
@@ -518,6 +527,17 @@ model FirebaseNotification {
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
  }
+
+ model MultiDeliverySystem {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  addressCompare GoogleAddressComponentType []
+  addressSetMultyDelivert GoogleAddressComponentType []
+  isActive Boolean
+  ttl DateTime
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+ }
+
 
 // ***** Fine dataModel *****
 
