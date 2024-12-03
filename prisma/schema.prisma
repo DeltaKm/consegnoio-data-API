@@ -2,7 +2,7 @@
 // Index:
 //  objType    r17  
 //  enumType   r146  
-//  dataModel  r202
+//  dataModel  r204
 
 generator client {
   provider = "prisma-client-js"
@@ -20,7 +20,7 @@ type CordType {
   long Float
 }
 // Token metaData standard ERC20 => da implementare in model
-type Token {
+type TokenType {
   tokenName String
   tokenSumbol String
   decimalPlaces Int
@@ -435,7 +435,7 @@ model Order {
   model Wallet {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     userId String // reference
-    token Token
+    token TokenType
     tokenAmmount Float 
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
