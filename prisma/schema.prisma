@@ -247,19 +247,19 @@ model VerificationToken {
 }
  
 
-// model Authenticator {
-//   credentialID         String  @id @map("_id")
-//   userId               String  @db.ObjectId
-//   providerAccountId    String
-//   credentialPublicKey  String
-//   counter              Int
-//   credentialDeviceType String
-//   credentialBackedUp   Boolean
-//   transports           String? 
-//   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Authenticator {
+  credentialID         String  @id @map("_id")
+  userId               String  @db.ObjectId
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String? 
+  // user User @relation(fields: [userId], references: [id], onDelete: Cascade)
  
-//   @@unique([userId, credentialID])
-// }
+  @@unique([userId, credentialID])
+}
 
 model Raider{
  id String @id @default(auto()) @map("_id") @db.ObjectId
