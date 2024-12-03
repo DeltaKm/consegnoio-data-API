@@ -567,13 +567,27 @@ model TrackingRaider {
   updateAt DateTime @updatedAt
 }
 
-model DeliveryArea {
+model DeliveryAreaPlus {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId
   radiusRangeCord CordType []
   location GoogleAddressComponentType []
   creatdAt DateTime @default(now())
   updateAt DateTime @updatedAt
+  }
+
+  model RaiderConfig {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    config String [] @db.ObjectId
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
+
+  model ContractorConfig {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    config String [] @db.ObjectId
+    cratedAt DateTime @default(now())
+    updateAt DateTime @updatedAt
   }
 // ***** Fine dataModel *****
 
