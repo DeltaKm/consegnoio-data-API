@@ -576,14 +576,14 @@ model DeliveryAreaPlus {
   updateAt DateTime @updatedAt
   }
 
-  model RaiderConfig {
+  model RaiderAppConfig {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     config String [] @db.ObjectId
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
 
-  model ContractorConfig {
+  model ContractorAppConfig {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     config String [] @db.ObjectId
     cratedAt DateTime @default(now())
