@@ -1,8 +1,8 @@
 
 // Index:
 //  objType    r17  
-//  enumType   r140  
-//  dataModel  r196
+//  enumType   r146  
+//  dataModel  r202
 
 generator client {
   provider = "prisma-client-js"
@@ -19,6 +19,12 @@ type CordType {
   lat Float
   long Float
 }
+
+type Token {
+    Name String
+    deciaml Int
+    valueEur Float
+  }
 
 type DatiFiscaliType {
   codiceFisclale String
@@ -428,15 +434,9 @@ model Order {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     userId String // reference
     token Token
-    tokenAmmount Float
+    tokenAmmount Float 
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
-  }
-
-  type Token {
-    Name String
-    deciaml Int
-    valueEur Float
   }
 // prototipo raider profile
   model ViewRaider {
