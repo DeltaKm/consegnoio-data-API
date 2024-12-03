@@ -227,24 +227,24 @@ model Account {
   @@unique([provider, providerAccountId])
 }
  
-// model Session {
-//   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-//   sessionToken String   @unique
-//   userId       String   @db.ObjectId
-//   expires      DateTime
-//   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-// }
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  // user         User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
  
-// model VerificationToken {
-//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-//   identifier String
-//   token      String
-//   expires    DateTime
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
  
-//   @@unique([identifier, token])
-// }
+  @@unique([identifier, token])
+}
  
 
 // model Authenticator {
