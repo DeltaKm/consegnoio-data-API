@@ -22,6 +22,7 @@ type CordType {
 
 type Token {
     Name String
+    Slug String
     deciaml Int
     valueEur Float
   }
