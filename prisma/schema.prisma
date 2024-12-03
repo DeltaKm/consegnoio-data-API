@@ -538,7 +538,15 @@ model FirebaseNotification {
   updateAt DateTime @updatedAt
  }
 
-
+model TrackingRaider {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  lastPosition PosMapType []
+  livePosition PosMapType []
+  isTracking Boolean
+  ttl DateTime
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+}
 // ***** Fine dataModel *****
 
 
