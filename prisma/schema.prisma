@@ -599,6 +599,7 @@ model DeliveryAreaPlus {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     config String [] @db.ObjectId
     providerData String [] @db.ObjectId
+    dbDriver String [] @db.ObjectId
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
@@ -607,9 +608,11 @@ model DeliveryAreaPlus {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     config String [] @db.ObjectId
     providerData String [] @db.ObjectId
+    dbDriver String [] @db.ObjectId
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
-  }
+  }  
+
 // ***** Fine dataModel *****
 
 
