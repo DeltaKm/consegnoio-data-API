@@ -427,11 +427,16 @@ model Order {
   model Wallet {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     userId String // reference
-    tokenName String // enum
-    valueEur Float
+    token Token
     tokenAmmount Float
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
+  }
+
+  type Token {
+    Name String
+    deciaml Int
+    valueEur Float
   }
 // prototipo raider profile
   model ViewRaider {
@@ -586,6 +591,22 @@ model DeliveryAreaPlus {
   model ContractorAppConfig {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     config String [] @db.ObjectId
+    cratedAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
+
+  model AdminDashboardConfig {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    config String [] @db.ObjectId
+    providerData String [] @db.ObjectId
+    cratedAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
+
+  model BusinessDashboardConfig {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    config String [] @db.ObjectId
+    providerData String [] @db.ObjectId
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
