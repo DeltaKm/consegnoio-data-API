@@ -4,7 +4,7 @@
 //  zVal dataModel  r67
 
 import { RuoloEnum, PosMapType, Customer } from "@prisma/client";
-import { z } from "zod"
+import { object, z } from "zod"
 
 
 const alertMin = "La lunghezza deve essere di almeno caratteri "
@@ -134,6 +134,27 @@ export const ViewContractorSchema = z.object({
     areaConsegna: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
     rating: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
 })
+
+export const CorsConfigSchema = z.object({
+    mobileClientParam: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    dashBoardParam: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+    serviceParam: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+    cloudParam: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+})
+
+export const VercelConfigSchema = z.object({
+    amazonUrl: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+    googleUrl: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+})
+
+export const ClientDashBoardCofngiSchema = z.object({
+    path: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+})
+
+export const ClientMobileConfigSchema = z.object({
+    path: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+})
+
 // ***** Fine validazione dataModel *****
 
 

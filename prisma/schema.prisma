@@ -471,10 +471,10 @@ model Order {
 
   model CoreConfig {
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    ModileClientParam String @db.ObjectId
-    DashBoardParam String  @db.ObjectId
-    SeviceParam String @db.ObjectId
-    CloudParam String @db.ObjectId
+    mobileClientParam String @db.ObjectId
+    dashBoardParam String  @db.ObjectId
+    seviceParam String @db.ObjectId
+    cloudParam String @db.ObjectId
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
