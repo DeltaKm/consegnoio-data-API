@@ -121,6 +121,19 @@ export const WalletSchema = z.object({
     valueEur: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
     tokenAmmount: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
 })
+
+export const ViewRaiderSchema = z.object({
+    raiderId: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    numeroConsegne: z.number().min(1, alertMin + "1").max(20, alertMax + "20"),
+    areaConsegne: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    rating: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),   
+})
+
+export const ViewContractorSchema = z.object({
+    contractorId: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+    areaConsegna: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+    rating: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+})
 // ***** Fine validazione dataModel *****
 
 

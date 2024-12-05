@@ -613,8 +613,17 @@ model DeliveryAreaPlus {
     dbDriver String [] @db.ObjectId
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
-  }  
-
+  } 
+  // prototipo
+  model serverConfig {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    config String [] @db.ObjectId
+    service String [] @db.ObjectId
+    providerData String @db.ObjectId
+    osDriver String @db.ObjectId
+    cratedAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
 // ***** Fine dataModel *****
 
 
