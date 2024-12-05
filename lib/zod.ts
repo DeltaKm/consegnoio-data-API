@@ -172,6 +172,13 @@ export const FirebaseContractorNotificationSchema = z.object({
     presetMessage: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
     message: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),    
 })
+
+export const PrevDDSConfigSchema = z.object({
+    url: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    cloudflareConfig: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    tcpFirewall: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+})
+
 // ***** Fine validazione dataModel *****
 
 
