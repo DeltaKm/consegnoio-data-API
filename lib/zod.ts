@@ -4,6 +4,7 @@
 //  zVal dataModel  r67
 
 import { RuoloEnum, PosMapType, Customer } from "@prisma/client";
+import { preset } from "swr/_internal";
 import { object, z } from "zod"
 
 
@@ -160,6 +161,16 @@ export const ChatLogSchema = z.object({
     textMessage: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
     raiderId: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
     contractorId: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),     
+})
+
+export const FirebaseRaiderNotificationSchema = z.object({
+    presetMessage: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+    message: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+})
+
+export const FirebaseContractorNotificationSchema = z.object({
+    presetMessage: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+    message: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),    
 })
 // ***** Fine validazione dataModel *****
 
