@@ -648,6 +648,13 @@ model DeliveryAreaPlus {
     updateAt DateTime @updatedAt      
   }
 
+  // prototipo
+  model TsInterface {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    prototype String [] @db.ObjectId
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
 // ***** Fine dataModel *****
 
 
