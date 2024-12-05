@@ -203,6 +203,25 @@ export const ContractorAppConfigSchema = z.object({
     config: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
 })
 
+export const AdminDashBoardConfigSchema = z.object({
+    config: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    providerData: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    dbDrivere: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),    
+})
+
+export const BusinessDashboardConfigSchema = z.object({
+    config: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    providerData: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    dbDriver: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),    
+})
+
+export const serverConfigSchema = z.object({
+    config: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    service: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    providerData: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    osDriver: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+})
+
 // ***** Fine validazione dataModel *****
 
 
