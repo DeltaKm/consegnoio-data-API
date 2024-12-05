@@ -189,12 +189,19 @@ export const TrackingRaiderSchema = z.object({
     livePosition: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
 })
 
-export const DeliveryAreaPlus = z.object({
+export const DeliveryAreaPlusSchema = z.object({
     userId: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
     radiusRangeCord: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
     location: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
 })
 
+export const RaiderAppConfigSchema = z.object({
+    config: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+})
+
+export const ContractorAppConfigSchema = z.object({
+    config: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+})
 
 // ***** Fine validazione dataModel *****
 
