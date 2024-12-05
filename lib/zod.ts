@@ -155,6 +155,12 @@ export const ClientMobileConfigSchema = z.object({
     path: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
 })
 
+export const ChatLogSchema = z.object({
+    presetMessage: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+    textMessage: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+    raiderId: z.string().min(2, alertMin + "2").max(16, alertMax + "16"), 
+    contractorId: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),     
+})
 // ***** Fine validazione dataModel *****
 
 
