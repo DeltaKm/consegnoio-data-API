@@ -20,6 +20,11 @@ type CordType {
   long Float
 }
 // Token metaData standard ERC20 => da implementare in model
+type DeliveryValidation {
+  ritiro Boolean
+  consegna Boolean
+}
+
 type TokenType {
   tokenName String
   tokenSumbol String
@@ -557,7 +562,7 @@ model FirebaseNotification {
  model MultiDeliverySystem {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   addressCompare GoogleAddressComponentType []
-  addressSetMultyDelivert GoogleAddressComponentType []
+  addressSetMultyDelivery GoogleAddressComponentType []
   isActive Boolean @default(false)
   ttl DateTime
   createdAt DateTime @default(now())
@@ -615,7 +620,7 @@ model DeliveryAreaPlus {
     updateAt DateTime @updatedAt
   } 
   // prototipo
-  model serverConfig {
+  model ServerConfig {
     id String @id @default(auto()) @map("_id") @db.ObjectId
     config String [] @db.ObjectId
     service String [] @db.ObjectId
@@ -624,6 +629,25 @@ model DeliveryAreaPlus {
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+
+  model Feedback {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    presetMessage String []
+    message String
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
+
+  model ValidationDelivery {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    deliveryId String @db.ObjectId // reference
+    validation DeliveryValidation
+    isValidate Boolean
+    ttl DateTime
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt      
+  }
+
 // ***** Fine dataModel *****
 
 
