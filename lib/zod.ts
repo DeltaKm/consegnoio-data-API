@@ -222,6 +222,16 @@ export const serverConfigSchema = z.object({
     osDriver: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
 })
 
+export const FeedbackSchema = z.object ({
+    presetMessage: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    message: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+})
+
+export const ValidationDeliverySchema = z.object({
+    deliveryId: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    validaiton: z.boolean(),
+    isValidate: z.boolean()
+})
 // ***** Fine validazione dataModel *****
 
 
