@@ -184,6 +184,18 @@ export const MultiDeliverySystemSchema = z.object({
     addressSetMultyDelivery: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
 })
 
+export const TrackingRaiderSchema = z.object({
+    lastPosition: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    livePosition: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+})
+
+export const DeliveryAreaPlus = z.object({
+    userId: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    radiusRangeCord: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    location: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+})
+
+
 // ***** Fine validazione dataModel *****
 
 
