@@ -179,6 +179,11 @@ export const PrevDDSConfigSchema = z.object({
     tcpFirewall: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
 })
 
+export const MultiDeliverySystemSchema = z.object({
+    addressCompare: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+    addressSetMultyDelivery: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+})
+
 // ***** Fine validazione dataModel *****
 
 
