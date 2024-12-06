@@ -4,6 +4,7 @@
 //  zVal dataModel  r67
 
 import { RuoloEnum, PosMapType, Customer } from "@prisma/client";
+import { prototype } from "events";
 import { preset } from "swr/_internal";
 import { object, z } from "zod"
 
@@ -232,11 +233,16 @@ export const ValidationDeliverySchema = z.object({
     validaiton: z.boolean(),
     isValidate: z.boolean()
 })
+
+export const TsInterfaceSchema = z.object({
+    prototype: z.string().min(2, alertMin + "2").max(16, alertMax + "16"),
+})
 // ***** Fine validazione dataModel *****
 
 
 export type UserSchema = z.infer<typeof userSchema>;
 export type ComuniSchema = z.infer<typeof comuniSchema>;
+export type TsInterfaceSchema = z.infer<typeof TsInterfaceSchema>;
 
 export const schemas = {
     userSchema,
