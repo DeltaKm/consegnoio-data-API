@@ -655,6 +655,16 @@ model DeliveryAreaPlus {
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+
+  model StatsConfig {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    map String [] @db.ObjectId
+    filter String [] @db.ObjectId
+    reduce String [] @db.ObjectId
+    data String [] @db.ObjectId
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
 // ***** Fine dataModel *****
 
 
