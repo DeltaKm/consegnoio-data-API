@@ -1,8 +1,8 @@
 
 // Index:
 //  objType    r17  
-//  enumType   r156  
-//  dataModel  r213
+//  enumType   r164  
+//  dataModel  r236
 
 generator client {
   provider = "prisma-client-js"
@@ -91,6 +91,13 @@ type PreferenzeZonaRaiderType {
 type WorkTime {
   data DateTime
   oreTotali Float
+}
+
+type RouteModifiersType {
+  avoidTolls Boolean
+  avoidHigways Boolean
+  avoidFerries Boolean
+  avoidIndoor Boolean  
 }
 
 // ----- INIZIO DistanceMatrixType vTEST ----
@@ -182,6 +189,22 @@ enum MetodoConsegnaEnum {
   Driving  
   Walking
   Bicycling
+}
+
+enum GoogleRouteTravelModeEum {
+  TRAVEL_MODE_UNSPECIFIED //VALORE PREDEFINITO SE NON SPECIFICATO "DRIVE"
+  DRIVE
+  BICYCLE
+  WALK 
+  TWO_WHEELER // modalità due ruote a motore
+  TRANSIT // percorsi mezzi pubblici
+}
+
+enum GoogleRoutingPreference {
+  ROUTING_PREFERENCE_UNSPECIFIED // Nessuna preferenza di routing specificata. Il valore predefinito è TRAFFIC_UNAWARE.
+  TRAFFIC_UNAWARE // Calcola i percorsi senza prendere in considerazione le condizioni del traffico in tempo reale. Ideale quando le condizioni del traffico non sono importanti o non sono applicabili. L'uso di questo valore produce la latenza più bassa. Nota: per RouteTravelMode DRIVE e TWO_WHEELER, il percorso e la durata scelti si basano sulla rete stradale e sulle condizioni medie del traffico non dipendenti dal tempo, non sulle condizioni delle strade attuali. Di conseguenza, i percorsi potrebbero includere strade temporaneamente chiuse. I risultati di una determinata richiesta possono variare nel tempo a causa di cambiamenti della rete stradale, condizioni medie aggiornate del traffico e natura distribuita del servizio. Inoltre, i risultati possono variare tra percorsi quasi equivalenti in qualsiasi momento o frequenza.
+  TRAFFIC_AWARE // Calcola i percorsi prendendo in considerazione le condizioni del traffico in tempo reale. A differenza di TRAFFIC_AWARE_OPTIMAL, vengono applicate alcune ottimizzazioni per ridurre significativamente la latenza.
+  TRAFFIC_AWARE_OPTIMAL // Calcola i percorsi prendendo in considerazione le condizioni del traffico in tempo reale, senza applicare la maggior parte delle ottimizzazioni delle prestazioni. L'uso di questo valore produce la massima latenza.
 }
 
 enum RuoloEnum {
@@ -734,7 +757,7 @@ model DeliveryAreaPlus {
       id String @id @default(auto()) @map("_id") @db.ObjectId
       distanceMeteres String
       duration String
-      polylineEncode String
+      polylineEncode String // enum
       createdAt DateTime @default(now())
       updateAt DateTime @updatedAt
     }
