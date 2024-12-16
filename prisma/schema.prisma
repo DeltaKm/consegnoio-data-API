@@ -665,6 +665,17 @@ model DeliveryAreaPlus {
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+
+  model Geolocation {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    homeMobileCountryCode Int
+    homeMobileNetworkCoode Int
+    radioType String
+    carrier String
+    considerIp Boolean
+    cratedAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
 // ***** Fine dataModel *****
 
 
