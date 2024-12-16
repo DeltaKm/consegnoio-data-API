@@ -696,7 +696,16 @@ model DeliveryAreaPlus {
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
     }
-// ***** Fine dataModel *****
+
+    model gelevation {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      elevation String
+      location String
+      resolution String
+      createdAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }    
+    // ***** Fine dataModel *****
 
 
 // Note:
