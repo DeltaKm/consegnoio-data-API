@@ -729,7 +729,15 @@ model DeliveryAreaPlus {
       cratedAt DateTime @default(now())
       updateAt DateTime @updatedAt
     }
-
+    // prototipo 
+    model gRouteGetDirection {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      distanceMeteres String
+      duration String
+      polylineEncode String
+      createdAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
     // ***** Fine dataModel *****
 
 
