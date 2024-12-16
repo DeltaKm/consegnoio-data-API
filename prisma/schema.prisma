@@ -676,6 +676,26 @@ model DeliveryAreaPlus {
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+
+  model gValidationAddress {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    address String 
+    previousResponseId String
+    enableUspsCass Boolean
+    sessionToken String
+    cratedAt DateTime @default(now())
+    updateAt DateTime @updatedAt    
+  }
+
+  model gPlace {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    type String
+    formattedAddress String
+    websiteUri String
+    displayName String [] @db.ObjectId
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+    }
 // ***** Fine dataModel *****
 
 
