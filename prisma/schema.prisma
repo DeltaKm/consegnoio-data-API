@@ -1,8 +1,8 @@
 
 // Index:
 //  objType    r17  
-//  enumType   r146  
-//  dataModel  r204
+//  enumType   r156  
+//  dataModel  r213
 
 generator client {
   provider = "prisma-client-js"
@@ -103,6 +103,10 @@ type Duration {
   text String
   value Float
 }
+type gWaypoint {
+  location CordType
+  routeMod Boolean
+ }
 //unitParam: imperial= miles / yard, metric=km / meters
 type DistanceMatrixType {
   destinazione String
@@ -697,14 +701,24 @@ model DeliveryAreaPlus {
     updateAt DateTime @updatedAt
     }
 
-    model gelevation {
+    model gElevation {
       id String @id @default(auto()) @map("_id") @db.ObjectId
       elevation String
       location String
       resolution String
       createdAt DateTime @default(now())
       updateAt DateTime @updatedAt
-    }    
+    }
+  // prototipo
+    model gFetchRouteMatrix {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      origins gWaypoint
+      destinations gWaypoint
+      travelMode MetodoConsegnaEnum
+      createdAt DateTime @default(now())
+      updateAt DateTime @updatedAt  
+    } 
+
     // ***** Fine dataModel *****
 
 
