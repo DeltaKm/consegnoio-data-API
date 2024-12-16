@@ -710,14 +710,25 @@ model DeliveryAreaPlus {
       updateAt DateTime @updatedAt
     }
   // prototipo
-    model gFetchRouteMatrix {
+    model gReqPostRouteMatrix {
       id String @id @default(auto()) @map("_id") @db.ObjectId
       origins gWaypoint
       destinations gWaypoint
       travelMode MetodoConsegnaEnum
       createdAt DateTime @default(now())
       updateAt DateTime @updatedAt  
-    } 
+    }
+  // prototipo
+    model gReqGetRouteMatrix {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      originIndex Int
+      destinationIndex Int
+      status String [] @db.ObjectId
+      duration String
+      condition Boolean
+      cratedAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
 
     // ***** Fine dataModel *****
 
