@@ -79,6 +79,10 @@ export default function FetchUser() {
           <CardContent >
           <p className="truncate">{e.password}</p>            
           </CardContent>
+          <CardContent >
+          <p>Profile Image: {e.profileImg}</p>            
+          </CardContent>
+          
         </Card>
       ))}
       <div className="px-5">

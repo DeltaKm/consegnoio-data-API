@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "test" : "mocha"
   },
   "dependencies": {
     "@googlemaps/google-maps-services-js": "^3.4.0",
