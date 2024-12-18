@@ -80,6 +80,12 @@ export default function FetchUser() {
           <p className="truncate">{e.password}</p>            
           </CardContent>
           <CardContent >
+          <p>Slug: {e.idSlug}</p>            
+          </CardContent>
+          <CardContent >
+          <p>Email: {e.email}</p>            
+          </CardContent>
+          <CardContent >
           <p>Profile Image: {e.profileImg}</p>            
           </CardContent>
           
