@@ -88,6 +88,15 @@ export default function FetchUser() {
           <CardContent >
           <p>Profile Image: {e.profileImg}</p>            
           </CardContent>
+
+          <CardContent >
+          <p>CreatedAt: {(e.createdAt).toString()}</p>            
+          </CardContent>
+          
+          <CardContent >
+          <p>UpdateAt: {(e.updatedAt).toString()}</p>            
+          </CardContent>
+          
           
         </Card>
       ))}
