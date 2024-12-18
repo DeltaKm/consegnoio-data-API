@@ -69,32 +69,33 @@ export default function FetchUser() {
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <DeleteUser id={e.id} />
           </div>
-
-          <CardHeader>
-            <CardTitle>User: {e.username}</CardTitle>
-          </CardHeader>
+   
           <CardContent>
-          <p>Hashed PWD:</p>            
+          <br />
+          <p><strong>User: </strong>{e.username}</p>
           </CardContent>
-          <CardContent >
-          <p className="truncate">{e.password}</p>            
+  
+          <CardContent>
+          <p className="truncate"><strong>Hashed PWD:</strong>{e.password}</p>                    
           </CardContent>
+ 
           <CardContent >
-          <p>Slug: {e.idSlug}</p>            
-          </CardContent>
-          <CardContent >
-          <p>Email: {e.email}</p>            
-          </CardContent>
-          <CardContent >
-          <p>Profile Image: {e.profileImg}</p>            
+          <p><strong>Slug: </strong>{e.idSlug}</p>            
           </CardContent>
 
           <CardContent >
-          <p>CreatedAt: {(e.createdAt).toString()}</p>            
+          <p><strong>Email:</strong> {e.email}</p>            
           </CardContent>
-          
+
           <CardContent >
-          <p>UpdateAt: {(e.updatedAt).toString()}</p>            
+          <p><strong>Profile Image: </strong>{e.profileImg}</p>            
+          </CardContent>
+          <CardContent >
+          <p><strong>CreatedAt: </strong>{(e.createdAt).toString()}</p>            
+          </CardContent>  
+
+          <CardContent >
+          <p><strong>UpdateAt: </strong>{(e.updatedAt).toString()}</p>            
           </CardContent>
           
           
