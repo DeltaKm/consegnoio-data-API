@@ -78,8 +78,8 @@ export default function CreateUser() {
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-                <Button>Aggiungi User</Button>
+            <DialogTrigger asChild>                
+                <Button>Aggiungi User</Button>                
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-[425px] bg-white">

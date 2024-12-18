@@ -70,13 +70,12 @@ export default function FetchUser() {
             <DeleteUser id={e.id} />
           </div>
    
-          <CardContent>
-          <br />
-          <p><strong>User: </strong>{e.username}</p>
+          <CardContent>       
+          <p className="pt-5"><strong>User: </strong>{e.username}</p>
           </CardContent>
   
           <CardContent>
-          <p className="truncate"><strong>Hashed PWD:</strong>{e.password}</p>                    
+          <p className="truncate"><strong>Hashed PWD: </strong>{e.password}</p>                    
           </CardContent>
  
           <CardContent >
@@ -90,18 +89,18 @@ export default function FetchUser() {
           <CardContent >
           <p><strong>Profile Image: </strong>{e.profileImg}</p>            
           </CardContent>
+
           <CardContent >
-          <p><strong>CreatedAt: </strong>{(e.createdAt).toString()}</p>            
+          <p><strong>Created At: </strong>{e.createdAt.toString()}</p>            
           </CardContent>  
 
           <CardContent >
-          <p><strong>UpdateAt: </strong>{(e.updatedAt).toString()}</p>            
-          </CardContent>
-          
+          <p><strong>Update At: </strong>{e.updatedAt.toString()}</p>            
+          </CardContent>       
           
         </Card>
       ))}
-      <div className="px-5">
+      <div className="px-10 ">
          <CreateUser />
        </div>
     </>
