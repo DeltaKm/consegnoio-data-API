@@ -838,6 +838,13 @@ model DeliveryAreaPlus {
       creatdAt DateTime @default(now())
       updateAt DateTime @updatedAt
     }
+
+    model simpleApiInit {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      initConfigPreset String [] @db.ObjectId
+      createdAt DateTime @default(now())
+      updateAt DateTime @updatedAt      
+    }
     // ***** Fine dataModel *****
 
 
