@@ -806,6 +806,14 @@ model DeliveryAreaPlus {
       createdAt DateTime @default(now())
       updateAt DateTime @updatedAt
     }
+
+    // prototipo
+    model simpleApiFirebaseNotification {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      firebaseConfig String [] @db.ObjectId
+      cratedAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }        
     // ***** Fine dataModel *****
 
 
