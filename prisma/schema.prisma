@@ -813,7 +813,16 @@ model DeliveryAreaPlus {
       firebaseConfig String [] @db.ObjectId
       cratedAt DateTime @default(now())
       updateAt DateTime @updatedAt
-    }        
+    }
+
+    // prototipo
+    model simpleApiUser{
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      userId String @db.ObjectId //reference
+      setting String [] @db.ObjectId
+      createdAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
     // ***** Fine dataModel *****
 
 
