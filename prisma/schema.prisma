@@ -787,13 +787,25 @@ model DeliveryAreaPlus {
       updateAt DateTime @updatedAt
     }
 
+    // prototipo
     model contractorDeliveryStatusHistory {
       id String @id @default(auto()) @map("_id") @db.ObjectId
       contractorStatusDelivery String []
-        createdAt DateTime @default(now())
-        updateAt DateTime @updatedAt      
+      createdAt DateTime @default(now())
+      updateAt DateTime @updatedAt      
     }
 
+    // prototipo 
+    model simpleApiConfig {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      dbDriver String [] @db.ObjectId
+      dbPath String [] @db.ObjectId
+      dbConfig String [] @db.ObjectId
+      cloudConfig String [] @db.ObjectId
+      sApiConfig String [] @db.ObjectId
+      createdAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
     // ***** Fine dataModel *****
 
 
