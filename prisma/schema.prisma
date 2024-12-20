@@ -100,6 +100,12 @@ type RouteModifiersType {
   avoidIndoor Boolean  
 }
 
+type SimpleApiConfigType {
+  cloudConfig String []
+  dbConfig String [] 
+  apiPresetConfig String []
+}
+
 // ----- INIZIO DistanceMatrixType vTEST ----
 type Distance {
   text String
