@@ -829,6 +829,15 @@ model DeliveryAreaPlus {
       createdAt DateTime @default(now())
       updateAt DateTime @updatedAt
     }
+
+    model simpleApiUsageStats {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      userMetrics String [] @db.ObjectId
+      clientMetrics String [] @db.ObjectId
+      errorLog String [] @db.ObjectId
+      creatdAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
     // ***** Fine dataModel *****
 
 
