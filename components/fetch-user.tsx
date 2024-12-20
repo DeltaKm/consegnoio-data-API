@@ -13,9 +13,6 @@ import DeleteUser from "./delete-user";
 import CreateUser from "./create-user";
 
 
-
-
-
 const fetcher = async (url: string) => {
   const apiKey = process.env.NEXT_PUBLIC_API_KEY; 
   if (!apiKey) {
@@ -26,7 +23,7 @@ const fetcher = async (url: string) => {
     headers: {
       "x-api-key": apiKey, 
     },
-  });
+  }); 
 
   if (!res.ok) {
     throw new Error(`Errore HTTP: ${res.status}`);
@@ -40,9 +37,7 @@ export default function FetchUser() {
     data: userData,
     error,
     isLoading,
-  } = useSWR<User[]>("/api/v1/user", fetcher);
-
-  
+  } = useSWR<User[]>("/api/v1/user", fetcher);  
 
   console.log(userData);
 
