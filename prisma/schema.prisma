@@ -761,6 +761,17 @@ model DeliveryAreaPlus {
       createdAt DateTime @default(now())
       updateAt DateTime @updatedAt
     }
+
+    model qrValidation {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      validation String [] @db.ObjectId
+      config String [] @db.ObjectId
+      presetMultiDelivery String [] @db.ObjectId
+      positionVal GoogleAddressComponentType []
+      cratedAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
+
     // ***** Fine dataModel *****
 
 
