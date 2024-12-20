@@ -772,6 +772,28 @@ model DeliveryAreaPlus {
       updateAt DateTime @updatedAt
     }
 
+    model raiderTrackingHistory {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      history GoogleAddressComponentType []      
+      createdAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
+
+    // prototipo
+    model raiderDeliveryStatusHistory {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      raiderStatusDelivery String []
+      cratedAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
+
+    model contractorDeliveryStatusHistory {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      contractorStatusDelivery String []
+        createdAt DateTime @default(now())
+        updateAt DateTime @updatedAt      
+    }
+
     // ***** Fine dataModel *****
 
 
