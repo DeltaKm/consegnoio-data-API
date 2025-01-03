@@ -13,7 +13,7 @@ enum StatusCodes {
   InternalServerError = 500,
 }
 
-// GET: Recupera tutti gli utenti
+
 export async function GET() {
   try {
     const users = await prisma.user.findMany({
@@ -30,7 +30,7 @@ export async function GET() {
   }
 }
 
-// POST: Crea un nuovo utente
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       email: data.email,
       tel: data.tel, 
       username: data.username,
-      password: await hash(data.password), // da sostituire funzione hash    
+      password: await hash(data.password),   
     },
    });
    
@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE: Elimina un utente specifico
 export async function DELETE(request: NextRequest) {
   try {
     const id = request.nextUrl.searchParams.get("id");
@@ -90,7 +89,7 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// PATCH: Aggiorna un utente
+
 export async function PATCH(request: NextRequest) {
   try {
     const id = request.nextUrl.searchParams.get("id");
@@ -127,4 +126,3 @@ export async function PATCH(request: NextRequest) {
     );
   }
 }
-
