@@ -16,7 +16,7 @@ import CreateUser from "./create-user";
 const fetcher = async (url: string) => {
   const apiKey = process.env.NEXT_PUBLIC_API_KEY; 
   if (!apiKey) {
-    throw new Error("API Key non configurata. Controlla il file .env.");
+    throw new Error("API Key non configurata. Controlla il file .env");
   }
 
   const res = await fetch(url, {
@@ -57,7 +57,7 @@ export default function FetchUser() {
 
   return (
     <>
-      <h1 className="text-4x1 font-bold my-4 pl-2">Test REST API GET</h1>
+      <h1 className="text-4x1 font-bold my-4 pl-2">Test REST API/GET</h1>
 
       {view.map((e) => (
         <Card className="group relative mx-5 my-8 max-w-[100%]" key={e.id}>
@@ -95,7 +95,7 @@ export default function FetchUser() {
           
         </Card>
       ))}
-      <div className="px-10 ">
+      <div className="px-10">
          <CreateUser />
        </div>
     </>

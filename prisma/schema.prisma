@@ -845,6 +845,14 @@ model DeliveryAreaPlus {
       createdAt DateTime @default(now())
       updateAt DateTime @updatedAt      
     }
+
+    model ClientFlutterSettings {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      iosConfig String [] @db.ObjectId
+      androidConfig String [] @db.ObjectId
+      creatdAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
     // ***** Fine dataModel *****
 
 
