@@ -853,6 +853,15 @@ model DeliveryAreaPlus {
       creatdAt DateTime @default(now())
       updateAt DateTime @updatedAt
     }
+
+    model SingleApiFlutterConfig {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      configRoute String [] @db.ObjectId
+      configSettings String [] @db.ObjectId
+      creatdAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
+
     // ***** Fine dataModel *****
 
 
