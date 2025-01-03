@@ -33,6 +33,15 @@ type TokenType {
   eurValue Float
   }
 
+    type WalletHistory {
+    mainId String
+    secId String
+    tokenAmmount Float
+    tokenType TokenType
+    date DateTime @default(now())
+    state Boolean
+  }
+
 type DatiFiscaliType {
   codiceFisclale String
   ragioneSociale String
@@ -475,9 +484,19 @@ model Order {
     userId String // reference
     token TokenType
     tokenAmmount Float 
+    isActive Boolean
     cratedAt DateTime @default(now())
     updateAt DateTime @updatedAt
   }
+
+  model WalletTransactions {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    walletId String @db.ObjectId //reference
+    history WalletHistory
+    creatdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+  }
+
 // prototipo raider profile
   model ViewRaider {
     id String @id @default(auto()) @map("_id") @db.ObjectId
@@ -854,13 +873,17 @@ model DeliveryAreaPlus {
       updateAt DateTime @updatedAt
     }
 
-    model SingleApiFlutterConfig {
+    model simplepiFlutterConfig {
       id String @id @default(auto()) @map("_id") @db.ObjectId
       configRoute String [] @db.ObjectId
       configSettings String [] @db.ObjectId
       creatdAt DateTime @default(now())
       updateAt DateTime @updatedAt
     }
+
+
+
+
 
     // ***** Fine dataModel *****
 
