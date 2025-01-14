@@ -261,6 +261,7 @@ model User {
     // Authenticator Authenticator[]
     username String 
     password String
+    businessAuth String @db.ObjectId //reference
     // role RuoloEnum  <= da implementare dopo i reference
     // raiderId Raider?
     // contractorId Contractor?
@@ -885,6 +886,21 @@ model DeliveryAreaPlus {
       id String @id @default(auto()) @map("_id") @db.ObjectId
       convertMutation String [] @db.ObjectId
       createdAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
+
+    model EzConfig {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      config String [] @db.ObjectId
+      createdAt DateTime @default(now())
+      updateAt DateTime @updatedAt
+    }
+
+    model RaiderBusinessAuth {
+      id String @id @default(auto()) @map("_id") @db.ObjectId
+      businessId String @db.ObjectId //reference
+      qrCodeAuth String @db.ObjectId //reference
+      cratedAt DateTime @default(now())
       updateAt DateTime @updatedAt
     }
     // ***** Fine dataModel *****
