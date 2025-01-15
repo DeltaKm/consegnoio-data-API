@@ -68,7 +68,7 @@ export const datiMerceTypeSchema = z.object({
 
 // ***** Inizio validazione dataModel *****
 export const userSchema = z.object({
-    idSlug: z.string().min(8, alertMin + "8").max(8, alertMax + "16"),
+    idSlug: z.string().min(8, alertMin + "8").max(16, alertMax + "16"),
     email: z.string()
     .min(1, { message: "Questo capodo deve essere riempito" })
     .email("Email non valida"),
@@ -78,6 +78,17 @@ export const userSchema = z.object({
       
     // role: z.enum()
 });
+
+
+
+export const testDeliverySchema = z.object({
+    name: z.string().min(1, "Il nome è obbligatorio"),
+    pickupAddress: z.string().min(1, "L'indirizzo di ritiro è obbligatorio"),
+    deliveryAddress: z.string().min(1, "L'indirizzo di consegna è obbligatorio"),
+    compensation: z.number().positive("La compensazione deve essere positiva"),
+    createdAt: z.date().optional(),
+    updatedAt: z.date().optional(),
+  });
 
 export const orderSchema = z.object({
     hashQrFirma: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
@@ -242,8 +253,9 @@ export const TsInterfaceSchema = z.object({
 
 export type UserSchema = z.infer<typeof userSchema>;
 export type ComuniSchema = z.infer<typeof comuniSchema>;
-export type TsInterfaceSchema = z.infer<typeof TsInterfaceSchema>;
+export type TestDeliverySchema = z.infer <typeof testDeliverySchema>;
 
 export const schemas = {
     userSchema,
+    testDeliverySchema,
 };
