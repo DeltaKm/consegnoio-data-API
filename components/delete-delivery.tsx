@@ -4,18 +4,23 @@ import { Button } from "./ui/button"
 import { TrashIcon } from "@radix-ui/react-icons"
 import { mutate } from "swr"
 
-export default function DeleteComuni({ id } : { id : string }) {
-
+export default function DeleteUser({ id } : { id : string }) {
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY; 
+    const headers = {
+        "Content-Type": "application/json",
+        ...(apiKey && { "x-api-key": apiKey }), 
+      };
     const handleDelete = async () => {
-        const response = await fetch(`/api/v1/crud?id=${id}`, {
+        const response = await fetch(`/api/v1/test?id=${id}`, {
             method: "DELETE",
+            headers            
         });
 
         if(response.ok) {
-            console.log("Collezione eliminata");
-            mutate("/api/v1/crud");
+            console.log("Consegna eliminata");
+            mutate("/api/test");
         } else {
-            console.error("Errore eliminazione lista")
+            console.error("Errore eliminazione consegna")
         }        
     };
     return(         

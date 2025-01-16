@@ -1,11 +1,11 @@
 
-import FetchUser from "@/components/fetch-user";
+import FetchDelivery from "@/components/fetch-delivery";
 
 // add const api url
 
 export default function Home() {
   return (  
-        <FetchUser />       
+        <FetchDelivery />       
   );
 }
 

@@ -20,36 +20,42 @@ import {
 import { Input } from "./ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { comuniSchema, type ComuniSchema } from "@/lib/zod";
+import { testDeliverySchema, type TestDeliverySchema } from "@/lib/zod";
 import { useState } from "react";
 import { mutate } from "swr";
 
-export default function CreateComuni() {
+export default function CreateUser() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [isDialogOpen, setDialogOpen] = useState(false);
- 
+   
 
-    const form = useForm<ComuniSchema>({
-        resolver: zodResolver(comuniSchema),
+    const form = useForm<TestDeliverySchema>({
+        resolver: zodResolver(testDeliverySchema),
         defaultValues: {
-            codiceIstat: "",
-            denominazioneIta: "",
-            cap: "",
-            siglaProvincia: "",
-            denominazioneProvincia: "",
-            denominazioneRegione: "",            
+            name: "",
+            pickupAddress: "",
+            deliveryAddress: "",
+            compensation: 0
+                        
+                       
         },
     });
 
-    const onSubmit = async (data: ComuniSchema) => {
+    const onSubmit = async (data: TestDeliverySchema) => {        
         setIsSubmitting(true);
-        setErrorMessage(""); // Azzera l'errore all'inizio
+        setErrorMessage("");
+
+        const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+        const headers = {
+            "Content-Type": "application/json",
+            ...(apiKey && { "x-api-key": apiKey }), 
+          };
 
         try {
-            const response = await fetch("/api/v1/crud", {
+            const response = await fetch("/api/v1/test", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers,                
                 body: JSON.stringify(data),
             });
 
@@ -58,7 +64,7 @@ export default function CreateComuni() {
                 throw new Error(responseData.message || "Errore di caricamento");
             }
 
-            await mutate("/api/crud");
+            await mutate("/api/v1/test");
             form.reset();
             setDialogOpen(false);
 
@@ -72,13 +78,13 @@ export default function CreateComuni() {
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-                <Button>Aggiungi Comune</Button>
+            <DialogTrigger asChild>                
+                <Button>Aggiungi Consegna</Button>                
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-[425px] bg-white">
                 <DialogHeader>
-                    <DialogTitle>Iserisci Comune</DialogTitle>
+                    <DialogTitle>Iserisci Consegna</DialogTitle>
                     <DialogDescription />
                 </DialogHeader>
 
@@ -88,14 +94,15 @@ export default function CreateComuni() {
                     </div>
                 )}
 
+
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
                             control={form.control}
-                            name="codiceIstat"
+                            name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Codice ISTAT</FormLabel>
+                                    <FormLabel>Nome</FormLabel>
                                     <FormControl>
                                         <Input {...field} />
                                     </FormControl>
@@ -105,10 +112,23 @@ export default function CreateComuni() {
                         />
                         <FormField
                             control={form.control}
-                            name="denominazioneIta"
+                            name="pickupAddress"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Denominazione ITA</FormLabel>
+                                    <FormLabel>Indirizzo di ritiro</FormLabel>
+                                    <FormControl>
+                                        <Input className="resize-none" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                                                <FormField
+                            control={form.control}
+                            name="deliveryAddress"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Indirizzo di consegna</FormLabel>
                                     <FormControl>
                                         <Input className="resize-none" {...field} />
                                     </FormControl>
@@ -118,56 +138,22 @@ export default function CreateComuni() {
                         />
                             <FormField
                             control={form.control}
-                            name="cap"
+                            name="compensation"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>CAP</FormLabel>
+                                    <FormLabel>Compenso</FormLabel>
                                     <FormControl>
-                                        <Input className="resize-none" {...field} />
+                                        <Input 
+                                        className="resize-none"
+                                        {...field} onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                                         type="number" />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                           <FormField
-                            control={form.control}
-                            name="siglaProvincia"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Sigla Provincia</FormLabel>
-                                    <FormControl>
-                                        <Input className="resize-none" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                              <FormField
-                            control={form.control}
-                            name="denominazioneProvincia"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Denominazione Provincia</FormLabel>
-                                    <FormControl>
-                                        <Input className="resize-none" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                             <FormField
-                            control={form.control}
-                            name="denominazioneRegione"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Denominazione Regione</FormLabel>
-                                    <FormControl>
-                                        <Input className="resize-none" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />   <div>
+
+                         <div>
                         <Button 
                             disabled={isSubmitting}
                             className="w-full relative"
@@ -179,7 +165,7 @@ export default function CreateComuni() {
                                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                 </div>
                             )}
-                            Crea scheda
+                            Crea ordine
                         </Button></div>
                     </form>
                 </Form>
