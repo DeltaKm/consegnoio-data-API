@@ -214,6 +214,7 @@ export async function PATCH(request: NextRequest) {
     const id = request.nextUrl.searchParams.get("id");
 
     if (!id) {
+      console.error("ID mancante nella richiesta PATCH.");
       return NextResponse.json(
         { message: "ID richiesto" },
         { status: StatusCodes.BadRequest }
@@ -221,9 +222,12 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
+    console.log("Dati ricevuti per aggiornamento:", { id, body });
+
     const result = testDeliverySchema.partial().safeParse(body);
 
     if (!result.success) {
+      console.error("Validazione fallita:", result.error.errors);
       return NextResponse.json(
         { message: "Dati non validi", errors: result.error.errors },
         { status: StatusCodes.BadRequest }
@@ -235,9 +239,10 @@ export async function PATCH(request: NextRequest) {
       data: result.data,
     });
 
+    console.log("Aggiornamento riuscito:", updatedDelivery);
     return NextResponse.json(updatedDelivery, { status: StatusCodes.Success });
   } catch (error) {
-    console.error("Errore durante l'aggiornamento dell'ordine", error);
+    console.error("Errore durante l'aggiornamento dell'ordine:", error);
     return NextResponse.json(
       { message: "Errore durante l'aggiornamento dell'ordine" },
       { status: StatusCodes.InternalServerError }
