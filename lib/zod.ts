@@ -82,8 +82,7 @@ export const userSchema = z.object({
 
 
 
-export const testDeliverySchema = z.object({
-  _id: z.string(), // Campo obbligatorio
+export const testDeliverySchema = z.object({  
   name: z.string().min(1, "Il nome è obbligatorio"),
   pickupAddress: z.string().min(1, "L'indirizzo di ritiro è obbligatorio"),
   deliveryAddress: z.string().min(1, "L'indirizzo di consegna è obbligatorio"),
@@ -94,8 +93,6 @@ export const testDeliverySchema = z.object({
   compensation: z.number().positive("La compensazione deve essere positiva"),
   isAssigned: z.boolean(), // Campo obbligatorio
   isCompleted: z.boolean(), // Campo obbligatorio
-  createdAt: z.date(), // Campo obbligatorio
-  updatedAt: z.date(), // Campo obbligatorio
 });
 
   

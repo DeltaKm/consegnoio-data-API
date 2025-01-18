@@ -209,39 +209,50 @@ export async function DELETE(request: NextRequest) {
 }
 
 
+
+
 export async function PATCH(request: NextRequest) {
   try {
-    const body = await request.json();
+    // Ottieni l'ID dall'URL o dal corpo della richiesta
+    const id = request.nextUrl.searchParams.get("id");
 
-    if (!body._id) {
+    if (!id) {
       return NextResponse.json(
-        { message: "ID richiesto (_id mancante)" },
-        { status: StatusCodes.BadRequest }
+        { message: "ID richiesto" },
+        { status: 400 } // Bad Request
       );
     }
 
-    const result = testDeliverySchema.partial().safeParse(body);
+    // Recupera il corpo della richiesta
+    const body = await request.json();
+
+    // Validazione dello schema Zod
+    const result = testDeliverySchema.safeParse(body);
 
     if (!result.success) {
+      console.error("Errore di validazione:", result.error.errors);
       return NextResponse.json(
         { message: "Dati non validi", errors: result.error.errors },
-        { status: StatusCodes.BadRequest }
+        { status: 400 } // Bad Request
       );
     }
 
     const data = result.data;
+
+    // Aggiorna il documento su MongoDB con Prisma
     const updatedDelivery = await prisma.testDelivery.update({
-      where: { id: body._id }, // Usa _id come chiave per MongoDB
+      where: { id }, // Usa il campo `id` (che corrisponde a `_id` mappato in Prisma)
       data,
     });
 
-    return NextResponse.json(updatedDelivery, { status: StatusCodes.Success });
+    return NextResponse.json(updatedDelivery, { status: 200 }); // Successo
   } catch (error) {
-    console.error("Errore durante l'aggiornamento dell'ordine", error);
+    console.error("Errore durante l'aggiornamento dell'ordine:", error);
     return NextResponse.json(
       { message: "Errore durante l'aggiornamento dell'ordine" },
-      { status: StatusCodes.InternalServerError }
+      { status: 500 } // Internal Server Error
     );
   }
 }
+
 
