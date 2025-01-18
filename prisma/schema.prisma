@@ -905,17 +905,17 @@ model DeliveryAreaPlus {
 
     model testDelivery {
       id String @id @default(auto()) @map("_id") @db.ObjectId
-      name String
-      pickupAddress String
-      deliveryAddress String
-      totalDistance String
-      deliveryType String
-      peso Float
-      numeroColli Int
-      compensation Float
-      isAssigned Boolean
-      isCompleted Boolean
-      createdAt DateTime @default(now())
+      name String?
+      pickupAddress String?
+      deliveryAddress String?
+      totalDistance String?
+      deliveryType String?
+      peso Float?
+      numeroColli Int?
+      compensation Float?
+      isAssigned Boolean?
+      isCompleted Boolean?
+      createdAt DateTime @default(now()) 
       updateAt DateTime @updatedAt
     }
     // ***** Fine dataModel *****
