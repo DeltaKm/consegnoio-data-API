@@ -81,17 +81,23 @@ export const userSchema = z.object({
 
 
 
+
 export const testDeliverySchema = z.object({
-    _id: z.string().optional(), // Modifica qui per accettare `_id`
-    name: z.string().min(1, "Il nome è obbligatorio"),
-    pickupAddress: z.string().min(1, "L'indirizzo di ritiro è obbligatorio"),
-    deliveryAddress: z.string().min(1, "L'indirizzo di consegna è obbligatorio"),
-    compensation: z.number().positive("La compensazione deve essere positiva"),
-    isAssigned: z.boolean().optional(),
-    isCompleted: z.boolean().optional(),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
-  });
+  _id: z.string(), // Campo obbligatorio
+  name: z.string().min(1, "Il nome è obbligatorio"),
+  pickupAddress: z.string().min(1, "L'indirizzo di ritiro è obbligatorio"),
+  deliveryAddress: z.string().min(1, "L'indirizzo di consegna è obbligatorio"),
+  totalDistance: z.string().min(1, "La distanza totale è obbligatoria"),
+  deliveryType: z.string().min(1, "Il tipo di consegna è obbligatorio"),
+  peso: z.number().min(0, "Il peso deve essere maggiore o uguale a 0"),
+  numeroColli: z.number().min(1, "Il numero di colli deve essere almeno 1"),
+  compensation: z.number().positive("La compensazione deve essere positiva"),
+  isAssigned: z.boolean(), // Campo obbligatorio
+  isCompleted: z.boolean(), // Campo obbligatorio
+  createdAt: z.date(), // Campo obbligatorio
+  updatedAt: z.date(), // Campo obbligatorio
+});
+
   
 export const orderSchema = z.object({
     hashQrFirma: z.string().min(8, alertMin + "8").max(8, alertMax + "8"),
