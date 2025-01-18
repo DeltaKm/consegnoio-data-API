@@ -82,16 +82,13 @@ export const userSchema = z.object({
 
 
 export const testDeliverySchema = z.object({
+    _id: z.string().optional(), // Modifica qui per accettare `_id`
     name: z.string().min(1, "Il nome è obbligatorio"),
     pickupAddress: z.string().min(1, "L'indirizzo di ritiro è obbligatorio"),
     deliveryAddress: z.string().min(1, "L'indirizzo di consegna è obbligatorio"),
-    totalDistance: z.string().min(1, "La distanza totale è obbligatoria"),
-    deliveryType: z.string().min(1, "Il tipo di consegna è obbligatorio"),
-    peso: z.number().positive("Il peso deve essere positivo"),
-    numeroColli: z.number().int().positive("Il numero dei colli deve essere positivo"),
     compensation: z.number().positive("La compensazione deve essere positiva"),
-    isAssigned: z.boolean().default(false),
-    isCompleted: z.boolean().default(false),
+    isAssigned: z.boolean().optional(),
+    isCompleted: z.boolean().optional(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
   });

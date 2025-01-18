@@ -211,41 +211,37 @@ export async function DELETE(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const id = request.nextUrl.searchParams.get("id");
+    const body = await request.json();
 
-    if (!id) {
-      console.error("ID mancante nella richiesta PATCH.");
+    if (!body._id) {
       return NextResponse.json(
-        { message: "ID richiesto" },
+        { message: "ID richiesto (_id mancante)" },
         { status: StatusCodes.BadRequest }
       );
     }
 
-    const body = await request.json();
-    console.log("Dati ricevuti per aggiornamento:", { id, body });
-
     const result = testDeliverySchema.partial().safeParse(body);
 
     if (!result.success) {
-      console.error("Validazione fallita:", result.error.errors);
       return NextResponse.json(
         { message: "Dati non validi", errors: result.error.errors },
         { status: StatusCodes.BadRequest }
       );
     }
 
+    const data = result.data;
     const updatedDelivery = await prisma.testDelivery.update({
-      where: { id },
-      data: result.data,
+      where: { id: body._id }, // Usa _id come chiave per MongoDB
+      data,
     });
 
-    console.log("Aggiornamento riuscito:", updatedDelivery);
     return NextResponse.json(updatedDelivery, { status: StatusCodes.Success });
   } catch (error) {
-    console.error("Errore durante l'aggiornamento dell'ordine:", error);
+    console.error("Errore durante l'aggiornamento dell'ordine", error);
     return NextResponse.json(
       { message: "Errore durante l'aggiornamento dell'ordine" },
       { status: StatusCodes.InternalServerError }
     );
   }
 }
+
