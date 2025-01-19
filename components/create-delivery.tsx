@@ -85,7 +85,7 @@ export default function CreateDelivery() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px] bg-white p-4 sm:p-6 mx-auto">
+      <DialogContent className="sm:max-w-[425px] bg-white p-4 sm:p-6 mx-auto overflow-y-auto max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="text-center text-xl sm:text-2xl font-bold">
             Inserisci Consegna
