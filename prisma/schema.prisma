@@ -913,8 +913,8 @@ model DeliveryAreaPlus {
       peso Float?
       numeroColli Int?
       compensation Float?
-      isAssigned Boolean?
-      isCompleted Boolean?
+      isAssigned Boolean? @default(false)
+      isCompleted Boolean? @default(false)
       createdAt DateTime @default(now()) 
       updateAt DateTime @updatedAt
     }

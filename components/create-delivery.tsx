@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "./ui/button";
-import { 
+import {
     Dialog,
     DialogContent,
     DialogHeader,
@@ -9,7 +9,7 @@ import {
     DialogTrigger,
     DialogDescription
 } from "./ui/dialog";
-import { 
+import {
     Form,
     FormControl,
     FormField,
@@ -24,11 +24,10 @@ import { testDeliverySchema, type TestDeliverySchema } from "@/lib/zod";
 import { useState } from "react";
 import { mutate } from "swr";
 
-export default function CreateUser() {
+export default function CreateDelivery() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [isDialogOpen, setDialogOpen] = useState(false);
-   
 
     const form = useForm<TestDeliverySchema>({
         resolver: zodResolver(testDeliverySchema),
@@ -36,26 +35,28 @@ export default function CreateUser() {
             name: "",
             pickupAddress: "",
             deliveryAddress: "",
+            totalDistance: "",
+            deliveryType: "",
+            peso: 0,
+            numeroColli: 0,
             compensation: 0
-                        
-                       
         },
     });
 
-    const onSubmit = async (data: TestDeliverySchema) => {        
+    const onSubmit = async (data: TestDeliverySchema) => {
         setIsSubmitting(true);
         setErrorMessage("");
 
         const apiKey = process.env.NEXT_PUBLIC_API_KEY;
         const headers = {
             "Content-Type": "application/json",
-            ...(apiKey && { "x-api-key": apiKey }), 
-          };
+            ...(apiKey && { "x-api-key": apiKey }),
+        };
 
         try {
             const response = await fetch("/api/v1/test", {
                 method: "POST",
-                headers,                
+                headers,
                 body: JSON.stringify(data),
             });
 
@@ -78,13 +79,13 @@ export default function CreateUser() {
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>                
-                <Button>Aggiungi Consegna</Button>                
+            <DialogTrigger asChild>
+                <Button>Aggiungi Consegna</Button>
             </DialogTrigger>
 
             <DialogContent className="sm:max-w-[425px] bg-white">
                 <DialogHeader>
-                    <DialogTitle>Iserisci Consegna</DialogTitle>
+                    <DialogTitle>Inserisci Consegna</DialogTitle>
                     <DialogDescription />
                 </DialogHeader>
 
@@ -93,7 +94,6 @@ export default function CreateUser() {
                         {errorMessage}
                     </div>
                 )}
-
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -123,7 +123,7 @@ export default function CreateUser() {
                                 </FormItem>
                             )}
                         />
-                                                <FormField
+                        <FormField
                             control={form.control}
                             name="deliveryAddress"
                             render={({ field }) => (
@@ -136,37 +136,99 @@ export default function CreateUser() {
                                 </FormItem>
                             )}
                         />
-                            <FormField
+                        <FormField
+                            control={form.control}
+                            name="totalDistance"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Distanza totale</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="deliveryType"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Tipologia merce</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="peso"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Peso (kg)</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="numeroColli"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Numero colli</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
                             control={form.control}
                             name="compensation"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Compenso</FormLabel>
                                     <FormControl>
-                                        <Input 
-                                        className="resize-none"
-                                        {...field} onChange={(e) => field.onChange(Number(e.target.value) || 0)}
-                                         type="number" />
+                                        <Input
+                                            type="number"
+                                            {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                         <div>
-                        <Button 
-                            disabled={isSubmitting}
-                            className="w-full relative"
-                            variant='outline'                            
-                            type="submit"
-                        >
-                            {isSubmitting && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-primary/50 rounded-md">
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                </div>
-                            )}
-                            Crea ordine
-                        </Button></div>
+                        <div>
+                            <Button
+                                disabled={isSubmitting}
+                                className="w-full relative"
+                                variant='outline'
+                                type="submit"
+                            >
+                                {isSubmitting && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-primary/50 rounded-md">
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    </div>
+                                )}
+                                Crea ordine
+                            </Button>
+                        </div>
                     </form>
                 </Form>
             </DialogContent>
