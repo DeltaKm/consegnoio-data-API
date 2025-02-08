@@ -125,7 +125,7 @@
 //   }
 // }
 
-
+// route.ts
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { testDeliverySchema } from "@/lib/zod";
@@ -140,13 +140,15 @@ enum StatusCodes {
 }
 
 
+
+
 export async function GET() {
   try {
     const delivery = await prisma.testDelivery.findMany({
       orderBy: { createdAt: "desc" },
     });
-
     return NextResponse.json(delivery, { status: StatusCodes.Success });
+
   } catch (error) {
     console.error("Errore durante il fetch delle consegne", error);
     return NextResponse.json(
@@ -209,8 +211,6 @@ export async function DELETE(request: NextRequest) {
 }
 
 
-
-
 export async function PATCH(request: NextRequest) {
   try {
     // Ottieni l'ID dall'URL o dal corpo della richiesta
@@ -242,7 +242,7 @@ export async function PATCH(request: NextRequest) {
     // Aggiorna il documento su MongoDB con Prisma
     const updatedDelivery = await prisma.testDelivery.update({
       where: { id }, // Usa il campo `id` (che corrisponde a `_id` mappato in Prisma)
-      data,
+      data, // <= qua va passato solo il campo da variaree invece che rendere opzionale i campi cona la validazione di
     });
 
     return NextResponse.json(updatedDelivery, { status: 200 }); // Successo

@@ -172,7 +172,7 @@ export default function CreateDelivery() {
                   </FormItem>
                 )}
               />
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="peso"
                 render={({ field }) => (
@@ -210,7 +210,7 @@ export default function CreateDelivery() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
 
             <div className="mt-4 w-full">
