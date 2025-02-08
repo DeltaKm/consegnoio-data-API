@@ -1,10 +1,17 @@
-// app/api/v1/auth/register/route.ts
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-// Assicurati che JWT_SECRET sia definito oppure usa l'asserzione non nulla
+enum StatusCodes {
+  NotFound = 404,
+  Success = 200,
+  Created = 201,
+  BadRequest = 400,
+  InternalServerError = 500,
+}
+
+// Asserzione non nulla per JWT_SECRET
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET non definito nelle variabili d'ambiente");
@@ -18,16 +25,16 @@ export async function POST(request: NextRequest) {
     if (!email || !password) {
       return NextResponse.json(
         { message: "Email e password sono obbligatorie" },
-        { status: 400 }
+        { status: StatusCodes.BadRequest }
       );
     }
 
-    // Verifica se l'utente esiste già
+    // Controlla se l'utente esiste già
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json(
         { message: "Utente già registrato" },
-        { status: 400 }
+        { status: StatusCodes.BadRequest }
       );
     }
 
@@ -39,15 +46,17 @@ export async function POST(request: NextRequest) {
       data: { email, password: hashedPassword },
     });
 
-    // Genera il token JWT usando JWT_SECRET che sappiamo essere definito
+    // Genera il token JWT (puoi impostare expiresIn oppure rimuoverlo se non vuoi la scadenza)
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+    // Se preferisci che il token non scada, elimina l'opzione expiresIn:
+    // const token = jwt.sign({ userId: user.id }, JWT_SECRET);
 
-    return NextResponse.json({ token }, { status: 201 });
+    return NextResponse.json({ token }, { status: StatusCodes.Created });
   } catch (error) {
     console.error("Errore durante la registrazione:", error);
     return NextResponse.json(
-      { message: "Errore interno del server" },
-      { status: 500 }
+      { message: "Errore interno durante la registrazione" },
+      { status: StatusCodes.InternalServerError }
     );
   }
 }

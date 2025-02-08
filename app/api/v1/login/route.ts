@@ -1,11 +1,21 @@
-// app/api/v1/auth/login/route.ts
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+enum StatusCodes {
+  NotFound = 404,
+  Success = 200,
+  Created = 201,
+  BadRequest = 400,
+  InternalServerError = 500,
+}
+
 // Asserzione non nulla per JWT_SECRET
 const JWT_SECRET: string = process.env.JWT_SECRET!;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET non definito nelle variabili d'ambiente");
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +25,7 @@ export async function POST(request: NextRequest) {
     if (!email || !password) {
       return NextResponse.json(
         { message: "Email e password sono obbligatorie" },
-        { status: 400 }
+        { status: StatusCodes.BadRequest }
       );
     }
 
@@ -24,7 +34,7 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { message: "Utente non trovato" },
-        { status: 401 }
+        { status: StatusCodes.NotFound }
       );
     }
 
@@ -33,19 +43,21 @@ export async function POST(request: NextRequest) {
     if (!isValid) {
       return NextResponse.json(
         { message: "Credenziali non valide" },
-        { status: 401 }
+        { status: StatusCodes.BadRequest }
       );
     }
 
-    // Genera il token JWT SENZA scadenza (non impostiamo expiresIn)
+    // Genera il token JWT (con scadenza impostata o senza, secondo le tue esigenze)
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+    // Per token senza scadenza, usa:
+    // const token = jwt.sign({ userId: user.id }, JWT_SECRET);
 
-    return NextResponse.json({ token }, { status: 200 });
+    return NextResponse.json({ token }, { status: StatusCodes.Success });
   } catch (error) {
     console.error("Errore durante il login:", error);
     return NextResponse.json(
-      { message: "Errore interno del server" },
-      { status: 500 }
+      { message: "Errore interno durante il login" },
+      { status: StatusCodes.InternalServerError }
     );
   }
 }
