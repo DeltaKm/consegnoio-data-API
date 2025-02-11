@@ -16,11 +16,11 @@ export const testDeliverySchema = z.object({
     peso: z.number(),
     numeroColli: z.number(),
     compensation: z.number(),
-    isAssigned: z.boolean(),
-    isCompleted: z.boolean(),
-  }).partial(); 
+    // isAssigned: z.boolean(),
+    // isCompleted: z.boolean(),
+  })
 
-
+  
 export type TestDeliverySchema = z.infer <typeof testDeliverySchema>;
 
 export const schemas = {    

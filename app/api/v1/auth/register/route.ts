@@ -46,10 +46,8 @@ export async function POST(request: NextRequest) {
       data: { email, password: hashedPassword },
     });
 
-    // Genera il token JWT (puoi impostare expiresIn oppure rimuoverlo se non vuoi la scadenza)
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
-    // Se preferisci che il token non scada, elimina l'opzione expiresIn:
-    // const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+   
 
     return NextResponse.json({ token }, { status: StatusCodes.Created });
   } catch (error) {
