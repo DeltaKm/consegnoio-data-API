@@ -3,6 +3,7 @@
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { testDeliverySchema } from "@/lib/zod";
+import { optional } from "zod";
 
 enum StatusCodes {
   Success = 200,
@@ -12,6 +13,8 @@ enum StatusCodes {
 
 export async function PATCH(request: NextRequest) {
   try {
+
+
     const id = request.nextUrl.searchParams.get("id");
     if (!id) {
       return NextResponse.json(
@@ -20,8 +23,26 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+     // rende opzionale il campo name
+    // const nameop = testDeliverySchema.partial({
+    //   name: true
+    // })
+    // const body = await request.json();
+    // const result = nameop.safeParse(body);
+
+    const optional = testDeliverySchema.partial({
+          name: true,
+          pickupAddress:  true,
+          deliveryAddress: true,
+          totalDistance:  true,
+          deliveryType:  true,
+          peso:  true,
+          numeroColli:  true,
+          compensation:  true,   
+    })
+
     const body = await request.json();
-    const result = testDeliverySchema.safeParse(body);
+    const result = optional.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
