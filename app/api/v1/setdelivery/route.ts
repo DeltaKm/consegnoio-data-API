@@ -1,4 +1,4 @@
-// deve avre dei parametri per l' id bussines
+// deve avere dei parametri per l' id bussines
 // deve ritorna succes e la i dati inseriti
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
@@ -12,17 +12,8 @@ enum StatusCodes {
 
 export async function POST(request: NextRequest) {
   try {
-
-    // rende opzionale il campo name
-    // const nameop = testDeliverySchema.partial({
-    //   name: true
-    // })
-    // const body = await request.json();
-    // const result = nameop.safeParse(body);
-
     const body = await request.json();
     const result = testDeliverySchema.safeParse(body);
-
 
     if (!result.success) {
       return NextResponse.json(

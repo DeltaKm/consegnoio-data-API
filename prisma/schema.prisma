@@ -30,7 +30,7 @@ model UserToImp {
   password      String?
   role          RoleEnum
   tokenJWT      String?
-  expirationJWT DateTime?
+  expirationJWT DateTime? // da testare
   expirid       Boolean?
   imgUrl        String    @default("asset/immages/log-consegnoio.png")
   creatdeAt     DateTime  @default(now())
@@ -62,7 +62,7 @@ model Business {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   userId          String   @db.ObjectId // reference to user
   name            String
-  dataBussines    String // da definire i dati per  l' attività
+  dataBussines    String   // da definire i dati per  l' attività
   address         String[] // da definire il componente google
   raiderWhitelist String[] @db.ObjectId //reference to raider id
   raiderBlacklist String[] @db.ObjectId //reference to raider id
@@ -77,6 +77,7 @@ model Business {
 // da aggiungere id business e id cooperativa
 // da valutare tutti i campo  della consegna 
 // da implementare stato consegna sia backend che frontend
+
 model testDelivery {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   name            String? // business name valutare se inserire id easy appear e crare un type con nome e ideasy appear
@@ -96,7 +97,7 @@ model testDelivery {
 // schema da implementare
 model Delivery {
   id              String     @id @default(auto()) @map("_id") @db.ObjectId
-  name            String?
+  name            String? // reference to business name
   pickupAddress   String?
   deliveryAddress String?
   totalDistance   String? // calcolata con google maps

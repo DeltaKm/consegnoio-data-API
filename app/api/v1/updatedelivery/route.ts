@@ -12,9 +12,8 @@ enum StatusCodes {
 }
 
 export async function PATCH(request: NextRequest) {
+
   try {
-
-
     const id = request.nextUrl.searchParams.get("id");
     if (!id) {
       return NextResponse.json(
@@ -23,22 +22,16 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-     // rende opzionale il campo name
-    // const nameop = testDeliverySchema.partial({
-    //   name: true
-    // })
-    // const body = await request.json();
-    // const result = nameop.safeParse(body);
-
+    // rendo opzional i cmapi
     const optional = testDeliverySchema.partial({
-          name: true,
-          pickupAddress:  true,
-          deliveryAddress: true,
-          totalDistance:  true,
-          deliveryType:  true,
-          peso:  true,
-          numeroColli:  true,
-          compensation:  true,   
+      name: true,
+      pickupAddress: true,
+      deliveryAddress: true,
+      totalDistance: true,
+      deliveryType: true,
+      peso: true,
+      numeroColli: true,
+      compensation: true,
     })
 
     const body = await request.json();
@@ -60,7 +53,7 @@ export async function PATCH(request: NextRequest) {
   } catch (error) {
     console.error("Errore durante l'aggiornamento dell'ordine:", error);
     return NextResponse.json(
-      { message: "Errore durante l'aggiornamento dell'ordine" },
+      { message: "Errore durante l'aggiornamento dell'ordine o ID non trovato" },
       { status: StatusCodes.InternalServerError }
     );
   }
