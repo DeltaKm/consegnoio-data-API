@@ -18,8 +18,7 @@ export const testDeliverySchema = z.object({
   compensation:    z.number(),
   // isAssigned: z.boolean(),
   // isCompleted: z.boolean(),
-})
-
+}).partial()
 
 export type TestDeliverySchema = z.infer<typeof testDeliverySchema>;
 

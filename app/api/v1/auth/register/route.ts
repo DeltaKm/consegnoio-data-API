@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
    
 
-    return NextResponse.json({ token }, { status: StatusCodes.Created });
+    return NextResponse.json({status: "Success", hashedPassword: hashedPassword, token }, { status: StatusCodes.Created });
   } catch (error) {
     console.error("Errore durante la registrazione:", error);
     return NextResponse.json(
@@ -58,3 +58,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

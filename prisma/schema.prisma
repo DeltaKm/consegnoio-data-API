@@ -47,28 +47,51 @@ enum RoleEnum {
 
 // =============================================================
 
+
+// =============================================================
+// ========================= Raider ============================
+// =============================================================
+
 model Raider {
   id                String   @id @default(auto()) @map("_id") @db.ObjectId
   userId            String   @db.ObjectId // reference to user
   inService         Boolean  @default(false) // flag per attivare la modalita raider on
-  vehicle           String // enum con quale mezzo di trasporto usa
+  vehicle           veichleEnum // enum con quale mezzo di trasporto usa
   businessWhitelist String[] @db.ObjectId // reference to bussiness id
   businessBlacklist String[] @db.ObjectId // refference to business id
   createdAt         DateTime @default(now())
   updateAt          DateTime @updatedAt
 }
 
+enum veichleEnum {
+  CAR
+  BICYCLE
+  MOTORCYCLE
+}
+
+// =============================================================
+
+
+// =============================================================
+// ======================== Business ===========================
+// =============================================================
+
+
 model Business {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   userId          String   @db.ObjectId // reference to user
   name            String
-  dataBussines    String   // da definire i dati per  l' attività
+  dataBussines    String   // da definire i dati per l' attività
   address         String[] // da definire il componente google
   raiderWhitelist String[] @db.ObjectId //reference to raider id
-  raiderBlacklist String[] @db.ObjectId //reference to raider id
+  raiderBlacklist String[] @db.ObjectId //reference to raider id 
   createdAt       DateTime @default(now())
   updateAt        DateTime @updatedAt
 }
+
+// =============================================================
+
+
 
 // =============================================================
 // ====================== TestDelivery =========================
