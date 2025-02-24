@@ -11,7 +11,6 @@ enum StatusCodes {
   InternalServerError = 500,
 }
 
-// Asserzione non nulla per JWT_SECRET
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET non definito nelle variabili d'ambiente");
@@ -28,8 +27,7 @@ export async function POST(request: NextRequest) {
         { status: StatusCodes.BadRequest }
       );
     }
-
-    // Controlla se l'utente esiste già
+   
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json(
@@ -37,17 +35,13 @@ export async function POST(request: NextRequest) {
         { status: StatusCodes.BadRequest }
       );
     }
-
-    // Cripta la password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Crea l'utente
+   
+    const hashedPassword = await bcrypt.hash(password, 10);    
     const user = await prisma.user.create({
       data: { email, password: hashedPassword },
     });
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
-   
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });   
 
     return NextResponse.json({status: "Success", hashedPassword: hashedPassword, token }, { status: StatusCodes.Created });
   } catch (error) {
