@@ -53,11 +53,11 @@ enum RoleEnum {
 
 model Raider {
   id                String      @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String      @db.ObjectId    // reference to user
+  userId            String      @db.ObjectId // reference to user
   inService         Boolean     @default(false) // flag per attivare la modalita raider on
-  vehicle           veichleEnum                 // enum con quale mezzo di trasporto usa
-  businessWhitelist String[]    @db.ObjectId    // reference to bussiness id
-  businessBlacklist String[]    @db.ObjectId    // refference to business id
+  vehicle           veichleEnum // enum con quale mezzo di trasporto usa
+  businessWhitelist String[]    @db.ObjectId // reference to bussiness id
+  businessBlacklist String[]    @db.ObjectId // refference to business id
   createdAt         DateTime    @default(now())
   updateAt          DateTime    @updatedAt
 }
@@ -115,16 +115,16 @@ model testDelivery {
 // schema da implementare
 model Delivery {
   id               String           @id @default(auto()) @map("_id") @db.ObjectId
-  name             String?                                // reference to business name
+  name             String? // reference to business name
   pickupAddress    String?
   deliveryAddress  String?
-  totalDistance    String?                                // calcolata con google maps
+  totalDistance    String? // calcolata con google maps
   deliveryCategory CategoryDelivery @relation(fields: [categoryId], references: [id])
   categoryId       String           @unique @db.ObjectId // categoria tipologia prodotto
-  peso             Float?                                // peso merce
+  peso             Float? // peso merce
   numeroColli      Int?
-  compensation     Float?                                // compenso raider
-  status           statusEnum                            // stato consegna
+  compensation     Float? // compenso raider
+  status           statusEnum // stato consegna
   isAssiged        Boolean?         @default(false)
   isCompleted      Boolean?         @default(false)
   createdAt        DateTime         @default(now())
@@ -192,3 +192,30 @@ type GoogleAddressComponentType {
   lat     Float
   long    Float
 }
+
+type DatiOrdineEasyApepr {
+  idRestaruant      String
+  idClient          String
+  name              String
+  surname           String
+  addressa          String
+  cordClient        String
+  category          String
+  costoProdotto     Int
+  modalitaPagamento String
+  costoConsegna     String
+  Note              String
+  consegnaPiano     String
+  prodotto          prodottoWasyAppere
+  costoTotale       Float  
+}
+
+type prodottoWasyAppere {
+  qty         Float
+  descrizione String
+  categoria   String
+  costoUnit   Float
+}
+
+
+// da definire tutti i reference
