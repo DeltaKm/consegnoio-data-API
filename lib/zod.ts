@@ -16,8 +16,8 @@ export const testDeliverySchema = z.object({
   peso:            z.number(),
   numeroColli:     z.number(),
   compensation:    z.number(),
-  // isAssigned: z.boolean(),
-  // isCompleted: z.boolean(),
+  isAssigned: z.boolean(),
+  isCompleted: z.boolean(),
 }).partial()
 
 export type TestDeliverySchema = z.infer<typeof testDeliverySchema>;
