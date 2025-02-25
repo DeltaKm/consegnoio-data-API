@@ -219,3 +219,11 @@ type prodottoWasyAppere {
 
 
 // da definire tutti i reference
+// per mappare l ordie da easy apper
+model Data {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  content     Json
+  createdAt   DateTime     @default(now())
+
+}
+
