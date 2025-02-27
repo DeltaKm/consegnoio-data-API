@@ -1,3 +1,4 @@
+// /app/auth/login/route.ts
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
@@ -6,12 +7,10 @@ import jwt from "jsonwebtoken";
 enum StatusCodes {
   NotFound = 404,
   Success = 200,
-  Created = 201,
   BadRequest = 400,
   InternalServerError = 500,
 }
 
-// Asserzione non nulla per JWT_SECRET
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET non definito nelle variabili d'ambiente");
@@ -29,7 +28,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Trova l'utente in base all'email
+    // Usa il modello UserToImp per cercare l'utente
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return NextResponse.json(
@@ -38,8 +37,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Confronta la password fornita con quella salvata (hashata)
-    const isValid = await bcrypt.compare(password, user.password);
+    const isValid = await bcrypt.compare(password, user.password!);
     if (!isValid) {
       return NextResponse.json(
         { message: "Credenziali non valide" },
@@ -47,10 +45,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Genera il token JWT (con scadenza impostata o senza, secondo le tue esigenze)
+    // Genera un nuovo token JWT valido per 1h
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
-    // Per token senza scadenza, usa:
-    // const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+    const expiration = new Date();
+    expiration.setHours(expiration.getHours() + 1);
+
+    // Aggiorna il record utente con il token e la sua scadenza
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { tokenJWT: token, expirationJWT: expiration, expired: false },
+    });
 
     return NextResponse.json({ token }, { status: StatusCodes.Success });
   } catch (error) {

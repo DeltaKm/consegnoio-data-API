@@ -1,4 +1,22 @@
-// schema.prisma
+/**
+ * - Abilitare GPS
+ * - Auth User
+ * - Gestire i datii visualizzati nelle card
+ * - Migliorare la grafica delle card e del dettaglio ordine
+ * - attivare lo stato raider Attivo / Disattivo con avviso di attivazione gps
+ * - aggiungere campi profilo raider
+ * - abilitare la modifica profilo raider
+ * - inserire versionamento app
+ * - inserire tracciamento raider
+ * - sistemare codice app flutter nelle path corrette
+ * - abiliatre sistema di notifiche
+ * - inserire sistema id comnnsegne per dare al raider solo le consegne della sua ditta
+ * - sistema di filitri per le schede consegne, assegnate e storico
+ * - finire gli endpoint aggiungere anche quello che invia un hook ad easyapper per lo stato della consegna
+ * - crere file docker del backend
+ * - Implementare sistema generatore di api key, stabilire nel databese come gestire i dati
+ * - primo stemp Configurare sistema api key e db predisposto primo step
+ */
 
 generator client {
   provider = "prisma-client-js"
@@ -15,23 +33,23 @@ datasource db {
 
 // da aggiungere field per jwt valido anche per la dashboard
 // da aggiungere i ruoli
-model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  password  String
-  creatdeAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
-}
+// model User {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//   email     String   @unique
+//   password  String
+//   creatdeAt DateTime @default(now())
+//   updateAt  DateTime @updatedAt
+// }
 
 // da implementare verificare il funzionamento degli enum con role
-model UserToImp {
+model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   email         String    @unique
   password      String?
-  role          RoleEnum
+  role          RoleEnum?
   tokenJWT      String?
   expirationJWT DateTime? // da testare
-  expirid       Boolean?
+  expired       Boolean?
   imgUrl        String    @default("asset/immages/log-consegnoio.png")
   creatdeAt     DateTime  @default(now())
   updateAt      DateTime  @updatedAt
@@ -53,11 +71,13 @@ enum RoleEnum {
 
 model Raider {
   id                String      @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String      @db.ObjectId // reference to user
+  userId            String      @db.ObjectId    // reference to user
+  isActive          Boolean
+  bussinesActived   String[]    @default([])    // reference 
   inService         Boolean     @default(false) // flag per attivare la modalita raider on
-  vehicle           veichleEnum // enum con quale mezzo di trasporto usa
-  businessWhitelist String[]    @db.ObjectId // reference to bussiness id
-  businessBlacklist String[]    @db.ObjectId // refference to business id
+  vehicle           veichleEnum                 // enum con quale mezzo di trasporto usa
+  businessWhitelist String[]    @db.ObjectId    // reference to bussiness id
+  businessBlacklist String[]    @db.ObjectId    // refference to business id
   createdAt         DateTime    @default(now())
   updateAt          DateTime    @updatedAt
 }
@@ -77,6 +97,7 @@ enum veichleEnum {
 model Business {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   userId          String   @db.ObjectId // reference to user
+  tokenBusiness   String // generato da easyapper o cosengoio
   name            String
   dataBussines    String // da definire i dati per l' attività
   address         String[] // da definire il componente google
@@ -84,6 +105,21 @@ model Business {
   raiderBlacklist String[] @db.ObjectId //reference to raider id 
   createdAt       DateTime @default(now())
   updateAt        DateTime @updatedAt
+}
+
+// =============================================================
+
+// =============================================================
+// ================= ServerApiKeyManagement ====================
+// =============================================================
+
+model ServerApiKeyManagement {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  bussinesId     String // reference
+  assigendApiKey String
+  isActive       Boolean  @default(false)
+  creatdAt       DateTime @default(now())
+  updateAt       DateTime @updatedAt
 }
 
 // =============================================================
@@ -139,6 +175,7 @@ model CategoryDelivery {
   updateAt  DateTime   @updatedAt
 }
 
+// probaiblmente da rimuovere
 // prototipo, da valutare in base ai dati forniti e se ha utilità
 type businessType {
   easyAppearId String
@@ -206,24 +243,61 @@ type DatiOrdineEasyApepr {
   costoConsegna     String
   Note              String
   consegnaPiano     String
-  prodotto          prodottoWasyAppere
-  costoTotale       Float  
+  prodotto          prodottoEasyappear
+  costoTotale       Float
 }
 
-type prodottoWasyAppere {
+type prodottoEasyappear {
   qty         Float
   descrizione String
   categoria   String
   costoUnit   Float
 }
 
-
 // da definire tutti i reference
-// per mappare l ordie da easy apper
+// per mappare l ordine da easyappear
 model Data {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  content     Json
-  createdAt   DateTime     @default(now())
-
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   Json
+  createdAt DateTime @default(now())
 }
 
+// =============================================================
+// =================== DeliveryEasyappear =======================
+// =============================================================
+
+model DeliveryEasyappear {
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  idRestaurant        String // token restaurant generato come token identificatico bussiness
+  deliveryCreatedAt   String
+  deliveryTime        String
+  businessName        String
+  customerId          String
+  customerName        String
+  customerSurname     String
+  customerAddress     String
+  customerZipcode     String
+  customerProvince    String
+  customerCity        String
+  paymentType         String
+  shippingType        String
+  totalPaid           Float
+  totalShipping       Float
+  note                String
+  customerCoordinates String
+  details             orderDetails[]
+  createdAt           DateTime       @default(now())
+  updateAt            DateTime       @updatedAt
+}
+
+type orderDetails {
+  id       String
+  quantity Float
+  weight   Float
+  price    Float
+  category String
+}
+
+// =============================================================
+// =============================================================
+// =============================================================

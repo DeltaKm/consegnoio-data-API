@@ -1,12 +1,11 @@
+// /app/auth/register/route.ts
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 enum StatusCodes {
-  NotFound = 404,
-  Success = 200,
-  Created = 201,
+  Success = 201,
   BadRequest = 400,
   InternalServerError = 500,
 }
@@ -27,7 +26,7 @@ export async function POST(request: NextRequest) {
         { status: StatusCodes.BadRequest }
       );
     }
-   
+
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json(
@@ -35,15 +34,22 @@ export async function POST(request: NextRequest) {
         { status: StatusCodes.BadRequest }
       );
     }
-   
-    const hashedPassword = await bcrypt.hash(password, 10);    
+
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
-      data: { email, password: hashedPassword },
+      data: { email, password: hashedPassword, role: "USER" },
     });
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });   
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+    const expiration = new Date();
+    expiration.setHours(expiration.getHours() + 1);
 
-    return NextResponse.json({status: "Success", hashedPassword: hashedPassword, token }, { status: StatusCodes.Created });
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { tokenJWT: token, expirationJWT: expiration, expired: false },
+    });
+
+    return NextResponse.json({ token }, { status: StatusCodes.Success });
   } catch (error) {
     console.error("Errore durante la registrazione:", error);
     return NextResponse.json(
@@ -52,4 +58,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
