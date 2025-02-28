@@ -1,21 +1,34 @@
 /**
- * - Abilitare GPS
- * - Auth User
+ * - DONE  => Auth User
+ * - DONE  => attivare lo stato raider Attivo / Disattivo con avviso di attivazione gps
+ * - DONE  => sistemare codice app flutter nelle path corrette
+ * - FIXED => RISOLVERE BUG SCHEDA STORICO
+ * - FIXED => BUG NELLA MODALITA RAID ATTIVA NELLA NUOVA IMPORTAZIONE
+ * - DONE  => conferma  mail per la registrazione
+ * - DONE  => reinvio conferma mail per la registrazione
+ * - DONE  => salvare la modlità raider nel database
+ * - DONE  => reset password
+ * - DONE  => fixxare errore 550 nel login penso dipenda dal fatto che si provaa loggare quando l user non ha confermato la mail
+ * - messaggio di avviso quando si cerca di rilasciare un ordine che avviisa del rating, con un timer che non puo rilasciare ordine
  * - Gestire i datii visualizzati nelle card
  * - Migliorare la grafica delle card e del dettaglio ordine
- * - attivare lo stato raider Attivo / Disattivo con avviso di attivazione gps
+ * - Abilitare GPS
  * - aggiungere campi profilo raider
  * - abilitare la modifica profilo raider
  * - inserire versionamento app
  * - inserire tracciamento raider
- * - sistemare codice app flutter nelle path corrette
  * - abiliatre sistema di notifiche
  * - inserire sistema id comnnsegne per dare al raider solo le consegne della sua ditta
- * - sistema di filitri per le schede consegne, assegnate e storico
+ * - sistema di filitri per le schede consegne, consegne assegnate e storico
  * - finire gli endpoint aggiungere anche quello che invia un hook ad easyapper per lo stato della consegna
  * - crere file docker del backend
  * - Implementare sistema generatore di api key, stabilire nel databese come gestire i dati
- * - primo stemp Configurare sistema api key e db predisposto primo step
+ * - primo step Configurare sistema api key e db predisposto
+ * - aggiungere reset password
+ * - aggiungere validazione dati campo registrazione e login
+ * - accettare orario previsto consegna
+ * - implementare rotte con auth token e id nei query param
+ * - implementare politica per attivare o disattivare utente raider / business
  */
 
 generator client {
@@ -31,28 +44,21 @@ datasource db {
 // ========================== User =============================
 // =============================================================
 
-// da aggiungere field per jwt valido anche per la dashboard
-// da aggiungere i ruoli
-// model User {
-//   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-//   email     String   @unique
-//   password  String
-//   creatdeAt DateTime @default(now())
-//   updateAt  DateTime @updatedAt
-// }
-
-// da implementare verificare il funzionamento degli enum con role
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  email         String    @unique
-  password      String?
-  role          RoleEnum?
-  tokenJWT      String?
-  expirationJWT DateTime? // da testare
-  expired       Boolean?
-  imgUrl        String    @default("asset/immages/log-consegnoio.png")
-  creatdeAt     DateTime  @default(now())
-  updateAt      DateTime  @updatedAt
+  id                      String    @id @default(auto()) @map("_id") @db.ObjectId
+  email                   String    @unique
+  password                String?
+  role                    RoleEnum? @default(USER)
+  confirmed               Boolean   @default(false)
+  confirmationToken       String?
+  resetPasswordToken      String?
+  resetPasswordExpiration DateTime?
+  tokenJWT                String?
+  expirationJWT           DateTime? // da testare
+  expired                 Boolean?
+  imgUrl                  String    @default("asset/immages/log-consegnoio.png")
+  creatdeAt               DateTime  @default(now())
+  updateAt                DateTime  @updatedAt
 }
 
 enum RoleEnum {
@@ -71,16 +77,16 @@ enum RoleEnum {
 
 model Raider {
   id                String      @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String      @db.ObjectId    // reference to user
+  userId            String      @db.ObjectId // reference to user
   isActive          Boolean
-  bussinesActived   String[]    @default([])    // reference 
+  bussinesActived   String[]    @default([]) // reference 
   inService         Boolean     @default(false) // flag per attivare la modalita raider on
-  vehicle           veichleEnum                 // enum con quale mezzo di trasporto usa
-  businessWhitelist String[]    @db.ObjectId    // reference to bussiness id
-  businessBlacklist String[]    @db.ObjectId    // refference to business id
+  vehicle           veichleEnum @default(CAR)
   createdAt         DateTime    @default(now())
   updateAt          DateTime    @updatedAt
 }
+
+
 
 enum veichleEnum {
   CAR
@@ -95,16 +101,12 @@ enum veichleEnum {
 // =============================================================
 
 model Business {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String   @db.ObjectId // reference to user
-  tokenBusiness   String // generato da easyapper o cosengoio
-  name            String
-  dataBussines    String // da definire i dati per l' attività
-  address         String[] // da definire il componente google
-  raiderWhitelist String[] @db.ObjectId //reference to raider id
-  raiderBlacklist String[] @db.ObjectId //reference to raider id 
-  createdAt       DateTime @default(now())
-  updateAt        DateTime @updatedAt
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  dataBussines      String
+  address           String[]
+  createdAt         DateTime @default(now())
+  updateAt          DateTime @updatedAt
 }
 
 // =============================================================

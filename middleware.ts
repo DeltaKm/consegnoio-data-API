@@ -52,6 +52,32 @@ const corsHeaders: Record<string, string> = {
 };
 
 export async function middleware(req: NextRequest) {
+
+
+  const { pathname } = req.nextUrl;
+
+
+  if (pathname.startsWith('/api/v1/auth/confirm') ) {
+    const response = NextResponse.next();
+    // Applica comunque i corsHeaders se necessario
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+    return response;
+  }
+
+  if (pathname.startsWith('/api/v1/auth/reset') ) {
+    const response = NextResponse.next();
+    // Applica comunque i corsHeaders se necessario
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+    return response;
+  }
+
+
+
+
   const origin = req.headers.get('origin');
 
   if (req.method === 'OPTIONS') {

@@ -28,12 +28,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Usa il modello UserToImp per cercare l'utente
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return NextResponse.json(
         { message: "Utente non trovato" },
         { status: StatusCodes.NotFound }
+      );
+    }
+
+    if (!user.confirmed) {
+      return NextResponse.json(
+        { message: "Email non confermata. Verifica la tua casella di posta." },
+        { status: StatusCodes.BadRequest }
       );
     }
 
@@ -45,12 +51,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Genera un nuovo token JWT valido per 1h
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
     const expiration = new Date();
     expiration.setHours(expiration.getHours() + 1);
 
-    // Aggiorna il record utente con il token e la sua scadenza
     await prisma.user.update({
       where: { id: user.id },
       data: { tokenJWT: token, expirationJWT: expiration, expired: false },
