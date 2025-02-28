@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       data: {
         email,
         password: hashedPassword,
-        role: "RAIDER", // oppure usa il default se preferisci
+        role: "USER", // oppure usa il default se preferisci
         confirmed: false,
         confirmationToken,
       },
