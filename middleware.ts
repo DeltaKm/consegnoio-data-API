@@ -74,9 +74,7 @@ export async function middleware(req: NextRequest) {
     });
     return response;
   }
-
-
-
+  
 
   const origin = req.headers.get('origin');
 
