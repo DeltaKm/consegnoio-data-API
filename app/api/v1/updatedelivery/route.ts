@@ -32,6 +32,8 @@ export async function PATCH(request: NextRequest) {
       peso: true,
       numeroColli: true,
       compensation: true,
+      status: true,
+      schedulingDelivery: true
     })
 
     const body = await request.json();
