@@ -11,7 +11,9 @@
  * - DONE  => fixxare errore 550 nel login penso dipenda dal fatto che si provaa loggare quando l user non ha confermato la mail
  * - DONE  => aggiungere endpoint reset password
  * - DONE  => aggiungere frontend flutter reset password
- * - Doen => aggiungere messaggi restituiiti dal backend di conferma mail utente non confermato etc
+ * - DONE  => aggiungere messaggi restituiiti dal backend di conferma mail utente non confermato etc
+ * - DONE  => fix refresh indicator
+ * - DONE  => da fixxare un probblema con i tipi enumerati che non li prende sembra mongo ("fixato usando string in prisma e validato con zod per gli enum")
  * - messaggio di avviso quando si cerca di rilasciare un ordine che avvisa del rating, con un timer che non puo rilasciare ordine
  * - Gestire i datii visualizzati nelle card
  * - Migliorare la grafica delle card e del dettaglio ordine
@@ -44,6 +46,7 @@
  * - implementare paginazione o conectto simile per le richieste in modo da evitare il crash del server
  * - add baseurl costant client flutter
  * - add color costant
+ * - aggiungere swipe tra le pagine *** Future Release ***
  */
 
 generator client {
@@ -76,6 +79,7 @@ model User {
   updateAt                DateTime  @updatedAt
 }
 
+//da definire con zod per i problemi di prisma fare prima il test perche puo essere un problema solo sullo schema precedente
 enum RoleEnum {
   ADMIN
   USER
@@ -148,19 +152,32 @@ model ServerApiKeyManagement {
 // da implementare stato consegna sia backend che frontend
 
 model testDelivery {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  name            String? // business name valutare se inserire id easy appear e crare un type con nome e ideasy appear
-  pickupAddress   String?
-  deliveryAddress String?
-  totalDistance   String?
-  deliveryType    String?
-  peso            Float?
-  numeroColli     Int?
-  compensation    Float?
-  isAssigned      Boolean? @default(false)
-  isCompleted     Boolean? @default(false)
-  createdAt       DateTime @default(now())
-  updateAt        DateTime @updatedAt
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  name               String? // business name 
+  pickupAddress      String?
+  deliveryAddress    String?
+  totalDistance      String?
+  deliveryType       String?
+  peso               Float?
+  numeroColli        Int?
+  compensation       Float?
+  note               String?
+  schedulingDelivery DateTime? @default(now())
+  status             String?   @default("CREATED")
+  isAssigned         Boolean?  @default(false)
+  isCompleted        Boolean?  @default(false)
+  createdAt          DateTime  @default(now())
+  updateAt           DateTime  @updatedAt
+}
+
+// test enum
+model Test {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  enum       String?
+  field      String?
+  scheduling DateTime? @default(now())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 // schema da implementare
@@ -175,7 +192,7 @@ model Delivery {
   peso             Float? // peso merce
   numeroColli      Int?
   compensation     Float? // compenso raider
-  status           statusEnum // stato consegna
+  status           StatusEnum       @default(ASSIGNED) // stato consegna nda trovare una soluzione per gl ienum
   isAssiged        Boolean?         @default(false)
   isCompleted      Boolean?         @default(false)
   createdAt        DateTime         @default(now())
@@ -199,15 +216,16 @@ type businessType {
 
 // prototitopo 
 type deliveryStatus {
-  status    statusEnum
+  status    StatusEnum
   isDeleted Boolean
 }
 
 // stato della consegna
-enum statusEnum {
-  notAssigned
-  onDelivery
-  delivered
+enum StatusEnum {
+  ASSIGNED
+  ONDELIVERY
+  PENDINGT
+  COMPLETED
 }
 
 // =============================================================
@@ -231,11 +249,12 @@ model HistoryDelivery {
 }
 
 model CancelledDeliveries {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  isAssigend Boolean // per valutare se era stata assegnata nel momento della cancellazione
-  userId     String   @db.ObjectId // reference to user
-  createdAt  DateTime @default(now())
-  updateAt   DateTime @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId // reference to user diretto poi si valuta se era raider o business
+  note      String
+  status    String // lo stato in cui la consegna era quando è stata cancellata
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
 }
 
 type GoogleAddressComponentType {

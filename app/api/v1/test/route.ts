@@ -13,8 +13,6 @@ enum StatusCodes {
 }
 
 
-
-
 export async function GET() {
   try {
     const delivery = await prisma.testDelivery.findMany({
@@ -31,7 +29,6 @@ export async function GET() {
   }
 }
 
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -44,8 +41,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const dataToInsert = {
+      ...result.data,
+      schedulingDelivery: result.data.schedulingDelivery 
+        ? new Date(result.data.schedulingDelivery) 
+        : undefined,
+    };
+
     const newDelivery = await prisma.testDelivery.create({ 
-      data: result.data,
+      data: dataToInsert,
     });
 
     return NextResponse.json(newDelivery, { status: StatusCodes.Created });

@@ -15,10 +15,9 @@ enum StatusCodes {
 
 // ** text fix mongo funciton datetime
 // da fare il test con server ita per veder se mantine l ora coretta
-
 const dateIta = new Date();
 dateIta.setHours(dateIta.getHours() + 1); // UTC+1
-// ****
+// ******************************************
 
 
 const registerSchema = z.object({

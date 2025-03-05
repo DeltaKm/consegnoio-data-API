@@ -1,12 +1,9 @@
-
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { testDeliverySchema } from "@/lib/zod";
+import { testSchema } from "@/lib/zod";
 
-
+// Definizione degli status HTTP
 enum StatusCodes {
-  NotFound = 404,
-  Success = 200,
   Created = 201,
   BadRequest = 400,
   InternalServerError = 500,
@@ -17,7 +14,7 @@ enum StatusCodes {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const result = testDeliverySchema.safeParse(body);
+    const result = testSchema.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
@@ -25,23 +22,24 @@ export async function POST(request: NextRequest) {
         { status: StatusCodes.BadRequest }
       );
     }
-
+    
+    // fix data
     const dataToInsert = {
       ...result.data,
-      schedulingDelivery: result.data.schedulingDelivery 
-        ? new Date(result.data.schedulingDelivery) 
+      scheduling: result.data.scheduling 
+        ? new Date(result.data.scheduling) 
         : undefined,
     };
 
-    const newDelivery = await prisma.testDelivery.create({ 
+    const newTest = await prisma.test.create({
       data: dataToInsert,
     });
 
-    return NextResponse.json(newDelivery, { status: StatusCodes.Created });
+    return NextResponse.json(newTest, { status: StatusCodes.Created });
   } catch (error) {
-    console.error("Errore durante la creazione dell'ordine", error);
+    console.error("Errore durante la creazione del record Test", error);
     return NextResponse.json(
-      { message: "Errore durante la creazione dell'ordine" },
+      { message: "Errore durante la creazione del record Test" },
       { status: StatusCodes.InternalServerError }
     );
   }
