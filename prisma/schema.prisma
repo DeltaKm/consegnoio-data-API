@@ -47,6 +47,7 @@
  * - add baseurl costant client flutter
  * - add color costant
  * - aggiungere swipe tra le pagine *** Future Release ***
+ * - controlalre la cache che non mi prendeva lo status valure finche non ho aggiornato
  */
 
 generator client {
