@@ -27,6 +27,7 @@ export const testDeliverySchema = z.object({
   isCompleted: z.boolean(),
 }).partial();
 
+// schema di test per gli enum mapapti da me tramite zod
 export const testSchema = z.object({  
     enum: z.enum([
       "CREATED",
