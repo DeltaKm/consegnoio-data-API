@@ -1,5 +1,5 @@
 import prisma from "@/app/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 enum StatusCodes {
   NotFound = 404,
@@ -7,16 +7,36 @@ enum StatusCodes {
   InternalServerError = 500,
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const raiders = await prisma.raider.findMany({
-      include: {
-        businessRelations: true,
-        user: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    return NextResponse.json({ raiders }, { status: StatusCodes.Success });
+    const id = request.nextUrl.searchParams.get("id");
+
+    if (id) {
+      const raider = await prisma.raider.findUnique({
+        where: { id },
+        include: {
+          businessRelations: true,
+          user: true,
+        },
+      });
+      if (!raider) {
+        return NextResponse.json(
+          { message: "Raider non trovata" },
+          { status: StatusCodes.NotFound }
+        );
+      }
+      return NextResponse.json(raider, { status: StatusCodes.Success });
+    } else {
+      // Se non viene passato nessun id, restituisce tutti i Raider
+      const raiders = await prisma.raider.findMany({
+        include: {
+          businessRelations: true,
+          user: true,
+        },
+        orderBy: { createdAt: "desc" },
+      });
+      return NextResponse.json({ raiders }, { status: StatusCodes.Success });
+    }
   } catch (error: any) {
     console.error("Errore nel recupero dei Raider:", error);
     return NextResponse.json(

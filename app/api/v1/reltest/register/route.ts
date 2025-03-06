@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password, role } = body;
     // Se il ruolo non è passato, di default impostiamo RAIDER
-    const userRole: RoleEnum = role ?? "RAIDER";
+    const userRole: RoleEnum = role ?? "USER";
 
     // Crea l'utente base
     const user = await prisma.user.create({

@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
     const id = request.nextUrl.searchParams.get("id");
 
     if (id) {
-      // Se viene passato un id, restituisce solo quella delivery
       const delivery = await prisma.testDelivery.findUnique({ where: { id } });
       if (!delivery) {
         return NextResponse.json(
@@ -22,7 +21,6 @@ export async function GET(request: NextRequest) {
       }
       return NextResponse.json(delivery, { status: StatusCodes.Success });
     } else {
-      // Altrimenti restituisce tutte le delivery
       const deliveries = await prisma.testDelivery.findMany({
         orderBy: { createdAt: "desc" },
       });
