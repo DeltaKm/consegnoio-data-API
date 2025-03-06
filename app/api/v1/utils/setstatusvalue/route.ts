@@ -1,4 +1,3 @@
-//setstatusvalue/route.ts
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";

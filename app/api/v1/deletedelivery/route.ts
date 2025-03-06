@@ -1,4 +1,3 @@
-// app/api/deletedelivery/route.ts
 
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
