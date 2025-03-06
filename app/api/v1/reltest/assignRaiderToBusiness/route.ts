@@ -21,12 +21,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verifichiamo se esiste già una relazione per questa coppia
+    // Verifichiamo se esiste già una relazione nel modello pivot
     let relation = await prisma.businessRaider.findFirst({
       where: { raiderId, businessId },
     });
 
-    // Se la relazione non esiste, la creiamo
     if (!relation) {
       relation = await prisma.businessRaider.create({
         data: {
@@ -36,18 +35,16 @@ export async function POST(request: NextRequest) {
         },
       });
     } else {
-      // Se esiste, la aggiorniamo impostando confirmed a true
       relation = await prisma.businessRaider.update({
         where: { id: relation.id },
         data: { confirmed: true },
       });
     }
 
-    // Recuperiamo il record del raider per aggiornare l'array dei business attivi
+    // Aggiorniamo il profilo del raider: aggiorniamo bussinesActived
     const raider = await prisma.raider.findUnique({
       where: { id: raiderId },
     });
-
     if (!raider) {
       return NextResponse.json(
         { message: "Raider non trovato" },
@@ -55,7 +52,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Aggiorniamo l'array bussinesActived se il businessId non è già presente
     let updatedRaider = raider;
     if (!raider.bussinesActived.includes(businessId)) {
       const newActives = [...raider.bussinesActived, businessId];
@@ -65,11 +61,32 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Aggiorniamo il profilo del business: aggiorniamo raiderActived
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+    });
+    if (!business) {
+      return NextResponse.json(
+        { message: "Business non trovato" },
+        { status: StatusCodes.NotFound }
+      );
+    }
+
+    let updatedBusiness = business;
+    if (!business.raiderActived.includes(raiderId)) {
+      const newRaiders = [...business.raiderActived, raiderId];
+      updatedBusiness = await prisma.business.update({
+        where: { id: businessId },
+        data: { raiderActived: newRaiders },
+      });
+    }
+
     return NextResponse.json(
       {
         message: "Raider assegnato al business con successo",
         relation,
         updatedRaider,
+        updatedBusiness,
       },
       { status: StatusCodes.Created }
     );

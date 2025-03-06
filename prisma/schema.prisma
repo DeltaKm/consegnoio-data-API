@@ -79,7 +79,6 @@ model User {
   creatdeAt               DateTime  @default(now())
   updateAt                DateTime  @updatedAt
 
-  // Rimuoviamo il vincolo @unique per evitare errori sugli indici con null
   raiderProfiles   Raider[]   @relation("UserRaider")
   businessProfiles Business[] @relation("UserBusiness")
 }
@@ -110,10 +109,8 @@ model Raider {
   createdAt       DateTime    @default(now())
   updateAt        DateTime    @updatedAt
 
-  // Campo opposto per la relazione one-to-many
   user User? @relation("UserRaider", fields: [userId], references: [id])
 
-  // Relazione verso le associazioni col Business
   businessRelations BusinessRaider[]
   userId            String?          @db.ObjectId
 }
@@ -160,7 +157,7 @@ model BusinessRaider {
 // =============================================================
 // ================= ServerApiKeyManagement ====================
 // =============================================================
-
+// da valutare se mantenerla qua o fare un serizio esterno
 model ServerApiKeyManagement {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   bussinesId     String // reference
@@ -249,7 +246,7 @@ type deliveryStatus {
   isDeleted Boolean
 }
 
-// stato della consegna
+// stato della consegna fiel da eliminare perche lo valido con zod per problema sui tipi enumerati di prisma
 enum StatusEnum {
   ASSIGNED
   ONDELIVERY
@@ -374,3 +371,13 @@ model StatusValue {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+model DeliveryTypeValue {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  label String
+  value String
+  cratedAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+}
+
