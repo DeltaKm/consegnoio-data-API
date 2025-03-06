@@ -78,6 +78,10 @@ model User {
   imgUrl                  String    @default("asset/immages/log-consegnoio.png")
   creatdeAt               DateTime  @default(now())
   updateAt                DateTime  @updatedAt
+
+  // Rimuoviamo il vincolo @unique per evitare errori sugli indici con null
+  raiderProfiles   Raider[]   @relation("UserRaider")
+  businessProfiles Business[] @relation("UserBusiness")
 }
 
 //da definire con zod per i problemi di prisma fare prima il test perche puo essere un problema solo sullo schema precedente
@@ -97,13 +101,21 @@ enum RoleEnum {
 
 model Raider {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String      @db.ObjectId // reference to user
+  Name            String
+  Surname         String
   isActive        Boolean
   bussinesActived String[]    @default([]) // reference 
   inService       Boolean     @default(false) // flag per attivare la modalita raider on
   vehicle         veichleEnum @default(CAR)
   createdAt       DateTime    @default(now())
   updateAt        DateTime    @updatedAt
+
+  // Campo opposto per la relazione one-to-many
+  user User? @relation("UserRaider", fields: [userId], references: [id])
+
+  // Relazione verso le associazioni col Business
+  businessRelations BusinessRaider[]
+  userId            String?          @db.ObjectId
 }
 
 enum veichleEnum {
@@ -119,15 +131,31 @@ enum veichleEnum {
 // =============================================================
 
 model Business {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  dataBussines String
-  address      String[]
-  createdAt    DateTime @default(now())
-  updateAt     DateTime @updatedAt
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  bussinesName  String
+  raiderActived String[]
+  address       String
+  createdAt     DateTime @default(now())
+  updateAt      DateTime @updatedAt
+
+  user User? @relation("UserBusiness", fields: [userId], references: [id])
+
+  raiderRelations BusinessRaider[]
+  userId          String?          @db.ObjectId
 }
 
 // =============================================================
+
+model BusinessRaider {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  business   Business @relation(fields: [businessId], references: [id])
+  businessId String   @db.ObjectId
+  raider     Raider   @relation(fields: [raiderId], references: [id])
+  raiderId   String   @db.ObjectId
+  confirmed  Boolean  @default(false)
+
+  @@unique([businessId, raiderId])
+}
 
 // =============================================================
 // ================= ServerApiKeyManagement ====================
@@ -338,13 +366,11 @@ type orderDetails {
 // =============================================================
 // =============================================================
 
-
-
 // test per mapapre i valori per carlo
 model StatusValue {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  label     String  
-  value     String   
+  label     String
+  value     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

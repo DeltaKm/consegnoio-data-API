@@ -7,7 +7,6 @@ enum StatusCodes {
     InternalServerError = 500,
   }
 
-
 export async function GET() {
     try {
       const statusValue = await prisma.statusValue.findMany({
