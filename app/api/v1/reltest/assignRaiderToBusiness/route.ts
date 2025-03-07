@@ -12,7 +12,7 @@ enum StatusCodes {
 
 export async function POST(request: NextRequest) {
   try {
-    // Leggiamo il body come testo
+  
     const bodyText = await request.text();
     if (!bodyText || bodyText.trim() === "") {
       return NextResponse.json(
@@ -27,48 +27,60 @@ export async function POST(request: NextRequest) {
     const body = JSON.parse(bodyText);
     const { raiderId, businessId } = body;
 
-    // Controllo se entrambi i campi sono forniti
+ 
     if (!raiderId || !businessId) {
       return NextResponse.json(
         {
           message: "The fields raiderId and businessId are required.",
-          example: { raiderId: "ID_Raider", businessId: "ID__Business" },
+          example: { raiderId: "ID_Raider", businessId: "ID_Business" },
         },
         { status: StatusCodes.BadRequest }
       );
     }
 
-    // Verifichiamo se esiste già una relazione nel modello pivot
-    let relation = await prisma.businessRaider.findFirst({
-      where: { raiderId, businessId },
-    });
 
-    if (!relation) {
-      relation = await prisma.businessRaider.create({
-        data: {
-          raiderId,
-          businessId,
-          confirmed: true,
-        },
-      });
-    } else {
-      relation = await prisma.businessRaider.update({
-        where: { id: relation.id },
-        data: { confirmed: true },
-      });
-    }
-
-    // Aggiorniamo il profilo del raider: aggiorniamo bussinesActived
     const raider = await prisma.raider.findUnique({
       where: { id: raiderId },
     });
     if (!raider) {
       return NextResponse.json(
-        { message: "Raider non trovato" },
+        { message: "Raider not found" },
         { status: StatusCodes.NotFound }
       );
     }
 
+   
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
+    });
+    if (!business) {
+      return NextResponse.json(
+        { message: "Business not found" },
+        { status: StatusCodes.NotFound }
+      );
+    }
+
+
+    const existingRelation = await prisma.businessRaider.findFirst({
+      where: { raiderId, businessId },
+    });
+    if (existingRelation) {
+      return NextResponse.json(
+        { message: "Raider already assigned to the business.", relation: existingRelation },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+
+    const relation = await prisma.businessRaider.create({
+      data: {
+        raiderId,
+        businessId,
+        confirmed: true,
+      },
+    });
+
+    
     let updatedRaider = raider;
     if (!raider.bussinesActived.includes(businessId)) {
       const newActives = [...raider.bussinesActived, businessId];
@@ -78,17 +90,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Aggiorniamo il profilo del business: aggiorniamo raiderActived
-    const business = await prisma.business.findUnique({
-      where: { id: businessId },
-    });
-    if (!business) {
-      return NextResponse.json(
-        { message: "Business non trovato" },
-        { status: StatusCodes.NotFound }
-      );
-    }
-
+   
     let updatedBusiness = business;
     if (!business.raiderActived.includes(raiderId)) {
       const newRaiders = [...business.raiderActived, raiderId];
@@ -100,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: "Raider assegnato al business con successo",
+        message: "Raider assigned to the business successfully.",
         relation,
         updatedRaider,
         updatedBusiness,
@@ -108,9 +110,9 @@ export async function POST(request: NextRequest) {
       { status: StatusCodes.Created }
     );
   } catch (error: any) {
-    console.error("Errore durante l'assegnazione del raider al business:", error);
+    console.error("Error during raider assignment to business:", error);
     return NextResponse.json(
-      { message: "Errore interno durante l'assegnazione", error: error.message },
+      { message: "Internal error during assignment", error: error.message },
       { status: StatusCodes.InternalServerError }
     );
   }
