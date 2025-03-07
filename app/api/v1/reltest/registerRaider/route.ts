@@ -1,11 +1,11 @@
-// app/api/v1/auth/register/route.ts
+// app/api/v1/auth/registerRaider/route.ts
 import prisma from '@/app/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import transporter from '@/app/lib/mailer';
-import { z } from 'zod';
+import { string, z } from 'zod';
 
 enum StatusCodes {
   Success = 201,
@@ -17,11 +17,21 @@ enum StatusCodes {
 const dateIta = new Date();
 dateIta.setHours(dateIta.getHours() + 1);
 
-// Schema di validazione con Zod
+
 const registerSchema = z.object({
-  email: z.string().email({ message: "Email non valida" }),
-  password: z.string().min(6, { message: "La password deve avere almeno 6 caratteri" }),
-  role: z.string().optional(),
+  email: z.string().email({ message: "Email non valida" }).max(30, { message: "L'email deve avere massimo 30 caratteri" }),
+  password: z.string().min(6, { message: "La password deve avere almeno 6 caratteri" }).max(30, { message: "La password deve avere massimo 30 caratteri" }),
+  name: z.string().min(2, { message: "Il nome deve avere almeno 2 caratteri" }).max(30, { message: "Il nome deve avere massimo 30 caratteri" }),
+  surname: z.string().min(2, { message: "Il cognome deve avere almeno 2 caratteri" }).max(30, { message: "Il cognome deve avere massimo 30 caratteri" }), 
+  vehicle: z.enum ([
+    "CAR",
+    "MOTORCYCLE",
+    "BICYCLE",
+    "VAN",
+    "REFRIGERATEDVAN",
+    "WITHOUTVEHICLE",
+    "TRANSIT"
+  ]).optional(),
 });
 
 const JWT_SECRET: string = process.env.JWT_SECRET!;
@@ -31,7 +41,6 @@ if (!JWT_SECRET) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Leggiamo il body come testo
     const bodyText = await request.text();
     if (!bodyText || bodyText.trim() === "") {
       return NextResponse.json(
@@ -56,9 +65,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const { email, password } = validation.data;
+    const { email, password, name, surname, vehicle } = validation.data;
     
-    const userRole = (body.role === "RAIDER" || body.role === "BUSINESS") ? body.role : "USER";
     
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -76,33 +84,24 @@ export async function POST(request: NextRequest) {
       data: {
         email,
         password: hashedPassword,
-        role: userRole,
+        role: "RAIDER",
         confirmed: false,
         confirmationToken,
         creatdeAt: dateIta,
       },
     });
     
-    
+    // controlalre se il ciclo funziona
     let profile = null;
-    if (userRole === "RAIDER") {
+    if (user.id != null) {
       profile = await prisma.raider.create({
         data: {
-          name: "NomeDiTest",
-          surname: "CognomeDiTest",
-          isActive: false,
+          name,
+          surname,
+          isActive: true,
           bussinesActived: [],
           inService: false,
           vehicle: "CAR",
-          userId: user.id, 
-        },
-      });
-    } else if (userRole === "BUSINESS") {
-      profile = await prisma.business.create({
-        data: {
-          bussinesName: "Business di Test",
-          raiderActived: [],
-          address: "Via Test 123",
           userId: user.id, 
         },
       });

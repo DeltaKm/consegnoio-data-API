@@ -14,6 +14,7 @@
  * - DONE  => aggiungere messaggi restituiiti dal backend di conferma mail utente non confermato etc
  * - DONE  => fix refresh indicator
  * - DONE  => da fixxare un probblema con i tipi enumerati che non li prende sembra mongo ("fixato usando string in prisma e validato con zod per gli enum")
+ * - DONE => URGENTE CREARE LOGICA PER LA REGISTRAZIONE UTENTE IN BASE AI PROFILI
  * - messaggio di avviso quando si cerca di rilasciare un ordine che avvisa del rating, con un timer che non puo rilasciare ordine
  * - Gestire i datii visualizzati nelle card
  * - Migliorare la grafica delle card e del dettaglio ordine
@@ -48,6 +49,7 @@
  * - add color costant
  * - aggiungere swipe tra le pagine *** Future Release ***
  * - controlalre la cache che non mi prendeva lo status valure finche non ho aggiornato
+ * - La consegna creata deve avere l id del business che l ha create e quando assegnata l 'id del raider che  l ha presa in carico
  */
 
 generator client {
@@ -100,9 +102,9 @@ enum RoleEnum {
 
 model Raider {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
-  Name            String
-  Surname         String
-  isActive        Boolean
+  name            String
+  surname         String
+  isActive        Boolean     @default(false)
   bussinesActived String[]    @default([]) // reference 
   inService       Boolean     @default(false) // flag per attivare la modalita raider on
   vehicle         veichleEnum @default(CAR)
@@ -119,6 +121,20 @@ enum veichleEnum {
   CAR
   BICYCLE
   MOTORCYCLE
+  VAN
+  REFRIGERATEDVAN
+  WITHOUTVEHICLE
+  TRANSIT
+}
+
+// valutare se validare le modlità da inviare per calcolare le distanze
+// se ierirle lato db, o validare lato backend
+enum googleTravelMode {
+  driving // (default) indica le direzioni di guida standard o la distanza utilizzando la rete stradale
+  walking // indicazioni stradali o distanza tramite percorsi pedonali e marciapiedi (ove disponibili).
+  bicycling // indicazioni in bicicletta o distanza tramite piste ciclabili e strade preferite
+  transit // struzioni per le richieste di transito o distanza utilizzando le rotte di trasporto pubblico (ove disponibili)
+  transit_routing_preference // Se si imposta la modalità di transito, è possibile specificare facoltativamente un orario di partenza o un orario di arrivo. Se non viene specificato alcun orario, l'ora di partenza è predefinita ora (ovvero, l'orario di partenza è predefinito all'ora corrente). È inoltre possibile includere facoltativamente una modalità transit_ e / o una preferenza transit_routing_.
 }
 
 // =============================================================
@@ -372,12 +388,10 @@ model StatusValue {
   updatedAt DateTime @updatedAt
 }
 
-
 model DeliveryTypeValue {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  label String
-  value String
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  label    String
+  value    String
   cratedAt DateTime @default(now())
   updateAt DateTime @updatedAt
 }
-
