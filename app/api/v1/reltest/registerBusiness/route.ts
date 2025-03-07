@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (!bodyText || bodyText.trim() === "") {
       return NextResponse.json(
         { 
-          requiredFields: { email: "example@example.com", password: "password123" } 
+          requiredFields: { email: "example@example.com", password: "password123", bussinesName: "Verizon", address: "Washington Valley RoadBedminster, NJ 07921" } 
         },
         { status: StatusCodes.BadRequest }
       );
