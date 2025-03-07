@@ -1,3 +1,4 @@
+// app/api/v1/reltest/assignRaiderToBusiness/route.ts
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -11,12 +12,28 @@ enum StatusCodes {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    // Leggiamo il body come testo
+    const bodyText = await request.text();
+    if (!bodyText || bodyText.trim() === "") {
+      return NextResponse.json(
+        {
+          message: "Missing fields. Example of payload:",
+          example: { raiderId: "ID_Raider", businessId: "ID_Business" },
+        },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+    const body = JSON.parse(bodyText);
     const { raiderId, businessId } = body;
 
+    // Controllo se entrambi i campi sono forniti
     if (!raiderId || !businessId) {
       return NextResponse.json(
-        { message: "I campi raiderId e businessId sono obbligatori" },
+        {
+          message: "The fields raiderId and businessId are required.",
+          example: { raiderId: "ID_Raider", businessId: "ID__Business" },
+        },
         { status: StatusCodes.BadRequest }
       );
     }
