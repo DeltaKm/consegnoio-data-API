@@ -12,7 +12,7 @@ enum StatusCodes {
 
 export async function DELETE(request: NextRequest) {
   try {
-    // Leggiamo il body come testo
+   
     const bodyText = await request.text();
     if (!bodyText || bodyText.trim() === "") {
       return NextResponse.json(
@@ -27,7 +27,7 @@ export async function DELETE(request: NextRequest) {
     const body = JSON.parse(bodyText);
     const { raiderId, businessId } = body;
 
-    // Controllo se entrambi i campi sono forniti
+    
     if (!raiderId || !businessId) {
       return NextResponse.json(
         {
@@ -37,8 +37,7 @@ export async function DELETE(request: NextRequest) {
         { status: StatusCodes.BadRequest }
       );
     }
-
-    // Verifica se la relazione esiste
+  
     const existingRelation = await prisma.businessRaider.findFirst({
       where: { raiderId, businessId },
     });
@@ -49,12 +48,11 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Elimina la relazione
+ 
     await prisma.businessRaider.delete({
       where: { id: existingRelation.id },
     });
-
-    // Aggiorna il profilo del raider: rimuove businessId dall'array bussinesActived
+  
     const raider = await prisma.raider.findUnique({
       where: { id: raiderId },
     });
@@ -73,7 +71,6 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Aggiorna il profilo del business: rimuove raiderId dall'array raiderActived
     const business = await prisma.business.findUnique({
       where: { id: businessId },
     });
