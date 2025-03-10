@@ -11,8 +11,7 @@ enum StatusCodes {
 }
 
 export async function DELETE(request: NextRequest) {
-  try {
-   
+  try {   
     const bodyText = await request.text();
     if (!bodyText || bodyText.trim() === "") {
       return NextResponse.json(
@@ -47,7 +46,6 @@ export async function DELETE(request: NextRequest) {
         { status: StatusCodes.NotFound }
       );
     }
-
  
     await prisma.businessRaider.delete({
       where: { id: existingRelation.id },

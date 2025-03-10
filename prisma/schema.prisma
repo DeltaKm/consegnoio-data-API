@@ -17,6 +17,7 @@
  * - DONE => URGENTE CREARE LOGICA PER LA REGISTRAZIONE UTENTE IN BASE AI PROFILI
  * - messaggio di avviso quando si cerca di rilasciare un ordine che avvisa del rating, con un timer che non puo rilasciare ordine
  * - Gestire i datii visualizzati nelle card
+ * - Fixxare il punto che rimane quando apro l' app al centro del primary swatch
  * - Migliorare la grafica delle card e del dettaglio ordine
  * - Abilitare GPS
  * - aggiungere campi profilo raider
@@ -203,7 +204,7 @@ model testDelivery {
   peso               Float?
   numeroColli        Int?
   compensation       Float?
-  note               String?
+  note               String?  @default("")
   schedulingDelivery DateTime? @default(now())
   status             String?   @default("CREATED")
   isAssigned         Boolean?  @default(false)

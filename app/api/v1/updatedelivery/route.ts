@@ -22,7 +22,6 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // rendo opzional i cmapi
     const optional = testDeliverySchema.partial({
       name: true,
       pickupAddress: true,
@@ -33,7 +32,8 @@ export async function PATCH(request: NextRequest) {
       numeroColli: true,
       compensation: true,
       status: true,
-      schedulingDelivery: true
+      schedulingDelivery: true,
+      note: true
     })
 
     const body = await request.json();
