@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { 
           message: "Missing query parameter 'businessId'.",
-          example: { businessId: "ID_Business" }
+          example: { id: "ID_Business" }
         },
         { status: StatusCodes.BadRequest }
       );
