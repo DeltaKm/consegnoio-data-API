@@ -161,12 +161,14 @@ model Business {
 // =============================================================
 
 model BusinessRaider {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  business   Business @relation(fields: [businessId], references: [id])
-  businessId String   @db.ObjectId
-  raider     Raider   @relation(fields: [raiderId], references: [id])
-  raiderId   String   @db.ObjectId
-  confirmed  Boolean  @default(false)
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  business              Business @relation(fields: [businessId], references: [id])
+  businessId            String   @db.ObjectId
+  raider                Raider   @relation(fields: [raiderId], references: [id])
+  raiderId              String   @db.ObjectId
+  confirmedFromBusiness Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updateAt              DateTime @updatedAt
 
   @@unique([businessId, raiderId])
 }
@@ -204,7 +206,7 @@ model testDelivery {
   peso               Float?
   numeroColli        Int?
   compensation       Float?
-  note               String?  @default("")
+  note               String?   @default("")
   schedulingDelivery DateTime? @default(now())
   status             String?   @default("CREATED")
   isAssigned         Boolean?  @default(false)

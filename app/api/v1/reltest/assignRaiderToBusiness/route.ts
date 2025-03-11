@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       data: {
         raiderId,
         businessId,
-        confirmed: true,
+        confirmedFromBusiness: false,
       },
     });
 
