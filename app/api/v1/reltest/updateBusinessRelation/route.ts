@@ -11,7 +11,6 @@ enum StatusCodes {
 
 export async function PATCH(request: NextRequest) {
   try {
-    // Recupera i parametri di query "relationId" e "value"
     const relationId = request.nextUrl.searchParams.get("relationId");
     const valueParam = request.nextUrl.searchParams.get("value");
 
@@ -24,7 +23,6 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Converte valueParam in boolean
     let newValue: boolean;
     if (valueParam.toLowerCase() === "true") {
       newValue = true;

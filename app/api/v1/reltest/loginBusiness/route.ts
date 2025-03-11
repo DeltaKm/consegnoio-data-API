@@ -1,0 +1,85 @@
+// app/api/v1/reltest/loginBusiness/route.ts
+import prisma from "@/app/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+enum StatusCodes {
+  NotFound = 404,
+  Success = 200,
+  BadRequest = 400,
+  InternalServerError = 500,
+}
+
+const JWT_SECRET: string = process.env.JWT_SECRET!;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET non definito nelle variabili d'ambiente");
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { email, password } = body;
+
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: "Email e password sono obbligatorie" },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return NextResponse.json(
+        { message: "Utente non trovato" },
+        { status: StatusCodes.NotFound }
+      );
+    }
+
+    if (user.role !== "BUSINESS") {
+      return NextResponse.json(
+        { message: "Utente non autorizzato. Non hai i permessi per accedere come Business." },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+    if (!user.confirmed) {
+      return NextResponse.json(
+        { message: "Email non confermata. Verifica la tua casella di posta." },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+    const isValid = await bcrypt.compare(password, user.password!);
+    if (!isValid) {
+      return NextResponse.json(
+        { message: "Credenziali non valide" },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+    const expiration = new Date();
+    expiration.setHours(expiration.getHours() + 1);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { tokenJWT: token, expirationJWT: expiration, expired: false },
+    });
+
+    const business = await prisma.business.findFirst({
+      where: { userId: user.id },
+    });
+
+    return NextResponse.json(
+      { token, businessId: business?.id || null },
+      { status: StatusCodes.Success }
+    );
+  } catch (error) {
+    console.error("Errore durante il login Business:", error);
+    return NextResponse.json(
+      { message: "Errore interno durante il login" },
+      { status: StatusCodes.InternalServerError }
+    );
+  }
+}

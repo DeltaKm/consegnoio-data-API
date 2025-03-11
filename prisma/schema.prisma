@@ -129,7 +129,7 @@ enum veichleEnum {
 }
 
 // valutare se validare le modlità da inviare per calcolare le distanze
-// se ierirle lato db, o validare lato backend
+// se inserile lato db, o validare lato backend
 enum googleTravelMode {
   driving // (default) indica le direzioni di guida standard o la distanza utilizzando la rete stradale
   walking // indicazioni stradali o distanza tramite percorsi pedonali e marciapiedi (ove disponibili).
