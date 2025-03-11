@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         );
       }
       const activeRaiders = business.raiderRelations
-        .filter((rel) => rel.confirmed)
+        .filter((rel) => rel. confirmedFromBusiness)
         .map((rel) => rel.raiderId);
 
       return NextResponse.json(
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       const businessesWithActiveRaiders = businesses.map((business) => ({
         ...business,
         activeRaiders: business.raiderRelations
-          .filter((rel) => rel.confirmed)
+          .filter((rel) => rel. confirmedFromBusiness)
           .map((rel) => rel.raiderId),
       }));
 
