@@ -17,6 +17,7 @@ export const testDeliverySchema = z.object({
   schedulingDelivery: z.string().optional(),
   status: z.enum([
     "CREATED",
+    "RELEASED",
     "ASSIGNED",
     "ONDELIVERY",
     "COMPLETED",

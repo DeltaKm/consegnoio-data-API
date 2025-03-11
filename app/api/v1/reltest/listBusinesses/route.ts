@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       const business = await prisma.business.findUnique({
         where: { id },
         include: {
-          raiderRelations: true, // record pivot
+          raiderRelations: true, 
           user: true,
         },
       });

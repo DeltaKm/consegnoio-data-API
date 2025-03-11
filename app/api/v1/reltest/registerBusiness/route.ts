@@ -13,7 +13,6 @@ enum StatusCodes {
   InternalServerError = 500,
 }
 
-// Per gestire l'orario (UTC+1)
 const dateIta = new Date();
 dateIta.setHours(dateIta.getHours() + 1);
 
@@ -42,7 +41,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Effettuiamo il parsing del testo in JSON
     const body = JSON.parse(bodyText);
 
     const validation = registerSchema.safeParse(body);
