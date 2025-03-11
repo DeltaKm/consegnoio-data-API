@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       where: { businessId },
       select: {
         raider: { select: { id: true } },
-        confirmed: true,
+        confirmedFromBusiness: true,
       },
     });
 
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     const responseData = relations.map((relation) => ({
       raider_id: relation.raider.id,
-      confirmed: relation.confirmed,
+      confirmed: relation. confirmedFromBusiness,
     }));
 
     return NextResponse.json(responseData, { status: StatusCodes.Success });
