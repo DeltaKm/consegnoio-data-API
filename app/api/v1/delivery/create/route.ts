@@ -1,4 +1,3 @@
-// app/api/v1/delivery/create/route.ts
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -49,8 +48,8 @@ export async function POST(request: NextRequest) {
           example: {
             idBusiness: "ID_Business",
             schedulingDelivery: "2025-03-12 21:00:00",
-            customerName: "Valerio",
-            customerSurname: "Poetico",
+            customerName: "Mario",
+            customerSurname: "Rossi",
             customerAddress: "Via Gregorio D'alessandria",
             customerZipcode: "89900",
             customerProvince: "VV",
@@ -96,7 +95,6 @@ export async function POST(request: NextRequest) {
       details,
     } = parsed.data;
 
-    // Recupera il business (incluso il record user per l'imgUrl)
     const business = await prisma.business.findUnique({
       where: { id: idBusiness },
       include: { user: true },
@@ -108,36 +106,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Ottieni il nome del business e l'immagine (businessIMG) dal business
     const businessName = business.bussinesName;
     const businessIMG = business.user?.imgUrl || null;
 
-    // Imposta il pickupAddress con il valore di address del business
     const pickupAddress = business.address;
 
-    // Crea il campo recipient concatenando customerName e customerSurname
     const recipient = `${customerName} ${customerSurname}`;
 
-    // Crea la stringa per l'indirizzo di consegna
     const deliveryAddress = `${customerAddress}, ${customerZipcode}, ${customerProvince}, ${customerCity}`;
     const customerAddressDetails = deliveryAddress;
 
-    // Converte schedulingDelivery da stringa a Date
     const schedulingDeliveryDate = new Date(schedulingDelivery);
 
-    // Calcola il numero di colli sommando le quantità di tutti i dettagli
     const numeroColli = details.reduce((sum, detail) => sum + detail.quantity, 0);
 
-    // Genera un numero casuale da 1 a 10 e crea una stringa "numeroCasuale KM"
     const randomDistance = Math.floor(Math.random() * 10) + 1;
     const totalDistanceGenerated = `${randomDistance} KM`;
 
-    // Crea il record in testDeliveryEA
     const newDelivery = await prisma.testDeliveryEA.create({
       data: {
         name: businessName,
-        businessIMG,          // immagine del business
-        pickupAddress,        // indirizzo del business
+        businessIMG,         
+        pickupAddress,        
         schedulingDelivery: schedulingDeliveryDate,
         recipient,
         totalDistance: totalDistanceGenerated,
