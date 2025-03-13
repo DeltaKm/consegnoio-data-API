@@ -58,7 +58,10 @@ export const testDeliveryEASchema = z.object({
   compensation: z.number({ required_error: "compensation is required" }),
   paymentType: z.string({ required_error: "paymentType is required" }),
   note: z.string().default(""),
-  schedulingDelivery: z.string().optional(),
+  schedulingDelivery: z.preprocess(
+    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
+    z.date()
+  ).optional(),
   status: z.enum([
     "CREATED",
     "RELEASED",
@@ -70,14 +73,6 @@ export const testDeliveryEASchema = z.object({
   ]).optional(),
   isAssigned: z.boolean().default(false),
   isCompleted: z.boolean().default(false),
-  createdAt: z.preprocess(
-    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
-    z.date()
-  ),
-  updateAt: z.preprocess(
-    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
-    z.date()
-  ),
 }).partial();
 
 export type TestDeliveryEASchema = z.infer<typeof testDeliveryEASchema>

@@ -19,9 +19,6 @@ const deliverySchema = z.object({
   customerName: z.string(),
   customerSurname: z.string(),
   customerAddress: z.string(),
-  customerZipcode: z.string(),
-  customerProvince: z.string(),
-  customerCity: z.string(),
   paymentType: z.string(),
   totalPaid: z.number(),
   totalShipping: z.number(),
@@ -51,10 +48,7 @@ export async function POST(request: NextRequest) {
             schedulingDelivery: "2025-03-12 21:00:00",
             customerName: "Valerio",
             customerSurname: "Poetico",
-            customerAddress: "Via Gregorio D'alessandria",
-            customerZipcode: "89900",
-            customerProvince: "VV",
-            customerCity: "Vibo Valentia",
+            customerAddress: "Via Gregorio D'alessandria - 89900 - Vibo Valentia (VV)",
             paymentType: "Contrassegno",
             totalPaid: 29.23,
             totalShipping: 5.23,
@@ -84,10 +78,7 @@ export async function POST(request: NextRequest) {
       schedulingDelivery,
       customerName,
       customerSurname,
-      customerAddress,
-      customerZipcode,
-      customerProvince,
-      customerCity,
+      customerAddress,    
       paymentType,
       totalPaid,
       totalShipping,
@@ -119,7 +110,7 @@ export async function POST(request: NextRequest) {
     const recipient = `${customerName} ${customerSurname}`;
 
     // Crea la stringa per l'indirizzo di consegna
-    const deliveryAddress = `${customerAddress}, ${customerZipcode}, ${customerProvince}, ${customerCity}`;
+    const deliveryAddress = `${customerAddress}`;
     const customerAddressDetails = deliveryAddress;
 
     // Converte schedulingDelivery da stringa a Date
