@@ -23,16 +23,16 @@ const deliverySchema = z.object({
   totalShipping: z.number(),
   note: z.string(),
   customerCoordinates: z.string().optional(),
-  details: z.array(
-    z.object({
-      id: z.string(),
-      description: z.string().optional(),
-      quantity: z.number().optional(),
-      weight: z.number().optional(),
-      price: z.number().optional(),
-      category: z.string().optional(),
-    }).optional()
-  ),
+  // details: z.array(
+  //   z.object({
+  //     id: z.string(),
+  //     description: z.string().optional(),
+  //     quantity: z.number().optional(),
+  //     weight: z.number().optional(),
+  //     price: z.number().optional(),
+  //     category: z.string().optional(),
+  //   }).optional()
+  // ),
 });
 
 export async function POST(request: NextRequest) {
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
       totalShipping,
       note,
       customerCoordinates,
-      details,
+      // details,
     } = parsed.data;
 
     const business = await prisma.business.findUnique({
