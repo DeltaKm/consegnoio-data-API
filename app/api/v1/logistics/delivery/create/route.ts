@@ -1,6 +1,6 @@
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { optional, z } from "zod";
 
 enum StatusCodes {
   BadRequest = 400,
@@ -11,18 +11,18 @@ enum StatusCodes {
 
 const deliverySchema = z.object({
   idBusiness: z.string(), 
-  id: z.string(), 
+  id: z.string().optional(), 
   createdAt: z.string().optional(),
   schedulingDelivery: z.string(), 
-  customerId: z.string(),
+  customerId: z.string().optional(),
   customerName: z.string(),
   customerSurname: z.string(),
   customerAddress: z.string(),
-  paymentType: z.string(),
-  totalPaid: z.number(),
+  paymentType: z.string().optional(),
+  totalPaid: z.number().optional(),
   totalShipping: z.number(),
   note: z.string(),
-  customerCoordinates: z.string(),
+  customerCoordinates: z.string().optional(),
   details: z.array(
     z.object({
       id: z.string(),
@@ -31,7 +31,7 @@ const deliverySchema = z.object({
       weight: z.number(),
       price: z.number(),
       category: z.string(),
-    })
+    }).optional()
   ),
 });
 
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 
     const schedulingDeliveryDate = new Date(schedulingDelivery);
 
-    const numeroColli = details.reduce((sum, detail) => sum + detail.quantity, 0);
+    const numeroColli = 2;
 
     const randomDistance = Math.floor(Math.random() * 10) + 1;
     const totalDistanceGenerated = `${randomDistance} KM`;
