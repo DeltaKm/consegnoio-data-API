@@ -44,36 +44,41 @@ export const testSchema = z.object({
 
 
 export const testDeliveryEASchema = z.object({
-  name: z.string().optional(), // business name
-  businessIMG: z.string().optional(),
-  pickupAddress: z.string().optional(),
-  deliveryAddress: z.string().optional(),
-  customerCoordinates: z.string().optional(),
-  customerAddressDetails: z.string().optional(),
-  recipient: z.string().optional(),
-  totalDistance: z.string().optional(),
-  deliveryType: z.string().default("Alimenti").optional(),
-  numeroColli: z.number().optional(),
+  name: z.string(), 
+  businessIMG: z.string(),
+  pickupAddress: z.string(),
+  deliveryAddress: z.string(),
+  customerCoordinates: z.string(),
+  customerAddressDetails: z.string(),
+  recipient: z.string(),
+  totalDistance: z.string(),
+  deliveryType: z.string().default("Alimenti"),
+  numeroColli: z.number(),
   totalPaid: z.number({ required_error: "totalPaid is required" }),
   compensation: z.number({ required_error: "compensation is required" }),
   paymentType: z.string({ required_error: "paymentType is required" }),
-  note: z.string().default("").optional(),
-  schedulingDelivery: z.preprocess(
-    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
-    z.date()
-  ).optional(),
-  status: z.string().default("CREATED").optional(),
-  isAssigned: z.boolean().default(false).optional(),
-  isCompleted: z.boolean().default(false).optional(),
+  note: z.string().default(""),
+  schedulingDelivery: z.string().optional(),
+  status: z.enum([
+    "CREATED",
+    "RELEASED",
+    "ASSIGNED",
+    "ONDELIVERY",
+    "COMPLETED",
+    "NOTDELIVERED",
+    "DELETED"
+  ]).optional(),
+  isAssigned: z.boolean().default(false),
+  isCompleted: z.boolean().default(false),
   createdAt: z.preprocess(
     (arg) => (typeof arg === "string" ? new Date(arg) : arg),
     z.date()
-  ).optional(),
+  ),
   updateAt: z.preprocess(
     (arg) => (typeof arg === "string" ? new Date(arg) : arg),
     z.date()
-  ).optional(),
-});
+  ),
+}).partial();
 
 export type TestDeliveryEASchema = z.infer<typeof testDeliveryEASchema>
 export type TestSchema =z.infer<typeof testSchema>
