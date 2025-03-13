@@ -26,11 +26,11 @@ const deliverySchema = z.object({
   details: z.array(
     z.object({
       id: z.string(),
-      description: z.string(),
-      quantity: z.number(),
-      weight: z.number(),
-      price: z.number(),
-      category: z.string(),
+      description: z.string().optional(),
+      quantity: z.number().optional(),
+      weight: z.number().optional(),
+      price: z.number().optional(),
+      category: z.string().optional(),
     }).optional()
   ),
 });
