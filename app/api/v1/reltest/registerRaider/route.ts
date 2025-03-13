@@ -13,7 +13,6 @@ enum StatusCodes {
   InternalServerError = 500,
 }
 
-// Per gestire l'orario (UTC+1)
 const dateIta = new Date();
 dateIta.setHours(dateIta.getHours() + 1);
 
@@ -51,7 +50,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Effettuiamo il parsing del testo in JSON
     const body = JSON.parse(bodyText);
 
     const validation = registerSchema.safeParse(body);
@@ -65,8 +63,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const { email, password, name, surname, vehicle } = validation.data;
-    
+    const { email, password, name, surname, vehicle } = validation.data;    
     
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -91,7 +88,6 @@ export async function POST(request: NextRequest) {
       },
     });
     
-    // controlalre se il ciclo funziona
     let profile = null;
     if (user.id != null) {
       profile = await prisma.raider.create({

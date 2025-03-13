@@ -15,6 +15,7 @@
  * - DONE  => fix refresh indicator
  * - DONE  => da fixxare un probblema con i tipi enumerati che non li prende sembra mongo ("fixato usando string in prisma e validato con zod per gli enum")
  * - DONE => URGENTE CREARE LOGICA PER LA REGISTRAZIONE UTENTE IN BASE AI PROFILI
+ * - controllo messaggi di risposta e pop finestra che no si chiude e ti porta nella schermata giusta in assigned_order_details_page.dart
  * - messaggio di avviso quando si cerca di rilasciare un ordine che avvisa del rating, con un timer che non puo rilasciare ordine
  * - Gestire i datii visualizzati nelle card
  * - Fixxare il punto che rimane quando apro l' app al centro del primary swatch
@@ -193,19 +194,21 @@ model ServerApiKeyManagement {
 // =============================================================
 
 // da aggiungere id business e id cooperativa
-// da valutare tutti i campo  della consegna 
+// da valutare tutti i campo della consegna 
 // da implementare stato consegna sia backend che frontend
 
 model testDelivery {
-  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
-  name               String? // business name 
-  pickupAddress      String?
-  deliveryAddress    String?
-  totalDistance      String?
-  deliveryType       String?
-  peso               Float?
-  numeroColli        Int?
-  compensation       Float?
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  name            String? // business name deve puntare a id del bussines
+  pickupAddress   String?
+  deliveryAddress String?
+
+  totalDistance String?
+  deliveryType  String?
+  peso          Float? // da rimuovere
+  numeroColli   Int?
+  compensation  Float?
+
   note               String?   @default("")
   schedulingDelivery DateTime? @default(now())
   status             String?   @default("CREATED")
@@ -213,6 +216,30 @@ model testDelivery {
   isCompleted        Boolean?  @default(false)
   createdAt          DateTime  @default(now())
   updateAt           DateTime  @updatedAt
+}
+
+model testDeliveryEA {
+  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                   String? // business name deve puntare a id del bussines
+  businessIMG            String?
+  pickupAddress          String?
+  deliveryAddress        String?
+  customerCoordinates    String?
+  customerAddressDetails String?
+  recipient              String?
+  totalDistance          String?
+  deliveryType           String? @default("Alimenti")
+  numeroColli            Int?
+  totalPaid              Float?
+  compensation           Float?
+  paymentType            String?
+  note                   String?   @default("")
+  schedulingDelivery     DateTime? @default(now())
+  status                 String?   @default("CREATED")
+  isAssigned             Boolean?  @default(false)
+  isCompleted            Boolean?  @default(false)
+  createdAt              DateTime  @default(now())
+  updateAt               DateTime  @updatedAt
 }
 
 // test enum
@@ -225,29 +252,41 @@ model Test {
   updatedAt  DateTime  @updatedAt
 }
 
-// schema da implementare
+/**
+ * - schema da implementare
+ * - dopo la demo vanno inseriti i seguenti campi:
+ * Quanto paga il desitnatario
+ * se paga alla consegna o gia pagato
+ * e verificare gli altri campi
+ */
 model Delivery {
   id               String           @id @default(auto()) @map("_id") @db.ObjectId
-  name             String? // reference to business name
+  bussinessID      String? // reference to business name
   pickupAddress    String?
   deliveryAddress  String?
   totalDistance    String? // calcolata con google maps
+  // *** da valutare se category va gestita in questo modo
+  // infase iniziale potrei sosituirlo con la soluzione 
+  // in testDelivery con il campo string deliveryType mapapto con ZOD
   deliveryCategory CategoryDelivery @relation(fields: [categoryId], references: [id])
   categoryId       String           @unique @db.ObjectId // categoria tipologia prodotto
-  peso             Float? // peso merce
+  // **********************************************
+  peso             Float? // peso merce in KG
   numeroColli      Int?
   compensation     Float? // compenso raider
-  status           StatusEnum       @default(ASSIGNED) // stato consegna nda trovare una soluzione per gl ienum
+  status           StatusEnum       @default(CREATED) // stato consegna nda trovare una soluzione per gl ienum
   isAssiged        Boolean?         @default(false)
   isCompleted      Boolean?         @default(false)
   createdAt        DateTime         @default(now())
   updateAt         DateTime         @updatedAt
 }
 
+// da verificare se i reference sono corretti
 model CategoryDelivery {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   delivery  Delivery[]
-  category  String[]   @default(["Surgelati", "Alimenti"]) // da testare
+  label     String
+  value     String
   createdAt DateTime   @default(now())
   updateAt  DateTime   @updatedAt
 }
@@ -267,10 +306,13 @@ type deliveryStatus {
 
 // stato della consegna fiel da eliminare perche lo valido con zod per problema sui tipi enumerati di prisma
 enum StatusEnum {
+  CREATED
+  RELEASED
   ASSIGNED
   ONDELIVERY
-  PENDINGT
   COMPLETED
+  NOTDELIVERED
+  DELETED
 }
 
 // =============================================================
@@ -278,8 +320,8 @@ enum StatusEnum {
 // prototipo
 model AassignedDelivery {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  idDelivery String   @db.ObjectId // reference
-  idRaider   String   @db.ObjectId // reference
+  deliveryId String   @db.ObjectId // reference delivery
+  raiderId   String   @db.ObjectId // reference
   createdAt  DateTime @default(now())
   updateAt   DateTime @updatedAt
 }
@@ -287,19 +329,19 @@ model AassignedDelivery {
 // prototipo
 model HistoryDelivery {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  idDelivery String   @db.ObjectId // reference
-  idRaider   String   @db.ObjectId // reference
+  deliveryId String   @db.ObjectId // reference delivery
+  raiderId   String   @db.ObjectId // reference
   createdAt  DateTime @default(now())
   updateAt   DateTime @updatedAt
 }
 
 model CancelledDeliveries {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId // reference to user diretto poi si valuta se era raider o business
-  note      String
-  status    String // lo stato in cui la consegna era quando è stata cancellata
-  createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  deliveryId String   @db.ObjectId // reference delivery
+  userId     String   @db.ObjectId // reference to user diretto poi si valuta se era raider o business
+  note       String
+  createdAt  DateTime @default(now())
+  updateAt   DateTime @updatedAt
 }
 
 type GoogleAddressComponentType {
@@ -346,28 +388,29 @@ model Data {
 // =============================================================
 
 model DeliveryEasyappear {
-  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
-  idRestaurant        String // token restaurant generato come token identificatico bussiness
-  deliveryCreatedAt   String
-  deliveryTime        String
-  businessName        String
-  customerId          String
-  customerName        String
-  customerSurname     String
-  customerAddress     String
-  customerZipcode     String
-  customerProvince    String
-  customerCity        String
-  paymentType         String
-  shippingType        String
-  totalPaid           Float
-  totalShipping       Float
-  note                String
-  customerCoordinates String
-  deliveryScheduling  DateTime // orario consegna prevista
-  details             orderDetails[]
-  createdAt           DateTime       @default(now())
-  updateAt            DateTime       @updatedAt
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  idBusiness String // reference to bussines token restaurant generato come token identificatico bussiness
+
+  schedulingDelivery     String
+  businessName           String
+  customerId             String
+  customerName           String
+  customerSurname        String
+  customerAddress        String
+  customerZipcode        String
+  customerProvince       String
+  customerCity           String
+  customerAddressDetails String
+  paymentType            String
+  shippingType           String // categoria
+  totalPaid              Float // costo che paga il cliente
+  totalShipping          Float // costo consegna
+  note                   String
+  customerCoordinates    String
+  deliveryScheduling     DateTime // orario consegna prevista
+  details                orderDetails[]
+  createdAt              DateTime       @default(now())
+  updateAt               DateTime       @updatedAt
 }
 
 type orderDetails {

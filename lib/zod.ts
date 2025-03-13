@@ -43,10 +43,44 @@ export const testSchema = z.object({
 });
 
 
+export const testDeliveryEASchema = z.object({
+  name: z.string().optional(), // business name
+  businessIMG: z.string().optional(),
+  pickupAddress: z.string().optional(),
+  deliveryAddress: z.string().optional(),
+  customerCoordinates: z.string().optional(),
+  customerAddressDetails: z.string().optional(),
+  recipient: z.string().optional(),
+  totalDistance: z.string().optional(),
+  deliveryType: z.string().default("Alimenti").optional(),
+  numeroColli: z.number().optional(),
+  totalPaid: z.number({ required_error: "totalPaid is required" }),
+  compensation: z.number({ required_error: "compensation is required" }),
+  paymentType: z.string({ required_error: "paymentType is required" }),
+  note: z.string().default("").optional(),
+  schedulingDelivery: z.preprocess(
+    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
+    z.date()
+  ).optional(),
+  status: z.string().default("CREATED").optional(),
+  isAssigned: z.boolean().default(false).optional(),
+  isCompleted: z.boolean().default(false).optional(),
+  createdAt: z.preprocess(
+    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
+    z.date()
+  ).optional(),
+  updateAt: z.preprocess(
+    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
+    z.date()
+  ).optional(),
+});
+
+export type TestDeliveryEASchema = z.infer<typeof testDeliveryEASchema>
 export type TestSchema =z.infer<typeof testSchema>
 export type TestDeliverySchema = z.infer<typeof testDeliverySchema>;
 
 export const schemas = {
   testDeliverySchema,
-  testSchema
+  testSchema,
+  testDeliveryEASchema
 };
