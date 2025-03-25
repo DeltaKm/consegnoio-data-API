@@ -52,6 +52,7 @@
  * - aggiungere swipe tra le pagine *** Future Release ***
  * - controllare la cache che non mi prendeva lo status valure finche non ho aggiornato
  * - La consegna creata deve avere l id del business che l ha create e quando assegnata l 'id del raider che  l ha presa in carico
+ * - implementare invio stato ordine a easy appear
  */
 
 generator client {
@@ -174,20 +175,7 @@ model BusinessRaider {
   @@unique([businessId, raiderId])
 }
 
-// =============================================================
-// ================= ServerApiKeyManagement ====================
-// =============================================================
-// da valutare se mantenerla qua o fare un serizio esterno
-model ServerApiKeyManagement {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  bussinesId     String // reference
-  assigendApiKey String
-  isActive       Boolean  @default(false)
-  creatdAt       DateTime @default(now())
-  updateAt       DateTime @updatedAt
-}
 
-// =============================================================
 
 // =============================================================
 // ====================== TestDelivery =========================
@@ -317,32 +305,33 @@ enum StatusEnum {
 
 // =============================================================
 
-// prototipo
 model AassignedDelivery {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  deliveryId String   @db.ObjectId // reference delivery
-  raiderId   String   @db.ObjectId // reference
+  deliveryId String   @db.ObjectId // riferimento al testDeliveryEA (o Delivery)
+  raiderId   String   @db.ObjectId
   createdAt  DateTime @default(now())
   updateAt   DateTime @updatedAt
 }
 
-// prototipo
 model HistoryDelivery {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  deliveryId String   @db.ObjectId // reference delivery
-  raiderId   String   @db.ObjectId // reference
+  deliveryId String   @db.ObjectId // riferimento al testDeliveryEA (o Delivery)
+  raiderId   String   @db.ObjectId
   createdAt  DateTime @default(now())
   updateAt   DateTime @updatedAt
 }
 
 model CancelledDeliveries {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  deliveryId String   @db.ObjectId // reference delivery
-  userId     String   @db.ObjectId // reference to user diretto poi si valuta se era raider o business
+  deliveryId String   @db.ObjectId // riferimento al testDeliveryEA (o Delivery)
+  userId     String   @db.ObjectId // riferimento all'utente (raider o business)
   note       String
   createdAt  DateTime @default(now())
   updateAt   DateTime @updatedAt
 }
+
+
+
 
 type GoogleAddressComponentType {
   placeId String
