@@ -100,6 +100,44 @@ export async function DELETE(request: NextRequest) {
 }
 
 
+// export async function PATCH(request: NextRequest) {
+//   try {
+//     const id = request.nextUrl.searchParams.get("id");
+//     if (!id) {
+//       return NextResponse.json(
+//         { message: "ID richiesto" },
+//         { status: StatusCodes.BadRequest }
+//       );
+//     }
+
+//     const body = await request.json();
+//     const result = testDeliveryEASchema.safeParse(body);
+
+//     if (!result.success) {
+//       console.error("Errore di validazione:", result.error.errors);
+//       return NextResponse.json(
+//         { message: "Dati non validi", errors: result.error.errors },
+//         { status: StatusCodes.BadRequest }
+//       );
+//     }
+
+//     const data = result.data;
+
+//     const updatedDelivery = await prisma.testDeliveryEA.update({
+//       where: { id },
+//       data, 
+//     });
+
+//     return NextResponse.json(updatedDelivery, { status: StatusCodes.Success });
+//   } catch (error: any) {
+//     console.error("Errore durante l'aggiornamento dell'ordine:", error);
+//     return NextResponse.json(
+//       { message: "Errore durante l'aggiornamento dell'ordine", error: error.message },
+//       { status: StatusCodes.InternalServerError }
+//     );
+//   }
+// }
+
 export async function PATCH(request: NextRequest) {
   try {
     const id = request.nextUrl.searchParams.get("id");
@@ -115,18 +153,45 @@ export async function PATCH(request: NextRequest) {
 
     if (!result.success) {
       console.error("Errore di validazione:", result.error.errors);
-      return NextResponse.json(
-        { message: "Dati non validi", errors: result.error.errors },
-        { status: StatusCodes.BadRequest }
-      );
+      const errorMessage = result.error.errors
+        .map((err) => `${err.path.join('.')}: ${err.message}`)
+        .join(', ');
+      return NextResponse.json({ message: errorMessage }, { status: StatusCodes.BadRequest });
     }
 
     const data = result.data;
 
+    // Aggiorna la delivery nel modello testDeliveryEA
     const updatedDelivery = await prisma.testDeliveryEA.update({
       where: { id },
       data, 
     });
+
+    // Se nel payload è presente il campo status, mappa il valore e invia la richiesta all'endpoint esterno
+    if (data.status) {
+      // Mappatura dei valori locali ai valori attesi dal servizio esterno
+      const mapping: Record<string, string> = {
+        "CREATED": "in_approval",
+        "ASSIGNED": "in_progress",
+        "ONDELIVERY": "shipped",
+        "COMPLETED": "delivered",
+        "NOTDELIVERED": "returned",
+        "DELETED": "canceled"
+      };
+
+      const stateValue = mapping[data.status];
+      // Se esiste una mapping e il record aggiornato contiene un orderId, effettua la POST
+      if (stateValue && updatedDelivery.orderId) {
+        await fetch("https://app.easyappear.it/webservice/set_order_state_consegnoio/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: updatedDelivery.orderId,
+            state: stateValue
+          })
+        });
+      }
+    }
 
     return NextResponse.json(updatedDelivery, { status: StatusCodes.Success });
   } catch (error: any) {
