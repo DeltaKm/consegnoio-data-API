@@ -15,7 +15,7 @@
  * - DONE  => fix refresh indicator
  * - DONE  => da fixxare un probblema con i tipi enumerati che non li prende sembra mongo ("fixato usando string in prisma e validato con zod per gli enum")
  * - DONE => URGENTE CREARE LOGICA PER LA REGISTRAZIONE UTENTE IN BASE AI PROFILI
- * - controllo messaggi di risposta e pop finestra che no si chiude e ti porta nella schermata giusta in assigned_order_details_page.dart
+ * - DONE => controllo messaggi di risposta e pop finestra che no si chiude e ti porta nella schermata giusta in assigned_order_details_page.dart
  * - messaggio di avviso quando si cerca di rilasciare un ordine che avvisa del rating, con un timer che non puo rilasciare ordine
  * - Gestire i datii visualizzati nelle card
  * - Fixxare il punto che rimane quando apro l' app al centro del primary swatch
@@ -50,7 +50,7 @@
  * - add baseurl costant client flutter
  * - add color costant
  * - aggiungere swipe tra le pagine *** Future Release ***
- * - controlalre la cache che non mi prendeva lo status valure finche non ho aggiornato
+ * - controllare la cache che non mi prendeva lo status valure finche non ho aggiornato
  * - La consegna creata deve avere l id del business che l ha create e quando assegnata l 'id del raider che  l ha presa in carico
  */
 
@@ -221,6 +221,7 @@ model testDelivery {
 model testDeliveryEA {
   id                     String    @id @default(auto()) @map("_id") @db.ObjectId
   name                   String? // business name deve puntare a id del bussines
+  orderId                String? // id ordine di easy appear
   businessIMG            String?
   pickupAddress          String?
   deliveryAddress        String?
@@ -228,7 +229,7 @@ model testDeliveryEA {
   customerAddressDetails String?
   recipient              String?
   totalDistance          String?
-  deliveryType           String? @default("Alimenti")
+  deliveryType           String?   @default("Alimenti")
   numeroColli            Int?
   totalPaid              Float?
   compensation           Float?
@@ -242,7 +243,6 @@ model testDeliveryEA {
   updateAt               DateTime  @updatedAt
 }
 
-// test enum
 model Test {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
   enum       String?
@@ -304,7 +304,7 @@ type deliveryStatus {
   isDeleted Boolean
 }
 
-// stato della consegna fiel da eliminare perche lo valido con zod per problema sui tipi enumerati di prisma
+// stato della consegna da eliminare perche lo valido con zod per problema sui tipi enumerati di prisma
 enum StatusEnum {
   CREATED
   RELEASED

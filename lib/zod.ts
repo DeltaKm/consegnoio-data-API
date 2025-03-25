@@ -44,7 +44,8 @@ export const testSchema = z.object({
 
 
 export const testDeliveryEASchema = z.object({
-  name: z.string(), 
+  name: z.string(),
+  orderId: z.string(), 
   businessIMG: z.string(),
   pickupAddress: z.string(),
   deliveryAddress: z.string(),

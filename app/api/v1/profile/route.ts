@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    // Per test, passiamo il userId come query parameter: ?userId=...
     const userId = request.nextUrl.searchParams.get("userId");
     if (!userId) {
       return NextResponse.json(
