@@ -10,7 +10,7 @@ export default function Home() {
   const handleDownloadClick = () => {
     setTimeout(() => {
       if (typeof window !== 'undefined') {
-        window.history.back();
+        window.close();
       }
     }, 5000);
   };
