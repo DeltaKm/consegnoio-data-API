@@ -1,3 +1,4 @@
+'use client'
 import { Download, Smartphone, Shield, Wifi } from 'lucide-react';
 import Logo from '@/public/consegnoio_logo_rosso_senza_scritta.svg';
 import Image from 'next/image';
