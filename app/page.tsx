@@ -46,7 +46,7 @@ export default function Home() {
                 Scarica l'app e unisciti alla rete dei raider: organizza, consegna e monitora ogni ordine con semplicità.
               </p>
               <a
-                href="/downloads/app-release.apk"
+                href="/downloads/consegnoio.apk"
                 download
                 className="inline-flex items-center gap-3 bg-[#d5184e] hover:bg-[#b51440] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
               >
