@@ -48,6 +48,7 @@ export default function Home() {
               <a
                 href="/downloads/consegnoio.apk"
                 download
+                onClick={() => setTimeout(() => history.back(), 1500)}
                 className="inline-flex items-center gap-3 bg-[#d5184e] hover:bg-[#b51440] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
               >
                 <Download className="w-6 h-6" />
