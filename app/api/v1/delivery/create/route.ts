@@ -11,7 +11,6 @@ enum StatusCodes {
 
 const deliverySchema = z.object({
   idBusiness: z.string(),
-  bussinesId: z.string(), 
   orderId: z.string(), 
   createdAt: z.string().optional(),
   schedulingDelivery: z.string(), 
@@ -82,7 +81,6 @@ export async function POST(request: NextRequest) {
 
     const {
       idBusiness,
-      bussinesId,
       orderId,
       schedulingDelivery,
       customerName,
@@ -111,7 +109,7 @@ export async function POST(request: NextRequest) {
     }
 
     const businessName = business.bussinesName;
-    const bussinessId = business.id
+  
     const businessIMG = business.user?.imgUrl || null;
 
     const pickupAddress = business.address;
@@ -131,7 +129,7 @@ export async function POST(request: NextRequest) {
     const newDelivery = await prisma.testDeliveryEA.create({
       data: {
         name: businessName,
-        bussinesId: bussinessId,
+        bussinesId: idBusiness,
         orderId: orderId,
         businessIMG,         
         pickupAddress,        
