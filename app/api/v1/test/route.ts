@@ -161,15 +161,12 @@ export async function PATCH(request: NextRequest) {
 
     const data = result.data;
 
-    // Aggiorna la delivery nel modello testDeliveryEA
     const updatedDelivery = await prisma.testDeliveryEA.update({
       where: { id },
       data, 
     });
 
-    // Se nel payload è presente il campo status, mappa il valore e invia la richiesta all'endpoint esterno
     if (data.status) {
-      // Mappatura dei valori locali ai valori attesi dal servizio esterno
       const mapping: Record<string, string> = {
         "CREATED": "in_approval",
         "ASSIGNED": "in_progress",
@@ -180,13 +177,12 @@ export async function PATCH(request: NextRequest) {
       };
 
       const stateValue = mapping[data.status];
-      // Se esiste una mapping e il record aggiornato contiene un orderId, effettua la POST
       if (stateValue && updatedDelivery.orderId) {
         await fetch("https://app.easyappear.it/webservice/set_order_state_consegnoio/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            id: updatedDelivery.orderId,
+            order_id: updatedDelivery.orderId,
             state: stateValue
           })
         });

@@ -175,8 +175,6 @@ model BusinessRaider {
   @@unique([businessId, raiderId])
 }
 
-
-
 // =============================================================
 // ====================== TestDelivery =========================
 // =============================================================
@@ -209,6 +207,7 @@ model testDelivery {
 model testDeliveryEA {
   id                     String    @id @default(auto()) @map("_id") @db.ObjectId
   name                   String? // business name deve puntare a id del bussines
+  bussinesId             String?
   orderId                String? // id ordine di easy appear
   businessIMG            String?
   pickupAddress          String?
@@ -329,9 +328,6 @@ model CancelledDeliveries {
   createdAt  DateTime @default(now())
   updateAt   DateTime @updatedAt
 }
-
-
-
 
 type GoogleAddressComponentType {
   placeId String
