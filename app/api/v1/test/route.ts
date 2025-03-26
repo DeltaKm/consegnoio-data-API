@@ -182,6 +182,7 @@ export async function PATCH(request: NextRequest) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            businessId: updatedDelivery.businessId,
             order_id: updatedDelivery.orderId,
             state: stateValue
           })
