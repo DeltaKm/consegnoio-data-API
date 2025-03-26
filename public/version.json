@@ -1,6 +1,6 @@
 {
     "version": "1.0.0",
-    "build": 3,
-    "apk_url": "https://consegnoio-data-api.vercel.app/downloads/consegnoio.apk",
+    "build": 4,
+    "apk_url": "https://consegnoio-data-api.vercel.app/",
     "changelog": "Consegnoio alpha version\nBuild 2:\n - Abilitato sistema notifiche"
   }
