@@ -14,12 +14,12 @@ export default function Home() {
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Consegnoio
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            {/* <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Organizza le tue consegne, ricevi aggiornamenti in tempo reale e accedi a tutte le funzionalità per ottimizzare il tuo lavoro da rider, tutto in un'unica app intuitiva e veloce.
-            </p>
+            </p> */}
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          {/* <div className="grid md:grid-cols-3 gap-8 mb-16">
             <FeatureCard
               icon={<Smartphone className="w-8 h-8 text-[#d5184e]" />}
               title="Gestione Ordini"
@@ -35,13 +35,13 @@ export default function Home() {
               title="Aggiornamenti"
               description="Ricevi notifiche live su nuovi ordini, percorsi e modifiche"
             />
-          </div>
+          </div> */}
 
           <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 text-center">
             <div className="max-w-md mx-auto">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              {/* <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 Inizia le tue consegne ora
-              </h2>
+              </h2> */}
               <p className="text-gray-600 mb-8">
                 Scarica l'app e unisciti alla rete dei raider: organizza, consegna e monitora ogni ordine con semplicità.
               </p>
