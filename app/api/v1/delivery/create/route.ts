@@ -10,7 +10,7 @@ enum StatusCodes {
 }
 
 const deliverySchema = z.object({
-  idBusiness: z.string(),
+  bussinesId: z.string(),
   orderId: z.string(), 
   createdAt: z.string().optional(),
   schedulingDelivery: z.string(), 
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         {
           message: "Missing fields. Example of payload:",
           example: {
-            idBusiness: "ID_Business",
+            bussinesId: "ID_Business",
             orderId: "ID_ordine",
             schedulingDelivery: "2025-03-12 21:00:00",
             customerName: "Mario",
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     const {
-      idBusiness,
+      bussinesId,
       orderId,
       schedulingDelivery,
       customerName,
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     } = parsed.data;
 
     const business = await prisma.business.findUnique({
-      where: { id: idBusiness },
+      where: { id: bussinesId },
       include: { user: true },
     });
     if (!business) {
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
     const newDelivery = await prisma.testDeliveryEA.create({
       data: {
         name: businessName,
-        bussinesId: idBusiness,
+        bussinesId: bussinesId,
         orderId: orderId,
         businessIMG,         
         pickupAddress,        
