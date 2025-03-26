@@ -1,6 +1,6 @@
 {
-    "version": "1.0.0",
-    "build": 2,
+    "version": "1.0.1",
+    "build": 1,
     "apk_url": "https://consegnoio-data-api.vercel.app",
     "changelog": "Prima versione dell'app Consegnoio per i raider!\n Visualizza consegne disponibili\n Alpha"
   }
