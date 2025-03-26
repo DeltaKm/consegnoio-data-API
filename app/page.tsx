@@ -2,8 +2,18 @@
 import { Download, Smartphone, Shield, Wifi } from 'lucide-react';
 import Logo from '@/public/consegnoio_logo_rosso_senza_scritta.svg';
 import Image from 'next/image';
+import { useEffect } from 'react';
+
 
 export default function Home() {
+
+  const handleDownloadClick = () => {
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        window.history.back();
+      }
+    }, 5000);
+  };
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-10 via-pink-100 to-pink-200">
       <div className="container mx-auto px-4 py-16">
@@ -49,7 +59,7 @@ export default function Home() {
               <a
                 href="/downloads/consegnoio.apk"
                 download
-                onClick={() => setTimeout(() => history.back(), 1500)}
+                onClick={handleDownloadClick}
                 className="inline-flex items-center gap-3 bg-[#d5184e] hover:bg-[#b51440] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
               >
                 <Download className="w-6 h-6" />
