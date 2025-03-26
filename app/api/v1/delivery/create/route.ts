@@ -10,7 +10,7 @@ enum StatusCodes {
 }
 
 const deliverySchema = z.object({
-  bussinesId: z.string(),
+  businessId: z.string(),
   orderId: z.string(), 
   createdAt: z.string().optional(),
   schedulingDelivery: z.string(), 
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     const {
-      bussinesId,
+      businessId,
       orderId,
       schedulingDelivery,
       customerName,
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     } = parsed.data;
 
     const business = await prisma.business.findUnique({
-      where: { id: bussinesId },
+      where: { id: businessId },
       include: { user: true },
     });
     if (!business) {
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
     const newDelivery = await prisma.testDeliveryEA.create({
       data: {
         name: businessName,
-        bussinesId: bussinesId,
+        businessId: businessId,
         orderId: orderId,
         businessIMG,         
         pickupAddress,        
