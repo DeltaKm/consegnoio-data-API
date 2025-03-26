@@ -169,7 +169,7 @@ export async function PATCH(request: NextRequest) {
     if (data.status) {
       const mapping: Record<string, string> = {
         "CREATED": "in_approval",
-        "ASSIGNED": "in_progress",
+        "ASSIGNED": "confirmed",
         "ONDELIVERY": "shipped",
         "COMPLETED": "delivered",
         "NOTDELIVERED": "returned",
