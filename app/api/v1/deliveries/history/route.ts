@@ -32,9 +32,17 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const deliveries = completedDeliveries.map((entry) => entry.delivery);
+    // Deduplica per delivery.id
+    const uniqueDeliveriesMap = new Map();
+    for (const entry of completedDeliveries) {
+      if (!uniqueDeliveriesMap.has(entry.delivery.id)) {
+        uniqueDeliveriesMap.set(entry.delivery.id, entry.delivery);
+      }
+    }
 
-    return NextResponse.json(deliveries);
+    const uniqueDeliveries = Array.from(uniqueDeliveriesMap.values());
+
+    return NextResponse.json(uniqueDeliveries);
   } catch (error: any) {
     console.error("Errore nel recupero delle consegne completate:", error);
     return NextResponse.json(
