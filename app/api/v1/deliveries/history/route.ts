@@ -22,29 +22,41 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const completedDeliveries = await prisma.historyDelivery.findMany({
-      where: { raiderId: raider.id },
-      include: {
-        delivery: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const [completedDeliveries, cancelledDeliveries] = await Promise.all([
+      prisma.historyDelivery.findMany({
+        where: { raiderId: raider.id },
+        include: { delivery: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.cancelledDeliveries.findMany({
+        where: { raiderId: raider.id },
+        include: { delivery: true },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
 
-    // Deduplica per delivery.id
-    const uniqueDeliveriesMap = new Map();
-    for (const entry of completedDeliveries) {
-      if (!uniqueDeliveriesMap.has(entry.delivery.id)) {
-        uniqueDeliveriesMap.set(entry.delivery.id, entry.delivery);
-      }
+    const deliveries = [
+      ...completedDeliveries.map((entry) => ({
+        ...entry.delivery,
+        statusType: "COMPLETED",
+      })),
+      ...cancelledDeliveries.map((entry) => ({
+        ...entry.delivery,
+        note: entry.note,
+        cancelledAt: entry.createdAt,
+        statusType: "CANCELLED",
+      })),
+    ];
+
+    // Rimuove eventuali duplicati usando Map con chiave `id`
+    const uniqueMap = new Map();
+    for (const delivery of deliveries) {
+      uniqueMap.set(delivery.id, delivery);
     }
 
-    const uniqueDeliveries = Array.from(uniqueDeliveriesMap.values());
-
-    return NextResponse.json(uniqueDeliveries);
+    return NextResponse.json(Array.from(uniqueMap.values()));
   } catch (error: any) {
-    console.error("Errore nel recupero delle consegne completate:", error);
+    console.error("Errore nel recupero dello storico consegne:", error);
     return NextResponse.json(
       { message: "Errore interno", error: error.message },
       { status: 500 }

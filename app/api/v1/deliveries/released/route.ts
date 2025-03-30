@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const cancelledDeliveries = await prisma.cancelledDeliveries.findMany({
+    const releasedDeliveries = await prisma.releasedDelivery.findMany({
       where: { raiderId: raider.id },
       include: { delivery: true },
       orderBy: { createdAt: "desc" },
@@ -30,13 +30,13 @@ export async function GET(request: NextRequest) {
 
     const uniqueMap = new Map();
 
-    for (const entry of cancelledDeliveries) {
+    for (const entry of releasedDeliveries) {
       const deliveryId = entry.delivery.id;
       if (!uniqueMap.has(deliveryId)) {
         uniqueMap.set(deliveryId, {
           ...entry.delivery,
           note: entry.note,
-          cancelledAt: entry.createdAt,
+          releasedAt: entry.createdAt,
         });
       }
     }
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(deliveries);
   } catch (error: any) {
-    console.error("Errore nel recupero delle consegne annullate:", error);
+    console.error("Errore nel recupero delle consegne rilasciate:", error);
     return NextResponse.json(
       { message: "Errore interno", error: error.message },
       { status: 500 }
