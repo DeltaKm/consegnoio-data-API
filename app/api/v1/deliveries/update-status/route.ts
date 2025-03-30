@@ -23,30 +23,49 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ message: "deliveryId e status sono obbligatori" }, { status: 400 });
     }
 
-    // Aggiorna lo status della delivery
+    // Aggiorna lo stato della consegna
     const updated = await prisma.deliveryEA.update({
       where: { id: deliveryId },
       data: {
         status,
-        isCompleted: status === "COMPLETED" || status === "NOTDELIVERED",
+        isCompleted: status === "COMPLETED",
         isAssigned: status === "RELEASED" ? false : undefined,
       },
     });
 
-    // Gestione dei modelli correlati
-    if (status === "COMPLETED" || status === "NOTDELIVERED") {
+    // Gestione modelli correlati
+    if (status === "COMPLETED") {
       await prisma.historyDelivery.create({
         data: {
           deliveryId,
           raiderId: raider.id,
         },
       });
-    } else if (status === "RELEASED") {
+    }
+
+    if (status === "NOTDELIVERED") {
       await prisma.cancelledDeliveries.create({
         data: {
           deliveryId,
           raiderId: raider.id,
+          note: note || "Consegna non effettuata",
+        },
+      });
+    }
+
+    if (status === "RELEASED") {
+      await prisma.releasedDelivery.create({
+        data: {
+          deliveryId,
+          raiderId: raider.id,
           note: note || "Rilasciata dal rider",
+        },
+      });
+
+      await prisma.assignedDelivery.deleteMany({
+        where: {
+          deliveryId,
+          raiderId: raider.id,
         },
       });
     }
