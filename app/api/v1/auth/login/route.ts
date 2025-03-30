@@ -1,4 +1,3 @@
-// /app/auth/login/route.ts
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
@@ -51,13 +50,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
-    const expiration = new Date();
-    expiration.setHours(expiration.getHours() + 1);
+    // Token senza scadenza
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { tokenJWT: token, expirationJWT: expiration, expired: false },
+      data: {
+        tokenJWT: token,
+        expirationJWT: null,
+        expired: false,
+      },
     });
 
     return NextResponse.json({ token }, { status: StatusCodes.Success });

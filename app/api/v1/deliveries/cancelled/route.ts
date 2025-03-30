@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const completedDeliveries = await prisma.historyDelivery.findMany({
+    const cancelledDeliveries = await prisma.cancelledDeliveries.findMany({
       where: { raiderId: raider.id },
       include: {
         delivery: true,
@@ -32,11 +32,15 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const deliveries = completedDeliveries.map((entry) => entry.delivery);
+    const deliveries = cancelledDeliveries.map((entry) => ({
+      ...entry.delivery,
+      note: entry.note,
+      cancelledAt: entry.createdAt,
+    }));
 
     return NextResponse.json(deliveries);
   } catch (error: any) {
-    console.error("Errore nel recupero delle consegne completate:", error);
+    console.error("Errore nel recupero delle consegne annullate:", error);
     return NextResponse.json(
       { message: "Errore interno", error: error.message },
       { status: 500 }

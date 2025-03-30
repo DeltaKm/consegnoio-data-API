@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
     const randomDistance = Math.floor(Math.random() * 10) + 1;
     const totalDistanceGenerated = `${randomDistance} KM`;
 
-    const newDelivery = await prisma.testDeliveryEA.create({
+    const newDelivery = await prisma.deliveryEA.create({
       data: {
         name: businessName,
         businessId: businessId,

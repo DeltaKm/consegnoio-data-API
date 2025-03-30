@@ -80,7 +80,7 @@ model User {
   tokenJWT                String?
   expirationJWT           DateTime? // da testare
   expired                 Boolean?
-  imgUrl                  String    @default("asset/immages/log-consegnoio.png")
+  imgUrl                  String    @default("asset/immages/icon-white.png")
   creatdeAt               DateTime  @default(now())
   updateAt                DateTime  @updatedAt
 
@@ -118,6 +118,13 @@ model Raider {
 
   businessRelations BusinessRaider[]
   userId            String?          @db.ObjectId
+
+  assignedDeliveries  AssignedDelivery[]
+  historyDeliveries   HistoryDelivery[]
+  cancelledDeliveries CancelledDeliveries[]
+  releasedDeliveries  ReleasedDelivery[]
+
+  deliveriesAssigned DeliveryEA[] @relation("RaiderDeliveries")
 }
 
 enum veichleEnum {
@@ -158,6 +165,8 @@ model Business {
 
   raiderRelations BusinessRaider[]
   userId          String?          @db.ObjectId
+
+  deliveries DeliveryEA[]
 }
 
 // =============================================================
@@ -206,9 +215,9 @@ model testDelivery {
 
 model testDeliveryEA {
   id                     String    @id @default(auto()) @map("_id") @db.ObjectId
-  name                   String? // business name deve puntare a id del bussines
+  name                   String?
   businessId             String?
-  orderId                String? // id ordine di easy appear
+  orderId                String?
   businessIMG            String?
   pickupAddress          String?
   deliveryAddress        String?
@@ -228,6 +237,43 @@ model testDeliveryEA {
   isCompleted            Boolean?  @default(false)
   createdAt              DateTime  @default(now())
   updateAt               DateTime  @updatedAt
+}
+
+// ====================== DeliveryEA =========================
+model DeliveryEA {
+  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                   String?
+  businessId             String?   @db.ObjectId
+  orderId                String?
+  businessIMG            String?
+  pickupAddress          String?
+  deliveryAddress        String?
+  customerCoordinates    String?
+  customerAddressDetails String?
+  recipient              String?
+  totalDistance          String?
+  deliveryType           String?   @default("Alimenti")
+  numeroColli            Int?
+  totalPaid              Float?
+  compensation           Float?
+  paymentType            String?
+  note                   String?   @default("")
+  schedulingDelivery     DateTime? @default(now())
+  status                 String?   @default("CREATED")
+  isAssigned             Boolean?  @default(false)
+  isCompleted            Boolean?  @default(false)
+  createdAt              DateTime  @default(now())
+  updateAt               DateTime  @updatedAt
+
+  business Business? @relation(fields: [businessId], references: [id])
+
+  assignedToRaiderId String? @db.ObjectId
+  assignedToRaider   Raider? @relation("RaiderDeliveries", fields: [assignedToRaiderId], references: [id])
+
+  assignedDeliveries  AssignedDelivery[]
+  historyDeliveries   HistoryDelivery[]
+  cancelledDeliveries CancelledDeliveries[]
+  releasedEntries     ReleasedDelivery[]
 }
 
 model Test {
@@ -304,12 +350,18 @@ enum StatusEnum {
 
 // =============================================================
 
-model AassignedDelivery {
+model AssignedDelivery {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   deliveryId String   @db.ObjectId // riferimento al testDeliveryEA (o Delivery)
   raiderId   String   @db.ObjectId
   createdAt  DateTime @default(now())
   updateAt   DateTime @updatedAt
+
+  delivery DeliveryEA @relation(fields: [deliveryId], references: [id])
+  raider   Raider     @relation(fields: [raiderId], references: [id])
+
+  @@index([raiderId])
+  @@index([deliveryId])
 }
 
 model HistoryDelivery {
@@ -318,15 +370,42 @@ model HistoryDelivery {
   raiderId   String   @db.ObjectId
   createdAt  DateTime @default(now())
   updateAt   DateTime @updatedAt
+
+  delivery DeliveryEA @relation(fields: [deliveryId], references: [id])
+  raider   Raider     @relation(fields: [raiderId], references: [id])
+
+  @@index([raiderId])
+  @@index([deliveryId])
 }
 
 model CancelledDeliveries {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  deliveryId String   @db.ObjectId // riferimento al testDeliveryEA (o Delivery)
-  userId     String   @db.ObjectId // riferimento all'utente (raider o business)
+  deliveryId String   @db.ObjectId
+  raiderId   String   @db.ObjectId
   note       String
   createdAt  DateTime @default(now())
   updateAt   DateTime @updatedAt
+
+  delivery DeliveryEA @relation(fields: [deliveryId], references: [id])
+  raider   Raider     @relation(fields: [raiderId], references: [id])
+
+  @@index([raiderId])
+  @@index([deliveryId])
+}
+
+model ReleasedDelivery {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  deliveryId String   @db.ObjectId
+  raiderId   String   @db.ObjectId
+  note       String
+  createdAt  DateTime @default(now())
+  updateAt   DateTime @updatedAt
+
+  delivery DeliveryEA @relation(fields: [deliveryId], references: [id])
+  raider   Raider     @relation(fields: [raiderId], references: [id])
+
+  @@index([raiderId])
+  @@index([deliveryId])
 }
 
 type GoogleAddressComponentType {

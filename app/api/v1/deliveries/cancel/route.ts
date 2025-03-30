@@ -6,9 +6,8 @@ enum StatusCodes {
   Success = 200,
   BadRequest = 400,
   Unauthorized = 401,
-  Conflict = 409,
-  InternalServerError = 500,
   NotFound = 404,
+  InternalServerError = 500,
 }
 
 export async function POST(request: NextRequest) {
@@ -33,16 +32,15 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { deliveryId } = body;
+    const { deliveryId, note } = body;
 
-    if (!deliveryId) {
+    if (!deliveryId || !note) {
       return NextResponse.json(
-        { message: "deliveryId mancante nel body" },
+        { message: "deliveryId e nota sono obbligatori" },
         { status: StatusCodes.BadRequest }
       );
     }
 
-    // Verifica che la delivery esista
     const delivery = await prisma.deliveryEA.findUnique({ where: { id: deliveryId } });
     if (!delivery) {
       return NextResponse.json(
@@ -51,45 +49,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verifica duplicato
-    const existing = await prisma.assignedDelivery.findFirst({
-      where: {
-        deliveryId,
-        raiderId: raider.id,
-      },
-    });
-
-    if (existing) {
-      return NextResponse.json(
-        { message: "La consegna è già assegnata a questo rider" },
-        { status: StatusCodes.Conflict }
-      );
-    }
-
-    // Crea assegnazione
-    const assigned = await prisma.assignedDelivery.create({
+    await prisma.cancelledDeliveries.create({
       data: {
         deliveryId,
         raiderId: raider.id,
+        note,
       },
     });
 
-    // Aggiorna stato delivery (facoltativo)
     await prisma.deliveryEA.update({
       where: { id: deliveryId },
       data: {
-        assignedToRaiderId: raider.id,
-        status: "ASSIGNED" ,
-        isAssigned: true,
+        status: "NOTDELIVERED",
       },
     });
 
     return NextResponse.json(
-      { message: "Consegna assegnata correttamente", assigned },
+      { message: "Consegna annullata correttamente" },
       { status: StatusCodes.Success }
     );
   } catch (error: any) {
-    console.error("Errore durante l'assegnazione:", error);
+    console.error("Errore durante la cancellazione della consegna:", error);
     return NextResponse.json(
       { message: "Errore interno", error: error.message },
       { status: StatusCodes.InternalServerError }

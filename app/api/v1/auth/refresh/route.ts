@@ -1,4 +1,3 @@
-// /app/auth/refresh/route.ts
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
@@ -36,19 +35,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Utente non trovato" }, { status: StatusCodes.BadRequest });
     }
 
-    const now = new Date();
-    if (user.tokenJWT !== token || (user.expirationJWT && now > user.expirationJWT) || user.expired) {
+    if (user.tokenJWT !== token || user.expired) {
       return NextResponse.json({ message: "Token non valido o scaduto" }, { status: StatusCodes.Unauthorized });
     }
 
-    // Genera un nuovo token valido per 1h
-    const newToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
-    const expiration = new Date();
-    expiration.setHours(expiration.getHours() + 1);
+    // Genera un nuovo token senza scadenza
+    const newToken = jwt.sign({ userId: user.id }, JWT_SECRET);
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { tokenJWT: newToken, expirationJWT: expiration, expired: false },
+      data: {
+        tokenJWT: newToken,
+        expirationJWT: null,
+        expired: false,
+      },
     });
 
     return NextResponse.json({ token: newToken }, { status: StatusCodes.Success });

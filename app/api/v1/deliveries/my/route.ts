@@ -13,30 +13,34 @@ export async function GET(request: NextRequest) {
 
   const userId = decoded.userId;
 
-  const raider = await prisma.raider.findFirst({ where: { userId } });
-  if (!raider) {
-    return NextResponse.json(
-      { message: "Profilo Raider non trovato" },
-      { status: 404 }
-    );
-  }
-
   try {
-    const completedDeliveries = await prisma.historyDelivery.findMany({
+    const raider = await prisma.raider.findFirst({ where: { userId } });
+
+    if (!raider) {
+      return NextResponse.json(
+        { message: "Profilo Raider non trovato" },
+        { status: 404 }
+      );
+    }
+
+    const assignedDeliveries = await prisma.assignedDelivery.findMany({
       where: { raiderId: raider.id },
       include: {
         delivery: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
     });
 
-    const deliveries = completedDeliveries.map((entry) => entry.delivery);
+    const deliveries = assignedDeliveries
+      .map((assigned) => assigned.delivery)
+      .filter(
+        (delivery) =>
+          delivery?.status !== "COMPLETED" &&
+          delivery?.status !== "NOTDELIVERED"
+      );
 
-    return NextResponse.json(deliveries);
+    return NextResponse.json(deliveries, { status: 200 });
   } catch (error: any) {
-    console.error("Errore nel recupero delle consegne completate:", error);
+    console.error("Errore durante il recupero delle consegne assegnate:", error);
     return NextResponse.json(
       { message: "Errore interno", error: error.message },
       { status: 500 }

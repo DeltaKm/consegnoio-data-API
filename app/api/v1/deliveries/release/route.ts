@@ -6,9 +6,8 @@ enum StatusCodes {
   Success = 200,
   BadRequest = 400,
   Unauthorized = 401,
-  Conflict = 409,
-  InternalServerError = 500,
   NotFound = 404,
+  InternalServerError = 500,
 }
 
 export async function POST(request: NextRequest) {
@@ -22,27 +21,17 @@ export async function POST(request: NextRequest) {
 
   const userId = decoded.userId;
 
-  // Recupera l'ID del raider associato all'user
-  const raider = await prisma.raider.findFirst({ where: { userId } });
-  if (!raider) {
-    return NextResponse.json(
-      { message: "Profilo Raider non trovato" },
-      { status: StatusCodes.NotFound }
-    );
-  }
-
   try {
     const body = await request.json();
-    const { deliveryId } = body;
+    const { deliveryId, note } = body;
 
-    if (!deliveryId) {
+    if (!deliveryId || !note) {
       return NextResponse.json(
-        { message: "deliveryId mancante nel body" },
+        { message: "deliveryId e nota sono obbligatori" },
         { status: StatusCodes.BadRequest }
       );
     }
 
-    // Verifica che la delivery esista
     const delivery = await prisma.deliveryEA.findUnique({ where: { id: deliveryId } });
     if (!delivery) {
       return NextResponse.json(
@@ -51,45 +40,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verifica duplicato
-    const existing = await prisma.assignedDelivery.findFirst({
-      where: {
-        deliveryId,
-        raiderId: raider.id,
-      },
-    });
-
-    if (existing) {
+    const raider = await prisma.raider.findFirst({ where: { userId } });
+    if (!raider) {
       return NextResponse.json(
-        { message: "La consegna è già assegnata a questo rider" },
-        { status: StatusCodes.Conflict }
+        { message: "Profilo Raider non trovato" },
+        { status: StatusCodes.NotFound }
       );
     }
 
-    // Crea assegnazione
-    const assigned = await prisma.assignedDelivery.create({
+    const released = await prisma.releasedDelivery.create({
       data: {
         deliveryId,
         raiderId: raider.id,
+        note,
       },
     });
 
-    // Aggiorna stato delivery (facoltativo)
     await prisma.deliveryEA.update({
       where: { id: deliveryId },
       data: {
-        assignedToRaiderId: raider.id,
-        status: "ASSIGNED" ,
-        isAssigned: true,
+        status: "RELEASED",
+        isAssigned: false,
+        isCompleted: false,
       },
     });
 
     return NextResponse.json(
-      { message: "Consegna assegnata correttamente", assigned },
+      { message: "Consegna rilasciata correttamente", released },
       { status: StatusCodes.Success }
     );
   } catch (error: any) {
-    console.error("Errore durante l'assegnazione:", error);
+    console.error("Errore durante il rilascio della consegna:", error);
     return NextResponse.json(
       { message: "Errore interno", error: error.message },
       { status: StatusCodes.InternalServerError }

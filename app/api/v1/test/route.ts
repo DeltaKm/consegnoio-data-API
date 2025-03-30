@@ -100,44 +100,6 @@ export async function DELETE(request: NextRequest) {
 }
 
 
-// export async function PATCH(request: NextRequest) {
-//   try {
-//     const id = request.nextUrl.searchParams.get("id");
-//     if (!id) {
-//       return NextResponse.json(
-//         { message: "ID richiesto" },
-//         { status: StatusCodes.BadRequest }
-//       );
-//     }
-
-//     const body = await request.json();
-//     const result = testDeliveryEASchema.safeParse(body);
-
-//     if (!result.success) {
-//       console.error("Errore di validazione:", result.error.errors);
-//       return NextResponse.json(
-//         { message: "Dati non validi", errors: result.error.errors },
-//         { status: StatusCodes.BadRequest }
-//       );
-//     }
-
-//     const data = result.data;
-
-//     const updatedDelivery = await prisma.testDeliveryEA.update({
-//       where: { id },
-//       data, 
-//     });
-
-//     return NextResponse.json(updatedDelivery, { status: StatusCodes.Success });
-//   } catch (error: any) {
-//     console.error("Errore durante l'aggiornamento dell'ordine:", error);
-//     return NextResponse.json(
-//       { message: "Errore durante l'aggiornamento dell'ordine", error: error.message },
-//       { status: StatusCodes.InternalServerError }
-//     );
-//   }
-// }
-
 export async function PATCH(request: NextRequest) {
   try {
     const id = request.nextUrl.searchParams.get("id");
