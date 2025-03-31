@@ -122,6 +122,7 @@ export async function PATCH(request: NextRequest) {
         "COMPLETED": "delivered",
         "NOTDELIVERED": "returned",
         "DELETED": "canceled",
+        "RELEASED" : "new"
       };
       const stateValue = mapping[status];
 
