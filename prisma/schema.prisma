@@ -156,6 +156,7 @@ enum googleTravelMode {
 model Business {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   bussinesName  String
+  businessCord  String?  @default("")
   raiderActived String[]
   address       String
   createdAt     DateTime @default(now())
@@ -243,6 +244,7 @@ model testDeliveryEA {
 model DeliveryEA {
   id                     String    @id @default(auto()) @map("_id") @db.ObjectId
   name                   String?
+  businessCoordinates    String?
   businessId             String?   @db.ObjectId
   orderId                String?
   businessIMG            String?

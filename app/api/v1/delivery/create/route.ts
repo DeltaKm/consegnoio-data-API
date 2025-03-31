@@ -113,6 +113,7 @@ export async function POST(request: NextRequest) {
     }
 
     const businessName = business.bussinesName;
+    const businessCoordinates =business.businessCord;
   
     const businessIMG = business.user?.imgUrl || null;
 
@@ -133,6 +134,7 @@ export async function POST(request: NextRequest) {
     const newDelivery = await prisma.deliveryEA.create({
       data: {
         name: businessName,
+        businessCoordinates: businessCoordinates,
         businessId: businessId,
         orderId: orderId,
         businessIMG,         

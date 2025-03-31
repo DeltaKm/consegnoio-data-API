@@ -21,7 +21,8 @@ const registerSchema = z.object({
   email: z.string().email({ message: "Email non valida" }).max(30, { message: "L'email deve avere massimo 30 caratteri" }),
   password: z.string().min(6, { message: "La password deve avere almeno 6 caratteri" }).max(30, { message: "La password deve avere massimo 30 caratteri" }),
   bussinesName: z.string().min(2, { message: "Il nome del bussines deve avere almeno 2 caratteri" }).max(60, { message: "Il nome deve avere massimo 60 caratteri" }),
-  address: z.string().min(2, { message: "L' indirizzo deve avere almeno 2 caratteri" }).max(90, { message: "L'indirizzo deve avere massimo 90 caratteri" }), 
+  address: z.string().min(2, { message: "L' indirizzo deve avere almeno 2 caratteri" }).max(90, { message: "L'indirizzo deve avere massimo 90 caratteri" }),
+  businessCord: z.string().optional(), 
 });
 
 const JWT_SECRET: string = process.env.JWT_SECRET!;
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (!bodyText || bodyText.trim() === "") {
       return NextResponse.json(
         { 
-          requiredFields: { email: "example@example.com", password: "password123", bussinesName: "Verizon", address: "Washington Valley RoadBedminster, NJ 07921" } 
+          requiredFields: { email: "example@example.com", password: "password123", bussinesName: "Verizon", address: "Washington Valley RoadBedminster, NJ 07921", businessCord: "41.16147753061124, 14.327322668172036" } 
         },
         { status: StatusCodes.BadRequest }
       );
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const { email, password, bussinesName, address } = validation.data;
+    const { email, password, bussinesName, address, businessCord } = validation.data;
     
     
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -88,6 +89,7 @@ export async function POST(request: NextRequest) {
           bussinesName,          
           raiderActived: [],
           address,
+          businessCord,
           userId: user.id, 
         },
       });
