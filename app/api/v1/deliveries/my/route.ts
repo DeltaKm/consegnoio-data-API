@@ -23,10 +23,22 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // const assignedDeliveries = await prisma.assignedDelivery.findMany({
+    //   where: { raiderId: raider.id },
+    //   include: {
+    //     delivery: true,
+    //   },      
+    // });
+
     const assignedDeliveries = await prisma.assignedDelivery.findMany({
       where: { raiderId: raider.id },
       include: {
         delivery: true,
+      },
+      orderBy: {
+        delivery: {
+          schedulingDelivery: 'asc',
+        },
       },
     });
 

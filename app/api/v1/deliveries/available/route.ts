@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
           in: ["CREATED", "RELEASED"],
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { schedulingDelivery: "asc" },
     });
 
     return NextResponse.json(deliveries, { status: StatusCodes.Success });
