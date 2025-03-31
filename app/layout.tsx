@@ -19,6 +19,7 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Consegno IO",
   description: "Data API",
+  
 };
 
 export default function RootLayout({
