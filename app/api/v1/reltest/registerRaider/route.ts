@@ -18,7 +18,7 @@ dateIta.setHours(dateIta.getHours() + 1);
 
 
 const registerSchema = z.object({
-  email: z.string().email({ message: "Email non valida" }).max(30, { message: "L'email deve avere massimo 30 caratteri" }),
+  email: z.string().email({ message: "Email non valida" }).max(60, { message: "L'email deve avere massimo 60 caratteri" }),
   password: z.string().min(6, { message: "La password deve avere almeno 6 caratteri" }).max(30, { message: "La password deve avere massimo 30 caratteri" }),
   name: z.string().min(2, { message: "Il nome deve avere almeno 2 caratteri" }).max(30, { message: "Il nome deve avere massimo 30 caratteri" }),
   surname: z.string().min(2, { message: "Il cognome deve avere almeno 2 caratteri" }).max(30, { message: "Il cognome deve avere massimo 30 caratteri" }), 
