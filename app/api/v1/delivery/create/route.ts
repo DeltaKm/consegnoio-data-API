@@ -1,6 +1,6 @@
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { number, z } from "zod";
 
 enum StatusCodes {
   BadRequest = 400,
@@ -23,6 +23,8 @@ const deliverySchema = z.object({
   customerCity: z.string(),
   paymentType: z.string(),
   totalPaid: z.number(),
+  mobile: z.string(),
+  phone: z.string(),
   totalShipping: z.number(),
   note: z.string(),
   customerCoordinates: z.string(),
@@ -91,6 +93,8 @@ export async function POST(request: NextRequest) {
       customerCity,
       paymentType,
       totalPaid,
+      mobile,
+      phone,
       totalShipping,
       note,
       customerCoordinates,
@@ -138,6 +142,8 @@ export async function POST(request: NextRequest) {
         totalDistance: totalDistanceGenerated,
         deliveryAddress,
         totalPaid,
+        mobile,
+        phone,
         compensation: totalShipping,
         note,
         customerCoordinates,

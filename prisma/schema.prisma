@@ -255,6 +255,8 @@ model DeliveryEA {
   deliveryType           String?   @default("Alimenti")
   numeroColli            Int?
   totalPaid              Float?
+  mobile                 String?
+  phone                  String?
   compensation           Float?
   paymentType            String?
   note                   String?   @default("")
