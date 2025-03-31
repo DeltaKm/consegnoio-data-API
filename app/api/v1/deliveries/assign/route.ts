@@ -149,17 +149,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existing = await prisma.assignedDelivery.findFirst({
-      where: { deliveryId, raiderId: raider.id },
+    const existingAssignment = await prisma.assignedDelivery.findFirst({
+      where: { deliveryId },
     });
-
-    if (existing) {
+    
+    if (existingAssignment) {
       return NextResponse.json(
-        { message: "La consegna è già assegnata a questo rider" },
+        { message: "La consegna è già assegnata a un rider" },
         { status: StatusCodes.Conflict }
       );
     }
-
+    
     const assigned = await prisma.assignedDelivery.create({
       data: {
         deliveryId,
