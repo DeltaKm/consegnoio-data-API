@@ -22,7 +22,9 @@ export async function GET(request: NextRequest) {
       where: {
         isAssigned: false,
         isCompleted: false,
-        status: "CREATED",
+        status: {
+          in: ["CREATED", "RELEASED"],
+        },
       },
       orderBy: { createdAt: "desc" },
     });
