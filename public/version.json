@@ -2,5 +2,5 @@
     "version": "1.0.0",
     "build": 4,
     "apk_url": "https://consegnoio-data-api.vercel.app/",
-    "changelog": "Consegnoio alpha version\nBuild 3:\n - ReworkAPP"
+    "changelog": "Consegnoio alpha version\nBuild 3:\n - Add Total Paid\niIn aviable Delivery"
   }
