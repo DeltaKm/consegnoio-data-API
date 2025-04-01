@@ -8,10 +8,7 @@ if (!JWT_SECRET) {
   throw new Error("JWT_SECRET non definito nelle variabili d'ambiente");
 }
 
-/**
- * Verifica il token JWT, decodifica e controlla anche che
- * il token salvato nel database corrisponda e non sia scaduto/invalido.
- */
+
 export async function authenticateToken(request: NextRequest) {
   const authHeader = request.headers.get("Authorization");
   if (!authHeader) return null;
@@ -27,7 +24,6 @@ export async function authenticateToken(request: NextRequest) {
     return null;
   }
 
-  // Recupera l'utente dal DB e verifica il token memorizzato
   const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
   if (!user) return null;
   if (user.tokenJWT !== token || user.expired) return null;
