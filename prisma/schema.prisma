@@ -108,7 +108,7 @@ model Raider {
   name            String
   surname         String
   isActive        Boolean     @default(false)
-  bussinesActived String[]    @default([]) // reference 
+  bussinesActived String[]    @default([])
   inService       Boolean     @default(false) // flag per attivare la modalita raider on
   vehicle         veichleEnum @default(CAR)
   createdAt       DateTime    @default(now())
