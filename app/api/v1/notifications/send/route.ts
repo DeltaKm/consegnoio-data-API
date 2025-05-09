@@ -12,15 +12,20 @@ enum StatusCodes {
 }
 
 export async function POST(request: NextRequest) {
-  const apiKey = request.headers.get("x-api-key");
-  if (apiKey !== process.env.API_KEY) {
-    return NextResponse.json({ message: "Invalid API key" }, { status: StatusCodes.Unauthorized });
-  }
+  // ——————————————————————————————————————————————————
+  // 1) Autenticazione via JWT (middleware API‐Key già eseguito)
+  // ——————————————————————————————————————————————————
   const decoded = await authenticateToken(request);
   if (!decoded) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: StatusCodes.Unauthorized });
+    return NextResponse.json(
+      { message: "Unauthorized" },
+      { status: StatusCodes.Unauthorized }
+    );
   }
 
+  // ——————————————————————————————————————————————————
+  // 2) Parsing e validazione del body JSON
+  // ——————————————————————————————————————————————————
   const { raiderId, title, body, data } = await request.json();
   if (!raiderId || !title || !body) {
     return NextResponse.json(
@@ -29,12 +34,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // ——————————————————————————————————————————————————
+  // 3) Recupero i token FCM dal DB
+  // ——————————————————————————————————————————————————
   const raider = await prisma.raider.findUnique({
     where: { id: raiderId },
     select: { deviceTokens: true },
   });
   if (!raider) {
-    return NextResponse.json({ message: "Raider not found." }, { status: StatusCodes.NotFound });
+    return NextResponse.json(
+      { message: "Raider not found." },
+      { status: StatusCodes.NotFound }
+    );
   }
   if (!raider.deviceTokens.length) {
     return NextResponse.json(
@@ -43,16 +54,28 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { successCount, failureCount, results } = await sendNotification(
-    raiderId,
-    raider.deviceTokens,
-    title,
-    body,
-    data
-  );
+  // ——————————————————————————————————————————————————
+  // 4) Invia la notifica
+  // ——————————————————————————————————————————————————
+  try {
+    const { successCount, failureCount, results } = await sendNotification(
+      raiderId,
+      raider.deviceTokens,
+      title,
+      body,
+      data
+    );
 
-  return NextResponse.json(
-    { successCount, failureCount, results },
-    { status: StatusCodes.Success }
-  );
+    return NextResponse.json(
+      { successCount, failureCount, results },
+      { status: StatusCodes.Success }
+    );
+
+  } catch (error: any) {
+    console.error("Error sending notification:", error);
+    return NextResponse.json(
+      { message: "Internal error sending notification", error: error.message },
+      { status: StatusCodes.InternalServerError }
+    );
+  }
 }
