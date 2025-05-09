@@ -26,33 +26,33 @@
  * - inserire versionamento app
  * - inserire tracciamento raider
  * - abiliatre sistema di notifiche
- * - inserire sistema id consegne per dare al raider solo le consegne della sua ditta
+ * - DONE => inserire sistema id consegne per dare al raider solo le consegne della sua ditta
  * - sistema di filitri per le schede consegne, consegne assegnate e storico
- * - finire gli endpoint aggiungere anche quello che invia un hook ad easyapper per lo stato della consegna
+ * - DONE => finire gli endpoint aggiungere anche quello che invia un hook ad easyapper per lo stato della consegna
  * - crere file docker del backend
  * - Implementare sistema generatore di api key, stabilire nel databese come gestire i dati
  * - primo step Configurare sistema api key e db predisposto
  * - aggiungere validazione dati campo registrazione e login
- * - accettare orario previsto consegna
- * - implementare rotte con auth token e id nei query param
+ * - DONE => accettare orario previsto consegna
+ * - DONE => implementare rotte con auth token e id nei query param
  * - implementare politica per attivare o disattivare utente raider / business
  * - aggiungere documenteazion swagger
  * - cambiare nome package
- * - controllare img loghi etc
+ * - DONE => controllare img loghi etc
  * - aggiungere url per collegare le foto dei bussines e delle img raider
  * - hostare su cluster italiano sia db che server o fixare datetime **urgente
  * - implementare abilitazione raider da parte delle attività
  * - aggiungere data creazione ordine nelle card ed evenutale data modifica
- * - agggiungere oltre al veriosnamento patch note
+ * - agggiungere oltre al versionamento patch note
  * - visualizazzion costi in formato standard con ex 1,10€
- * - collegamento indirizzi a maps
+ * - DONE => collegamento indirizzi a maps
  * - implementare paginazione o conectto simile per le richieste in modo da evitare il crash del server
  * - add baseurl costant client flutter
  * - add color costant
- * - aggiungere swipe tra le pagine *** Future Release ***
- * - controllare la cache che non mi prendeva lo status valure finche non ho aggiornato
- * - La consegna creata deve avere l id del business che l ha create e quando assegnata l 'id del raider che  l ha presa in carico
- * - implementare invio stato ordine a easy appear
+ * - DONE => aggiungere swipe tra le pagine *** Future Release ***
+ * - DONE => controllare la cache che non mi prendeva lo status valure finche non ho aggiornato "da campire che ho scritto qui"
+ * - DONE => La consegna creata deve avere l id del business che l ha create e quando assegnata l 'id del raider che  l ha presa in carico
+ * - DONE => implementare invio stato ordine a easy appear
  */
 
 generator client {
@@ -113,6 +113,8 @@ model Raider {
   vehicle         veichleEnum @default(CAR)
   createdAt       DateTime    @default(now())
   updateAt        DateTime    @updatedAt
+
+  deviceTokens    String[]    @default([])
 
   user User? @relation("UserRaider", fields: [userId], references: [id])
 
