@@ -180,15 +180,30 @@ export async function POST(request: NextRequest) {
     // Invia notifica al rider che ha ricevuto l'assegnazione
     try {
       if (raider.deviceTokens && raider.deviceTokens.length > 0) {
+        // Formatta la data di consegna in un formato leggibile
+        // Utilizziamo schedulingDelivery invece di schedulingDeliveryDate
+        const schedulingTime = delivery.schedulingDelivery ? new Date(delivery.schedulingDelivery) : new Date();
+        const formattedDate = schedulingTime.toLocaleDateString('it-IT', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+        const formattedTime = schedulingTime.toLocaleTimeString('it-IT', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        const fullFormattedDate = `${formattedDate} ${formattedTime}`;
+        
         await sendNotification(
           raider.id,
           raider.deviceTokens,
           "Nuova consegna assegnata",
-          `Consegna assegnata da ${delivery.name || 'Attività'}`,
+          `Consegna assegnata da ${delivery.name || 'Attività'} - Data: ${fullFormattedDate}`,
           {
             type: "assigned_delivery",
             deliveryId: delivery.id,
             businessName: delivery.name || "Attività",
+            scheduledDate: fullFormattedDate,
             // Rimuoviamo gli indirizzi come richiesto
           }
         );

@@ -179,20 +179,24 @@ export async function POST(request: NextRequest) {
       for (const raider of eligibleRaiders) {
         if (raider.deviceTokens && raider.deviceTokens.length > 0) {
           try {
-            // Formatta l'orario di consegna in un formato leggibile
+            // Formatta la data di consegna in un formato leggibile
             const schedulingTime = schedulingDeliveryDate ? new Date(schedulingDeliveryDate) : new Date();
+            const formattedDate = schedulingTime.toLocaleDateString('it-IT', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            });
             const formattedTime = schedulingTime.toLocaleTimeString('it-IT', {
               hour: '2-digit',
-              minute: '2-digit',
-              day: '2-digit',
-              month: '2-digit'
+              minute: '2-digit'
             });
+            const fullFormattedDate = `${formattedDate} ${formattedTime}`;
             
             await sendNotification(
               raider.id,
               raider.deviceTokens,
               "Nuova consegna disponibile",
-              `${businessName} - Consegna prevista per ${formattedTime}`,
+              `${businessName} - Data: ${fullFormattedDate}`,
               {
                 type: "new_delivery",
                 deliveryId: newDelivery.id,
