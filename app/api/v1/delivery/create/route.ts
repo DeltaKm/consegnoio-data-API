@@ -1,6 +1,7 @@
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { number, z } from "zod";
+import { sendNotification } from "@/app/lib/fcm";
 
 enum StatusCodes {
   BadRequest = 400,
@@ -155,12 +156,59 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Trova i rider che dovrebbero ricevere la notifica
+    // In questo esempio, notifichiamo tutti i rider attivi
+    // In un'implementazione più avanzata, potresti filtrare per zona, disponibilità, ecc.
+    try {
+      const eligibleRaiders = await prisma.raider.findMany({
+        where: {
+          isActive: true,
+          inService: true,
+          // Se il business ha raider abilitati, notifica solo quelli
+          ...(business.raiderActived && business.raiderActived.length > 0
+            ? { id: { in: business.raiderActived } }
+            : {}),
+        },
+        select: {
+          id: true,
+          deviceTokens: true,
+        },
+      });
+
+      // Invia notifiche a tutti i rider idonei
+      for (const raider of eligibleRaiders) {
+        if (raider.deviceTokens && raider.deviceTokens.length > 0) {
+          try {
+            await sendNotification(
+              raider.id,
+              raider.deviceTokens,
+              "Nuova consegna disponibile",
+              `Nuova consegna da ${businessName} a ${customerAddressDetails}`,
+              {
+                type: "new_delivery",
+                deliveryId: newDelivery.id,
+                // Includi altri dati necessari per la navigazione
+                pickupAddress: pickupAddress || "",
+                deliveryAddress: deliveryAddress || "",
+              }
+            );
+          } catch (notificationError) {
+            console.error(`Errore nell'invio della notifica al rider ${raider.id}:`, notificationError);
+            // Continuiamo con gli altri rider anche se fallisce la notifica per uno
+          }
+        }
+      }
+    } catch (notificationError) {
+      console.error("Errore durante l'invio delle notifiche:", notificationError);
+      // Continuiamo anche se fallisce l'invio delle notifiche
+    }
+
     return NextResponse.json(
       { result: "success", delivery: newDelivery },
       { status: StatusCodes.Success }
     );
   } catch (error: any) {
-    console.error("Error creating testDeliveryEA:", error);
+    console.error("Error creating DeliveryEA:", error);
     return NextResponse.json(
       { message: "Internal error during creation", error: error.message },
       { status: StatusCodes.InternalServerError }

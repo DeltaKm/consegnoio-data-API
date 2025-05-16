@@ -101,6 +101,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { authenticateToken } from "@/app/lib/auth";
+import { sendNotification } from "@/app/lib/fcm";
 
 enum StatusCodes {
   Success = 200,
@@ -176,6 +177,28 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Invia notifica al rider che ha ricevuto l'assegnazione
+    try {
+      if (raider.deviceTokens && raider.deviceTokens.length > 0) {
+        await sendNotification(
+          raider.id,
+          raider.deviceTokens,
+          "Nuova consegna assegnata",
+          `Ti è stata assegnata una consegna da ${delivery.pickupAddress || ''} a ${delivery.deliveryAddress || ''}`,
+          {
+            type: "assigned_delivery",
+            deliveryId: delivery.id,
+            pickupAddress: delivery.pickupAddress || "",
+            deliveryAddress: delivery.deliveryAddress || "",
+          }
+        );
+      }
+    } catch (notificationError) {
+      console.error(`Errore nell'invio della notifica al rider ${raider.id}:`, notificationError);
+      // Continuiamo anche se fallisce la notifica
+    }
+
+    // Aggiorna lo stato su EasyAppear
     try {
       const mapping: Record<string, string> = {
         "ASSIGNED": "confirmed",
