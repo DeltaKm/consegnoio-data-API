@@ -116,7 +116,8 @@ export async function POST(request: NextRequest) {
     const businessName = business.bussinesName;
     const businessCoordinates =business.businessCord;
   
-    const businessIMG = business.user?.imgUrl || null;
+    // Assicuriamoci che businessIMG abbia sempre un valore valido
+    const businessIMG = business.user?.imgUrl || "asset/images/icon-white.png";
 
     const pickupAddress = business.address;
 
