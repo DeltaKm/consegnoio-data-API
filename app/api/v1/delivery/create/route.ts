@@ -179,17 +179,26 @@ export async function POST(request: NextRequest) {
       for (const raider of eligibleRaiders) {
         if (raider.deviceTokens && raider.deviceTokens.length > 0) {
           try {
+            // Formatta l'orario di consegna in un formato leggibile
+            const schedulingTime = schedulingDeliveryDate ? new Date(schedulingDeliveryDate) : new Date();
+            const formattedTime = schedulingTime.toLocaleTimeString('it-IT', {
+              hour: '2-digit',
+              minute: '2-digit',
+              day: '2-digit',
+              month: '2-digit'
+            });
+            
             await sendNotification(
               raider.id,
               raider.deviceTokens,
               "Nuova consegna disponibile",
-              `Nuova consegna da ${businessName} a ${customerAddressDetails}`,
+              `${businessName} - Consegna prevista per ${formattedTime}`,
               {
                 type: "new_delivery",
                 deliveryId: newDelivery.id,
-                // Includi altri dati necessari per la navigazione
-                pickupAddress: pickupAddress || "",
-                deliveryAddress: deliveryAddress || "",
+                businessName: businessName || "",
+                scheduledTime: formattedTime,
+                // Rimuoviamo gli indirizzi come richiesto
               }
             );
           } catch (notificationError) {

@@ -38,9 +38,21 @@ export async function sendNotification(
 
   for (const token of tokens) {
     try {
+      // Assicuriamoci che i dati non contengano indirizzi
+      const cleanData = { ...data };
+      // Rimuoviamo esplicitamente gli indirizzi dai dati
+      delete cleanData.pickupAddress;
+      delete cleanData.deliveryAddress;
+      
+      // Convertiamo tutti i valori in stringhe come richiesto da Firebase
+      const formattedData: Record<string, string> = {};
+      for (const key in cleanData) {
+        formattedData[key] = String(cleanData[key] || '');
+      }
+      
       const messageId = await admin
         .messaging()
-        .send({ token, notification: { title, body }, data: data || {} });
+        .send({ token, notification: { title, body }, data: formattedData });
       successCount++;
       results.push({ token, success: true, messageId });
     } catch (err: any) {

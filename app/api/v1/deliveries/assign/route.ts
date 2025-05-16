@@ -184,12 +184,12 @@ export async function POST(request: NextRequest) {
           raider.id,
           raider.deviceTokens,
           "Nuova consegna assegnata",
-          `Ti è stata assegnata una consegna da ${delivery.pickupAddress || ''} a ${delivery.deliveryAddress || ''}`,
+          `Consegna assegnata da ${delivery.name || 'Attività'}`,
           {
             type: "assigned_delivery",
             deliveryId: delivery.id,
-            pickupAddress: delivery.pickupAddress || "",
-            deliveryAddress: delivery.deliveryAddress || "",
+            businessName: delivery.name || "Attività",
+            // Rimuoviamo gli indirizzi come richiesto
           }
         );
       }
