@@ -43,6 +43,25 @@ const deliverySchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Verifica se è presente il parametro di query per l'assegnazione diretta
+    const searchParams = request.nextUrl.searchParams;
+    const assignToRaiderId = searchParams.get('assignToRaiderId');
+    
+    // Se è specificato un raider, verifichiamo che esista
+    let assignedRaider = null;
+    if (assignToRaiderId) {
+      assignedRaider = await prisma.raider.findUnique({
+        where: { id: assignToRaiderId },
+        select: { id: true, deviceTokens: true }
+      });
+      
+      if (!assignedRaider) {
+        return NextResponse.json(
+          { message: `Raider with ID ${assignToRaiderId} not found.` },
+          { status: StatusCodes.NotFound }
+        );
+      }
+    }
     const bodyText = await request.text();
     if (!bodyText || bodyText.trim() === "") {
       return NextResponse.json(
@@ -133,48 +152,97 @@ export async function POST(request: NextRequest) {
     const randomDistance = Math.floor(Math.random() * 10) + 1;
     const totalDistanceGenerated = `${randomDistance} KM`;
 
+    // Prepara i dati base per la consegna
+    const deliveryData = {
+      name: businessName,
+      businessCoordinates: businessCoordinates,
+      businessId: businessId,
+      orderId: orderId,
+      businessIMG,         
+      pickupAddress,        
+      schedulingDelivery: schedulingDeliveryDate,
+      recipient,
+      totalDistance: totalDistanceGenerated,
+      deliveryAddress,
+      totalPaid,
+      mobile,
+      phone,
+      compensation: totalShipping,
+      note,
+      customerCoordinates,
+      numeroColli,
+      paymentType,
+      customerAddressDetails,
+    };
+    
+    // Se è specificato un raider, assegna direttamente la consegna
+    if (assignedRaider) {
+      // Aggiungi i campi per l'assegnazione diretta
+      Object.assign(deliveryData, {
+        isAssigned: true,
+        status: 'ASSIGNED',
+        raiderId: assignedRaider.id,
+        assignedAt: new Date(),
+      });
+    }
+    
+    // Crea la consegna nel database
     const newDelivery = await prisma.deliveryEA.create({
-      data: {
-        name: businessName,
-        businessCoordinates: businessCoordinates,
-        businessId: businessId,
-        orderId: orderId,
-        businessIMG,         
-        pickupAddress,        
-        schedulingDelivery: schedulingDeliveryDate,
-        recipient,
-        totalDistance: totalDistanceGenerated,
-        deliveryAddress,
-        totalPaid,
-        mobile,
-        phone,
-        compensation: totalShipping,
-        note,
-        customerCoordinates,
-        numeroColli,
-        paymentType,
-        customerAddressDetails,
-      },
+      data: deliveryData,
     });
 
-    // Trova i rider che dovrebbero ricevere la notifica
-    // In questo esempio, notifichiamo tutti i rider attivi
-    // In un'implementazione più avanzata, potresti filtrare per zona, disponibilità, ecc.
+    // Gestione delle notifiche
     try {
-      const eligibleRaiders = await prisma.raider.findMany({
-        where: {
-          isActive: true,
-          inService: true,
-          // Se il business ha raider abilitati, notifica solo quelli
-          ...(business.raiderActived && business.raiderActived.length > 0
-            ? { id: { in: business.raiderActived } }
-            : {}),
-        },
-        select: {
-          id: true,
-          deviceTokens: true,
-        },
-      });
+      // Se la consegna è stata assegnata direttamente a un raider
+      if (assignedRaider) {
+        // Invia una notifica solo al raider assegnato
+        if (assignedRaider.deviceTokens && assignedRaider.deviceTokens.length > 0) {
+          try {
+            // Formatta la data di consegna in un formato leggibile
+            const schedulingTime = schedulingDeliveryDate ? new Date(schedulingDeliveryDate) : new Date();
+            const formattedDate = schedulingTime.toLocaleDateString('it-IT', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            });
+            const formattedTime = schedulingTime.toLocaleTimeString('it-IT', {
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+            const fullFormattedDate = `${formattedDate} ${formattedTime}`;
+            
+            await sendNotification(
+              assignedRaider.id,
+              assignedRaider.deviceTokens,
+              "Nuova consegna assegnata",
+              `${businessName} - Data: ${fullFormattedDate}`,
+              {
+                type: "assigned_delivery",
+                deliveryId: newDelivery.id,
+                businessName: businessName || "",
+                scheduledTime: formattedTime,
+              }
+            );
+          } catch (notificationError) {
+            console.error(`Errore nell'invio della notifica al raider ${assignedRaider.id}:`, notificationError);
+          }
+        }
+      } else {
+        // Comportamento standard: notifica tutti i rider idonei
+        const eligibleRaiders = await prisma.raider.findMany({
+          where: {
+            isActive: true,
+            inService: true,
+            // Se il business ha raider abilitati, notifica solo quelli
+            ...(business.raiderActived && business.raiderActived.length > 0
+              ? { id: { in: business.raiderActived } }
+              : {}),
+          },
+          select: {
+            id: true,
+            deviceTokens: true,
+          },
+        });
 
       // Invia notifiche a tutti i rider idonei
       for (const raider of eligibleRaiders) {
@@ -212,13 +280,19 @@ export async function POST(request: NextRequest) {
           }
         }
       }
+      }
     } catch (notificationError) {
       console.error("Errore durante l'invio delle notifiche:", notificationError);
       // Continuiamo anche se fallisce l'invio delle notifiche
     }
 
     return NextResponse.json(
-      { result: "success", delivery: newDelivery },
+      { 
+        result: "success", 
+        delivery: newDelivery,
+        assigned: assignedRaider ? true : false,
+        assignedTo: assignedRaider ? assignedRaider.id : null
+      },
       { status: StatusCodes.Success }
     );
   } catch (error: any) {
