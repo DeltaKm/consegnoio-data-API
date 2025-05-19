@@ -50,7 +50,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Token senza scadenza
     const token = jwt.sign({ userId: user.id }, JWT_SECRET);
 
     await prisma.user.update({
