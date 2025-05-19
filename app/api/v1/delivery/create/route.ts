@@ -153,10 +153,9 @@ export async function POST(request: NextRequest) {
     const totalDistanceGenerated = `${randomDistance} KM`;
 
     // Prepara i dati base per la consegna
-    const deliveryData = {
+    const deliveryData: any = {
       name: businessName,
       businessCoordinates: businessCoordinates,
-      businessId: businessId,
       orderId: orderId,
       businessIMG,         
       pickupAddress,        
@@ -173,6 +172,12 @@ export async function POST(request: NextRequest) {
       numeroColli,
       paymentType,
       customerAddressDetails,
+      // Relazione con il business
+      business: {
+        connect: {
+          id: businessId
+        }
+      }
     };
     
     // Se è specificato un raider, assegna direttamente la consegna
@@ -181,8 +186,12 @@ export async function POST(request: NextRequest) {
       Object.assign(deliveryData, {
         isAssigned: true,
         status: 'ASSIGNED',
-        raiderId: assignedRaider.id,
-        assignedAt: new Date(),
+        // Relazione con il raider
+        assignedToRaider: {
+          connect: {
+            id: assignedRaider.id
+          }
+        }
       });
     }
     
@@ -190,6 +199,46 @@ export async function POST(request: NextRequest) {
     const newDelivery = await prisma.deliveryEA.create({
       data: deliveryData,
     });
+    
+    // Se è specificato un raider, crea anche il record AssignedDelivery
+    if (assignedRaider) {
+      try {
+        // Crea l'assegnazione nella tabella AssignedDelivery
+        await prisma.assignedDelivery.create({
+          data: {
+            deliveryId: newDelivery.id,
+            raiderId: assignedRaider.id,
+          },
+        });
+        
+        // Aggiorna lo stato su EasyAppear se necessario
+        try {
+          const mapping: Record<string, string> = {
+            "ASSIGNED": "confirmed",
+          };
+          const stateValue = mapping["ASSIGNED"];
+          if (stateValue && newDelivery.orderId) {
+            await fetch("https://app.easyappear.it/webservice/set_order_state_consegnoio/", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                businessId: newDelivery.businessId,
+                order_id: newDelivery.orderId,
+                state: stateValue,
+              }),
+            });
+          }
+        } catch (externalError) {
+          console.error("Errore durante l'invio a EasyAppear:", externalError);
+          // Continuiamo anche se fallisce l'invio a EasyAppear
+        }
+      } catch (assignmentError) {
+        console.error("Errore durante la creazione dell'assegnazione:", assignmentError);
+        // Continuiamo anche se fallisce la creazione dell'assegnazione
+      }
+    }
 
     // Gestione delle notifiche
     try {
