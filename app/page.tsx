@@ -66,7 +66,7 @@ export default function Home() {
                 Scarica APK
               </a>
               <p className="mt-6 text-sm text-gray-500">
-                Versione 1.0.0 - Build:4 • Compatibile con Android 7.0 e superiori
+                Versione 1.0.1 - Build:5 • Compatibile con Android 7.0 e superiori
               </p>
             </div>
           </div>
