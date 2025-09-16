@@ -41,7 +41,10 @@ import { NextRequest, NextResponse } from 'next/server';
 // accettare tutte le origini prima di pushare
 const allowedOrigins = [ 
   'http://localhost:3000',
-  'consegnoio-data-api.vercel.app'
+  'consegnoio-data-api.vercel.app',
+  'rider-dashboard-one.vercel.app',
+  'https://consegnoio-data-api.vercel.app',
+  'https://rider-dashboard-one.vercel.app'
 ];
 
 const corsHeaders: Record<string, string> = {
