@@ -36,26 +36,22 @@ export async function POST(request: NextRequest) {
     }
     console.log("Utente trovato:", user);
 
-    // Genera il token di reset e imposta la scadenza (es. 1 ora)
     const resetToken = uuidv4();
     console.log("Token di reset generato:", resetToken);
     const expiration = new Date();
     expiration.setHours(expiration.getHours() + 1);
     console.log("Scadenza token:", expiration);
 
-    // Aggiorna l'utente con il token di reset e la sua scadenza
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: { resetPasswordToken: resetToken, resetPasswordExpiration: expiration },
     });
     console.log("Utente aggiornato con token reset:", updatedUser);
 
-    // Genera il link di reset usando BASE_URL (impostata nelle variabili d'ambiente)
     const baseUrl = process.env.BASE_URL || "http://localhost:3000";
     const resetLink = `${baseUrl}/api/v1/auth/reset?token=${resetToken}`;
     console.log("Link di reset generato:", resetLink);
 
-    // Configura l'email di reset
     const mailOptions = {
       from: process.env.SMTP_USER,
       to: email,

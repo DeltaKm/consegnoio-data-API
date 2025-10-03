@@ -84,8 +84,9 @@ model User {
   creatdeAt               DateTime  @default(now())
   updateAt                DateTime  @updatedAt
 
-  raiderProfiles   Raider[]   @relation("UserRaider")
-  businessProfiles Business[] @relation("UserBusiness")
+  raiderProfiles     Raider[]     @relation("UserRaider")
+  businessProfiles   Business[]   @relation("UserBusiness")
+  logisticsProfiles  Logistics[]  @relation("UserLogistics")
 }
 
 //da definire con zod per i problemi di prisma fare prima il test perche puo essere un problema solo sullo schema precedente
@@ -107,6 +108,7 @@ model Raider {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   surname         String
+  mobile          String?     // Telefono raider
   isActive        Boolean     @default(false)
   bussinesActived String[]    @default([])
   inService       Boolean     @default(false) // flag per attivare la modalita raider on
@@ -115,6 +117,11 @@ model Raider {
   updateAt        DateTime    @updatedAt
 
   deviceTokens    String[]    @default([])
+
+  // Chi ha creato il raider (per controllo permessi)
+  createdByBusinessId   String? @db.ObjectId
+  createdByLogisticsId  String? @db.ObjectId
+  createdByAdminId      String? @db.ObjectId
 
   user User? @relation("UserRaider", fields: [userId], references: [id])
 
@@ -170,6 +177,9 @@ model Business {
   userId          String?          @db.ObjectId
 
   deliveries DeliveryEA[]
+  
+  // Relazione con Logistics
+  logisticsRelations LogisticsBusiness[]
 }
 
 // =============================================================
@@ -510,4 +520,35 @@ model DeliveryTypeValue {
   value    String
   cratedAt DateTime @default(now())
   updateAt DateTime @updatedAt
+}
+
+// =============================================================
+// ==================== Logistics Model ========================
+// =============================================================
+
+// Profilo Logistics (gestisce multipli business)
+model Logistics {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  surname   String
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  user   User?   @relation("UserLogistics", fields: [userId], references: [id])
+  userId String? @db.ObjectId
+
+  businessRelations LogisticsBusiness[]
+}
+
+// Pivot table: Logistics <-> Business (many-to-many)
+model LogisticsBusiness {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  logistics   Logistics @relation(fields: [logisticsId], references: [id])
+  logisticsId String    @db.ObjectId
+  business    Business  @relation(fields: [businessId], references: [id])
+  businessId  String    @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updateAt    DateTime  @updatedAt
+
+  @@unique([logisticsId, businessId])
 }

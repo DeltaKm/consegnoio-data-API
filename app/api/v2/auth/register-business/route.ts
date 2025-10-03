@@ -1,11 +1,10 @@
-// app/api/v1/auth/registerBusiness/route.ts
 import prisma from '@/app/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import transporter from '@/app/lib/mailer';
-import { string, z } from 'zod';
+import { z } from 'zod';
 
 enum StatusCodes {
   Success = 201,
@@ -13,16 +12,12 @@ enum StatusCodes {
   InternalServerError = 500,
 }
 
-const dateIta = new Date();
-dateIta.setHours(dateIta.getHours() + 1);
-
-
 const registerSchema = z.object({
-  email: z.string().email({ message: "Email non valida" }).max(30, { message: "L'email deve avere massimo 30 caratteri" }),
+  email: z.string().email({ message: "Email non valida" }).max(60, { message: "L'email deve avere massimo 60 caratteri" }),
   password: z.string().min(6, { message: "La password deve avere almeno 6 caratteri" }).max(30, { message: "La password deve avere massimo 30 caratteri" }),
-  bussinesName: z.string().min(2, { message: "Il nome del bussines deve avere almeno 2 caratteri" }).max(60, { message: "Il nome deve avere massimo 60 caratteri" }),
-  address: z.string().min(2, { message: "L' indirizzo deve avere almeno 2 caratteri" }).max(90, { message: "L'indirizzo deve avere massimo 90 caratteri" }),
-  businessCord: z.string().optional(), 
+  bussinesName: z.string().min(2, { message: "Il nome del business deve avere almeno 2 caratteri" }).max(60, { message: "Il nome deve avere massimo 60 caratteri" }),
+  address: z.string().min(2, { message: "L'indirizzo deve avere almeno 2 caratteri" }).max(90, { message: "L'indirizzo deve avere massimo 90 caratteri" }),
+  businessCord: z.string().optional(),
 });
 
 const JWT_SECRET: string = process.env.JWT_SECRET!;
@@ -35,16 +30,23 @@ export async function POST(request: NextRequest) {
     const bodyText = await request.text();
     if (!bodyText || bodyText.trim() === "") {
       return NextResponse.json(
-        { 
-          requiredFields: { email: "example@example.com", password: "password123", bussinesName: "Verizon", address: "Washington Valley RoadBedminster, NJ 07921", businessCord: "41.16147753061124, 14.327322668172036" } 
+        {
+          message: "Campi mancanti",
+          requiredFields: {
+            email: "example@example.com",
+            password: "password123",
+            bussinesName: "Nome Attività",
+            address: "Via Example 123, 00100 Roma",
+            businessCord: "41.9028,12.4964"
+          }
         },
         { status: StatusCodes.BadRequest }
       );
     }
 
     const body = JSON.parse(bodyText);
-
     const validation = registerSchema.safeParse(body);
+    
     if (!validation.success) {
       const errorMessage = validation.error.errors
         .map((err) => `${err.path.join('.')}: ${err.message}`)
@@ -54,22 +56,20 @@ export async function POST(request: NextRequest) {
         { status: StatusCodes.BadRequest }
       );
     }
-    
+
     const { email, password, bussinesName, address, businessCord } = validation.data;
-    
-    
+
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json(
-        { message: "Utente già registrato" },
+        { message: "Utente già registrato con questa email" },
         { status: StatusCodes.BadRequest }
       );
     }
-    
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const confirmationToken = uuidv4();
-    
-    
+
     const user = await prisma.user.create({
       data: {
         email,
@@ -77,58 +77,68 @@ export async function POST(request: NextRequest) {
         role: "BUSINESS",
         confirmed: false,
         confirmationToken,
-        creatdeAt: dateIta,
       },
     });
-    
-    // controlalre se il ciclo funziona
-    let profile = null;
-    if (user.id != null) {
-      profile = await prisma.business.create({
-        data: {
-          bussinesName,          
-          raiderActived: [],
-          address,
-          businessCord,
-          userId: user.id, 
-        },
-      });
-    }
-    
+
+    const business = await prisma.business.create({
+      data: {
+        bussinesName,
+        raiderActived: [],
+        address,
+        businessCord: businessCord || "",
+        userId: user.id,
+      },
+    });
+
     const baseUrl = process.env.BASE_URL || "http://localhost:3000";
     const confirmationLink = `${baseUrl}/api/v1/auth/confirm?token=${confirmationToken}`;
-    
+
     const mailOptions = {
       from: process.env.SMTP_USER,
       to: email,
-      subject: "Conferma la tua email",
+      subject: "Conferma la tua email - Consegnoio Business",
       text: `Clicca sul seguente link per confermare la tua email: ${confirmationLink}`,
-      html: `<p>Clicca sul seguente link per confermare la tua email:</p><a href="${confirmationLink}">${confirmationLink}</a>`,
+      html: `
+        <h2>Benvenuto su Consegnoio!</h2>
+        <p>Grazie per esserti registrato come Business.</p>
+        <p>Clicca sul seguente link per confermare la tua email:</p>
+        <a href="${confirmationLink}">${confirmationLink}</a>
+      `,
     };
-    
+
     await transporter.sendMail(mailOptions);
-    
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "24h" });
     const expiration = new Date();
-    expiration.setHours(expiration.getHours() + 1);
-    
+    expiration.setHours(expiration.getHours() + 24);
+
     await prisma.user.update({
       where: { id: user.id },
       data: { tokenJWT: token, expirationJWT: expiration, expired: false },
     });
-    
+
     return NextResponse.json(
-      { token, message: "Registrazione completata. Controlla la tua email per confermare l'account.", user, profile },
+      {
+        token,
+        message: "Registrazione completata. Controlla la tua email per confermare l'account.",
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        },
+        business: {
+          id: business.id,
+          name: business.bussinesName,
+          address: business.address,
+        }
+      },
       { status: StatusCodes.Success }
     );
   } catch (error: any) {
-    console.error("Errore durante la registrazione:", error);
+    console.error("Errore durante la registrazione Business:", error);
     return NextResponse.json(
       { message: "Errore interno durante la registrazione" },
       { status: StatusCodes.InternalServerError }
     );
   }
 }
-
-// da implementare handeler per gli errori
-// migliorare la validazione

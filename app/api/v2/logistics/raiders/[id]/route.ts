@@ -1,0 +1,106 @@
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/app/lib/prisma";
+import { requireLogistics } from "@/app/lib/auth";
+import { z } from "zod";
+
+enum StatusCodes {
+  Success = 200,
+  BadRequest = 400,
+  Unauthorized = 401,
+  Forbidden = 403,
+  NotFound = 404,
+  InternalServerError = 500,
+}
+
+const updateRaiderSchema = z.object({
+  name: z.string().min(1).optional(),
+  surname: z.string().min(1).optional(),
+  vehicle: z.enum(["CAR", "BICYCLE", "MOTORCYCLE", "VAN", "REFRIGERATEDVAN", "WITHOUTVEHICLE", "TRANSIT"]).optional(),
+  mobile: z.string().optional(),
+});
+
+// PUT - Modifica raider della logistica
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const auth = await requireLogistics(request);
+  if (!auth) {
+    return NextResponse.json(
+      { message: "Non autorizzato. Accesso riservato a Logistics." },
+      { status: StatusCodes.Unauthorized }
+    );
+  }
+
+  try {
+    const raiderId = params.id;
+    const body = await request.json();
+
+    // Validazione
+    const validation = updateRaiderSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { message: "Dati non validi", errors: validation.error.errors },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+    // Verifica che raider esista
+    const raider = await prisma.raider.findUnique({
+      where: { id: raiderId },
+      select: {
+        id: true,
+        createdByLogisticsId: true,
+      }
+    });
+
+    if (!raider) {
+      return NextResponse.json(
+        { message: "Raider non trovato" },
+        { status: StatusCodes.NotFound }
+      );
+    }
+
+    // Verifica permessi: Logistics può modificare solo raider creati da lui
+    if (raider.createdByLogisticsId !== auth.logistics.id) {
+      return NextResponse.json(
+        { message: "Non hai i permessi per modificare questo raider" },
+        { status: StatusCodes.Forbidden }
+      );
+    }
+
+    // Aggiorna raider
+    const updatedRaider = await prisma.raider.update({
+      where: { id: raiderId },
+      data: validation.data,
+      include: {
+        user: {
+          select: {
+            email: true
+          }
+        }
+      }
+    });
+
+    return NextResponse.json(
+      {
+        message: "Raider aggiornato con successo",
+        raider: {
+          id: updatedRaider.id,
+          name: updatedRaider.name,
+          surname: updatedRaider.surname,
+          vehicle: updatedRaider.vehicle,
+          mobile: updatedRaider.mobile,
+          email: updatedRaider.user?.email,
+        }
+      },
+      { status: StatusCodes.Success }
+    );
+  } catch (error: any) {
+    console.error("Errore modifica raider:", error);
+    return NextResponse.json(
+      { message: "Errore interno", error: error.message },
+      { status: StatusCodes.InternalServerError }
+    );
+  }
+}
