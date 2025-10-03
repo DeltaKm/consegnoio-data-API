@@ -79,12 +79,12 @@ export async function middleware(req: NextRequest) {
 
   const origin = req.headers.get('origin');
 
+  // Gestisci preflight OPTIONS PRIMA di tutto
   if (req.method === 'OPTIONS') {
-    const response = NextResponse.json(
-      { status: 200 },
-      { headers: corsHeaders }
-    );
-    return response;
+    return new NextResponse(null, {
+      status: 200,
+      headers: corsHeaders
+    });
   }
 
   const apiKeyHeader = req.headers.get('x-api-key');
@@ -109,20 +109,6 @@ export async function middleware(req: NextRequest) {
   Object.entries(corsHeaders).forEach(([key, value]) => {
     response.headers.set(key, value);
   });
-
-  if (origin && !allowedOrigins.includes(origin)) {
-    const errorResponse = NextResponse.json(
-      { error: "Origine non consentita" },
-      { 
-        status: 403,
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-    return errorResponse;
-  }
 
   return response;
 }
