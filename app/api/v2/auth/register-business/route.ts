@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 enum StatusCodes {
   Success = 201,
+  Created = 201,
   BadRequest = 400,
   InternalServerError = 500,
 }
@@ -48,16 +49,38 @@ export async function POST(request: NextRequest) {
     const validation = registerSchema.safeParse(body);
     
     if (!validation.success) {
-      const errorMessage = validation.error.errors
-        .map((err) => `${err.path.join('.')}: ${err.message}`)
-        .join(', ');
       return NextResponse.json(
-        { message: errorMessage },
+        {
+          message: "Errore di validazione",
+          errors: validation.error?.errors.map((err) => ({
+            field: err.path.join("."),
+            message: err.message,
+          })) || [],
+        },
         { status: StatusCodes.BadRequest }
       );
     }
 
-    const { email, password, bussinesName, address, businessCord } = validation.data;
+    const { email, password, bussinesName, address, businessCord } = validation.data!;
+
+    // Validazione dominio email - Blocca solo domini chiaramente fake
+    const emailDomain = email.split('@')[1];
+    const invalidDomains = [
+      'test.com', 'fake.com', 'example.com', 'example.org', 'example.net',
+      'localhost', '127.0.0.1', 'temp.com', 'temporary.com', 'disposable.com',
+      '10minutemail.com', 'guerrillamail.com', 'mailinator.com'
+    ];
+    
+    // Verifica che il dominio abbia almeno un punto e non sia nella blacklist
+    if (!emailDomain || !emailDomain.includes('.') || invalidDomains.includes(emailDomain)) {
+      return NextResponse.json(
+        {
+          message: "Email non valida",
+          error: `Dominio '${emailDomain}' non valido. Evita domini temporanei o fake.`
+        },
+        { status: StatusCodes.BadRequest }
+      );
+    }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -70,6 +93,40 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const confirmationToken = uuidv4();
 
+    // Prima testa l'invio email SENZA salvare nel DB
+    const baseUrl = process.env.BASE_URL || "http://localhost:3000";
+    const confirmationLink = `${baseUrl}/api/v1/auth/confirm?token=${confirmationToken}`;
+
+    const mailOptions = {
+      from: process.env.SMTP_USER,
+      to: email,
+      subject: "Conferma la tua email - Consegnoio Business",
+      text: `Clicca sul seguente link per confermare la tua email: ${confirmationLink}`,
+      html: `
+        <h2>Benvenuto su Consegnoio!</h2>
+        <p>Grazie per esserti registrato come Business.</p>
+        <p>Clicca sul seguente link per confermare la tua email:</p>
+        <a href="${confirmationLink}">${confirmationLink}</a>
+      `,
+    };
+
+    // Test invio email PRIMA di salvare nel DB
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log('✅ Email di conferma inviata a:', email);
+    } catch (emailError) {
+      console.error(' Errore invio email:', emailError);
+      return NextResponse.json(
+        {
+          message: "Errore invio email",
+          error: "Impossibile inviare email di conferma. Verifica che l'indirizzo sia corretto.",
+          details: emailError instanceof Error ? emailError.message : "Errore sconosciuto"
+        },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+    // Se l'email è stata inviata con successo, ALLORA salva nel DB
     const user = await prisma.user.create({
       data: {
         email,
@@ -89,24 +146,6 @@ export async function POST(request: NextRequest) {
         userId: user.id,
       },
     });
-
-    const baseUrl = process.env.BASE_URL || "http://localhost:3000";
-    const confirmationLink = `${baseUrl}/api/v1/auth/confirm?token=${confirmationToken}`;
-
-    const mailOptions = {
-      from: process.env.SMTP_USER,
-      to: email,
-      subject: "Conferma la tua email - Consegnoio Business",
-      text: `Clicca sul seguente link per confermare la tua email: ${confirmationLink}`,
-      html: `
-        <h2>Benvenuto su Consegnoio!</h2>
-        <p>Grazie per esserti registrato come Business.</p>
-        <p>Clicca sul seguente link per confermare la tua email:</p>
-        <a href="${confirmationLink}">${confirmationLink}</a>
-      `,
-    };
-
-    await transporter.sendMail(mailOptions);
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "24h" });
     const expiration = new Date();

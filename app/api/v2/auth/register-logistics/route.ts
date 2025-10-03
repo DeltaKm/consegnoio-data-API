@@ -57,6 +57,25 @@ export async function POST(request: NextRequest) {
 
     const { email, password, name, surname } = validation.data;
 
+    // Validazione dominio email - Blocca solo domini chiaramente fake
+    const emailDomain = email.split('@')[1];
+    const invalidDomains = [
+      'test.com', 'fake.com', 'example.com', 'example.org', 'example.net',
+      'localhost', '127.0.0.1', 'temp.com', 'temporary.com', 'disposable.com',
+      '10minutemail.com', 'guerrillamail.com', 'mailinator.com'
+    ];
+    
+    // Verifica che il dominio abbia almeno un punto e non sia nella blacklist
+    if (!emailDomain || !emailDomain.includes('.') || invalidDomains.includes(emailDomain)) {
+      return NextResponse.json(
+        {
+          message: "Email non valida",
+          error: `Dominio '${emailDomain}' non valido. Evita domini temporanei o fake.`
+        },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json(
@@ -68,31 +87,11 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const confirmationToken = uuidv4();
 
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        role: "LOGISTICS",
-        confirmed: false,
-        confirmationToken,
-      },
-    });
-
-    // NOTA: Il profilo Logistics verrà creato dopo la migrazione Prisma
-    // Per ora commentiamo questa parte
-    /*
-    const logistics = await prisma.logistics.create({
-      data: {
-        name,
-        surname,
-        userId: user.id,
-      },
-    });
-    */
-
+    // Prima testa l'invio email SENZA salvare nel DB
     const baseUrl = process.env.BASE_URL || "http://localhost:3000";
     const confirmationLink = `${baseUrl}/api/v1/auth/confirm?token=${confirmationToken}`;
 
+    // Test invio email PRIMA di salvare nel DB
     try {
       await transporter.sendMail({
         from: process.env.SMTP_USER,
@@ -105,9 +104,37 @@ export async function POST(request: NextRequest) {
           <a href="${confirmationLink}">${confirmationLink}</a>
         `,
       });
-    } catch (mailError) {
-      console.error("Errore invio email:", mailError);
+      console.log('✅ Email di conferma inviata a:', email);
+    } catch (emailError) {
+      console.error('❌ Errore invio email:', emailError);
+      return NextResponse.json(
+        {
+          message: "Errore invio email",
+          error: "Impossibile inviare email di conferma. Verifica che l'indirizzo sia corretto.",
+          details: emailError instanceof Error ? emailError.message : "Errore sconosciuto"
+        },
+        { status: StatusCodes.BadRequest }
+      );
     }
+
+    // Se l'email è stata inviata con successo, ALLORA salva nel DB
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        role: "LOGISTICS",
+        confirmed: false,
+        confirmationToken,
+      },
+    });
+
+    const logistics = await prisma.logistics.create({
+      data: {
+        name,
+        surname,
+        userId: user.id,
+      },
+    });
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "24h" });
     const expiration = new Date();
@@ -126,6 +153,11 @@ export async function POST(request: NextRequest) {
           id: user.id,
           email: user.email,
           role: user.role,
+        },
+        logistics: {
+          id: logistics.id,
+          name: logistics.name,
+          surname: logistics.surname,
         }
       },
       { status: StatusCodes.Success }
