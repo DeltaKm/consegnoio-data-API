@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     // Prima testa l'invio email SENZA salvare nel DB
     const baseUrl = process.env.BASE_URL || "http://localhost:3000";
-    const confirmationLink = `${baseUrl}/api/v1/auth/confirm?token=${confirmationToken}`;
+    const confirmationLink = `${baseUrl}/api/v2/auth/confirm?token=${confirmationToken}`;
 
     const mailOptions = {
       from: process.env.SMTP_USER,

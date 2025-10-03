@@ -75,6 +75,14 @@ export async function middleware(req: NextRequest) {
     });
     return response;
   }
+
+  if (pathname.startsWith('/api/v2/auth/confirm') ) {
+    const response = NextResponse.next();
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+    return response;
+  }
   
 
   const origin = req.headers.get('origin');
