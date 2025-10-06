@@ -35,6 +35,10 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get("status"); // "confirmed", "pending", "all"
+    const name = searchParams.get("name");
+    const raiderId = searchParams.get("raiderId");
+    const dateFrom = searchParams.get("dateFrom");
+    const dateTo = searchParams.get("dateTo");
 
     let where: any = {
       businessId: auth.business.id,
@@ -44,6 +48,32 @@ export async function GET(request: NextRequest) {
       where.confirmedFromBusiness = true;
     } else if (status === "pending") {
       where.confirmedFromBusiness = false;
+    }
+
+    // Filtro per raiderId specifico
+    if (raiderId) {
+      where.raiderId = raiderId;
+    }
+
+    // Filtro per data creazione
+    if (dateFrom || dateTo) {
+      where.createdAt = {};
+      if (dateFrom) {
+        where.createdAt.gte = new Date(dateFrom);
+      }
+      if (dateTo) {
+        where.createdAt.lte = new Date(dateTo);
+      }
+    }
+
+    // Filtro per nome/cognome
+    if (name) {
+      where.raider = {
+        OR: [
+          { name: { contains: name, mode: 'insensitive' } },
+          { surname: { contains: name, mode: 'insensitive' } },
+        ]
+      };
     }
 
     const relations = await prisma.businessRaider.findMany({
