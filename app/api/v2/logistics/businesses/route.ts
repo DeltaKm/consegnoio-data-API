@@ -192,6 +192,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Crea la relazione LogisticsBusiness per associare il business alla logistica
+    await prisma.logisticsBusiness.create({
+      data: {
+        logisticsId: auth.logistics.id,
+        businessId: business.id,
+      },
+    });
+
     const baseUrl = process.env.BASE_URL || "http://localhost:3000";
     const confirmationLink = `${baseUrl}/api/v1/auth/confirm?token=${confirmationToken}`;
 
