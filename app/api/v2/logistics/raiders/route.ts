@@ -20,6 +20,7 @@ const createRaiderSchema = z.object({
   surname: z.string().min(1),
   vehicle: z.enum(["CAR", "BICYCLE", "MOTORCYCLE", "VAN", "REFRIGERATEDVAN", "WITHOUTVEHICLE", "TRANSIT"]),
   mobile: z.string().optional(),
+  businessId: z.string().optional(), // ID del business a cui assegnare il raider
 });
 
 // GET - Lista tutti i raider
@@ -176,7 +177,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, name, surname, vehicle, mobile } = validation.data;
+    const { email, password, name, surname, vehicle, mobile, businessId } = validation.data;
+
+    // Se businessId è specificato, verifica che la logistica gestisca quel business
+    if (businessId) {
+      const businessesManaged = await prisma.logisticsBusiness.findMany({
+        where: { logisticsId: auth.logistics.id },
+        select: { businessId: true }
+      });
+
+      const businessIds = businessesManaged.map(lb => lb.businessId);
+
+      if (!businessIds.includes(businessId)) {
+        return NextResponse.json(
+          { message: "Non hai i permessi per assegnare raider a questo business" },
+          { status: StatusCodes.BadRequest }
+        );
+      }
+    }
 
     // Verifica email non già usata
     const existingUser = await prisma.user.findUnique({
@@ -193,7 +211,7 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Crea user e raider in transazione
+    // Crea user, raider e relazione in transazione
     const result = await prisma.$transaction(async (tx) => {
       // 1. Crea User
       const user = await tx.user.create({
@@ -215,11 +233,34 @@ export async function POST(request: NextRequest) {
           vehicle,
           mobile,
           isActive: true,
-          createdByLogisticsId: auth.logistics.id, // ← Traccia chi l'ha creato
+          createdByLogisticsId: auth.logistics.id,
+          bussinesActived: businessId ? [businessId] : [],
         }
       });
 
-      return { user, raider };
+      // 3. Se businessId specificato, crea relazione BusinessRaider
+      let businessRaider = null;
+      if (businessId) {
+        businessRaider = await tx.businessRaider.create({
+          data: {
+            businessId: businessId,
+            raiderId: raider.id,
+            confirmedFromBusiness: true,
+          }
+        });
+
+        // 4. Aggiorna array raiderActived nel Business
+        await tx.business.update({
+          where: { id: businessId },
+          data: {
+            raiderActived: {
+              push: raider.id
+            }
+          }
+        });
+      }
+
+      return { user, raider, businessRaider };
     });
 
     return NextResponse.json(
