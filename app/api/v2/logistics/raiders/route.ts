@@ -39,7 +39,38 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search");
     const isActive = searchParams.get("isActive");
 
-    const where: any = {};
+    // Prima ottieni i business gestiti dalla logistica
+    const businessesManaged = await prisma.logisticsBusiness.findMany({
+      where: { logisticsId: auth.logistics.id },
+      select: { businessId: true }
+    });
+
+    const businessIds = businessesManaged.map(lb => lb.businessId);
+
+    // Se la logistica non gestisce nessun business, ritorna lista vuota
+    if (businessIds.length === 0) {
+      return NextResponse.json(
+        {
+          raiders: [],
+          pagination: {
+            total: 0,
+            limit,
+            offset,
+            hasMore: false
+          }
+        },
+        { status: StatusCodes.Success }
+      );
+    }
+
+    const where: any = {
+      // Filtra solo raider associati ai business gestiti dalla logistica
+      businessRelations: {
+        some: {
+          businessId: { in: businessIds }
+        }
+      }
+    };
 
     if (search) {
       where.OR = [
@@ -66,6 +97,7 @@ export async function GET(request: NextRequest) {
           businessRelations: {
             where: {
               confirmedFromBusiness: true,
+              businessId: { in: businessIds } // Mostra solo i business gestiti dalla logistica
             },
             include: {
               business: {

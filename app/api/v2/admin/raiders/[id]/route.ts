@@ -193,3 +193,106 @@ export async function PUT(
     );
   }
 }
+
+// DELETE - Elimina completamente raider (Admin only - ATTENZIONE: operazione irreversibile)
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const auth = await requireAdmin(request);
+  if (!auth) {
+    return NextResponse.json(
+      { message: "Non autorizzato. Accesso riservato agli Admin." },
+      { status: StatusCodes.Unauthorized }
+    );
+  }
+
+  try {
+    const raiderId = params.id;
+
+    // Verifica che raider esista
+    const raider = await prisma.raider.findUnique({
+      where: { id: raiderId },
+      include: {
+        user: true,
+        businessRelations: true,
+        assignedDeliveries: true,
+      }
+    });
+
+    if (!raider) {
+      return NextResponse.json(
+        { message: "Raider non trovato" },
+        { status: StatusCodes.NotFound }
+      );
+    }
+
+    // Verifica che non ci siano consegne attive
+    const activeDeliveries = await prisma.assignedDelivery.count({
+      where: {
+        raiderId: raiderId,
+        delivery: {
+          status: { in: ["CREATED", "ASSIGNED", "PICKEDUP"] }
+        }
+      }
+    });
+
+    if (activeDeliveries > 0) {
+      return NextResponse.json(
+        { 
+          message: "Impossibile eliminare il raider. Ha ancora consegne attive.",
+          activeDeliveries 
+        },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+    // Elimina in transazione: relazioni, raider e user
+    await prisma.$transaction(async (tx) => {
+      // 1. Elimina tutte le relazioni BusinessRaider
+      await tx.businessRaider.deleteMany({
+        where: { raiderId: raiderId }
+      });
+
+      // 2. Elimina AssignedDelivery (storico)
+      await tx.assignedDelivery.deleteMany({
+        where: { raiderId: raiderId }
+      });
+
+      // 3. Elimina HistoryDelivery
+      await tx.historyDelivery.deleteMany({
+        where: { raiderId: raiderId }
+      });
+
+      // 4. Elimina Raider
+      await tx.raider.delete({
+        where: { id: raiderId }
+      });
+
+      // 5. Elimina User associato (se esiste)
+      if (raider.user) {
+        await tx.user.delete({
+          where: { id: raider.user.id }
+        });
+      }
+    });
+
+    return NextResponse.json(
+      { 
+        message: "Raider e utente eliminati completamente con successo",
+        deletedRaider: {
+          id: raider.id,
+          name: raider.name,
+          surname: raider.surname,
+        }
+      },
+      { status: StatusCodes.Success }
+    );
+  } catch (error: any) {
+    console.error("Errore eliminazione raider:", error);
+    return NextResponse.json(
+      { message: "Errore interno", error: error.message },
+      { status: StatusCodes.InternalServerError }
+    );
+  }
+}

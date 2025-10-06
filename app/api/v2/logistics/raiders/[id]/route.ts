@@ -19,6 +19,90 @@ const updateRaiderSchema = z.object({
   mobile: z.string().optional(),
 });
 
+// GET - Ottieni dati singolo raider della logistica
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const auth = await requireLogistics(request);
+  if (!auth) {
+    return NextResponse.json(
+      { message: "Non autorizzato. Accesso riservato a Logistics." },
+      { status: StatusCodes.Unauthorized }
+    );
+  }
+
+  try {
+    const raiderId = params.id;
+
+    // Verifica che il raider sia gestito dalla logistica attraverso i business
+    const businessesManaged = await prisma.logisticsBusiness.findMany({
+      where: { logisticsId: auth.logistics.id },
+      select: { businessId: true }
+    });
+
+    const businessIds = businessesManaged.map(lb => lb.businessId);
+
+    const businessRaider = await prisma.businessRaider.findFirst({
+      where: {
+        raiderId: raiderId,
+        businessId: { in: businessIds },
+      },
+      include: {
+        raider: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                confirmed: true,
+                expired: true,
+                role: true,
+              }
+            }
+          }
+        },
+        business: {
+          select: {
+            id: true,
+            bussinesName: true,
+          }
+        }
+      }
+    });
+
+    if (!businessRaider) {
+      return NextResponse.json(
+        { message: "Raider non trovato o non gestito dai business della tua logistica" },
+        { status: StatusCodes.NotFound }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        raider: {
+          id: businessRaider.raider.id,
+          name: businessRaider.raider.name,
+          surname: businessRaider.raider.surname,
+          vehicle: businessRaider.raider.vehicle,
+          mobile: businessRaider.raider.mobile,
+          user: businessRaider.raider.user,
+          confirmedFromBusiness: businessRaider.confirmedFromBusiness,
+          business: businessRaider.business,
+          createdAt: businessRaider.createdAt,
+        }
+      },
+      { status: StatusCodes.Success }
+    );
+  } catch (error: any) {
+    console.error("Errore recupero raider logistics:", error);
+    return NextResponse.json(
+      { message: "Errore interno", error: error.message },
+      { status: StatusCodes.InternalServerError }
+    );
+  }
+}
+
 // PUT - Modifica raider della logistica
 export async function PUT(
   request: NextRequest,
@@ -98,6 +182,83 @@ export async function PUT(
     );
   } catch (error: any) {
     console.error("Errore modifica raider:", error);
+    return NextResponse.json(
+      { message: "Errore interno", error: error.message },
+      { status: StatusCodes.InternalServerError }
+    );
+  }
+}
+
+// DELETE - Rimuovi raider dai business gestiti dalla logistica
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const auth = await requireLogistics(request);
+  if (!auth) {
+    return NextResponse.json(
+      { message: "Non autorizzato. Accesso riservato a Logistics." },
+      { status: StatusCodes.Unauthorized }
+    );
+  }
+
+  try {
+    const raiderId = params.id;
+
+    // Verifica che il raider sia gestito dalla logistica attraverso i business
+    const businessesManaged = await prisma.logisticsBusiness.findMany({
+      where: { logisticsId: auth.logistics.id },
+      select: { businessId: true }
+    });
+
+    const businessIds = businessesManaged.map(lb => lb.businessId);
+
+    const businessRaider = await prisma.businessRaider.findFirst({
+      where: {
+        raiderId: raiderId,
+        businessId: { in: businessIds },
+      }
+    });
+
+    if (!businessRaider) {
+      return NextResponse.json(
+        { message: "Raider non trovato o non gestito dai business della tua logistica" },
+        { status: StatusCodes.NotFound }
+      );
+    }
+
+    // Verifica che non ci siano consegne attive
+    const activeDeliveries = await prisma.assignedDelivery.count({
+      where: {
+        raiderId: raiderId,
+        delivery: {
+          businessId: { in: businessIds },
+          status: { in: ["CREATED", "ASSIGNED", "PICKEDUP"] }
+        }
+      }
+    });
+
+    if (activeDeliveries > 0) {
+      return NextResponse.json(
+        { 
+          message: "Impossibile rimuovere il raider. Ha ancora consegne attive.",
+          activeDeliveries 
+        },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+    // Rimuovi la relazione BusinessRaider
+    await prisma.businessRaider.delete({
+      where: { id: businessRaider.id }
+    });
+
+    return NextResponse.json(
+      { message: "Raider rimosso dal business con successo" },
+      { status: StatusCodes.Success }
+    );
+  } catch (error: any) {
+    console.error("Errore rimozione raider logistics:", error);
     return NextResponse.json(
       { message: "Errore interno", error: error.message },
       { status: StatusCodes.InternalServerError }
