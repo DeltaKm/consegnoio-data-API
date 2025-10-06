@@ -40,9 +40,18 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get("offset") || "0");
     const search = searchParams.get("search");
     const isActive = searchParams.get("isActive");
+    const raiderId = searchParams.get("raiderId");
+    const dateFrom = searchParams.get("dateFrom");
+    const dateTo = searchParams.get("dateTo");
 
     const where: any = {};
 
+    // Filtro per ID raider specifico
+    if (raiderId) {
+      where.id = raiderId;
+    }
+
+    // Filtro per nome/cognome
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
@@ -50,8 +59,20 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    // Filtro per stato attivo
     if (isActive !== null && isActive !== undefined) {
       where.isActive = isActive === "true";
+    }
+
+    // Filtro per data creazione
+    if (dateFrom || dateTo) {
+      where.createdAt = {};
+      if (dateFrom) {
+        where.createdAt.gte = new Date(dateFrom);
+      }
+      if (dateTo) {
+        where.createdAt.lte = new Date(dateTo);
+      }
     }
 
     const [raiders, total] = await Promise.all([
