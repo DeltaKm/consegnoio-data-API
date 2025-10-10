@@ -233,7 +233,7 @@ export async function DELETE(
         raiderId: raiderId,
         delivery: {
           businessId: { in: businessIds },
-          status: { in: ["CREATED", "ASSIGNED", "PICKEDUP"] }
+          status: { in: ["CREATED", "ASSIGNED", "ONDELIVERY"] }
         }
       }
     });

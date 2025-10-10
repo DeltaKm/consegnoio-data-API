@@ -95,8 +95,8 @@ export async function GET(request: NextRequest) {
     });
 
     const raiders = relations.map(rel => ({
+      id: rel.raider.id,
       relationId: rel.id,
-      raiderId: rel.raider.id,
       name: rel.raider.name,
       surname: rel.raider.surname,
       vehicle: rel.raider.vehicle,

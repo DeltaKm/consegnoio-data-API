@@ -232,7 +232,7 @@ export async function DELETE(
       where: {
         raiderId: raiderId,
         delivery: {
-          status: { in: ["CREATED", "ASSIGNED", "PICKEDUP"] }
+          status: { in: ["CREATED", "ASSIGNED", "ONDELIVERY"] }
         }
       }
     });

@@ -217,7 +217,7 @@ export async function DELETE(
         raiderId: raiderId,
         delivery: {
           businessId: auth.business.id,
-          status: { in: ["CREATED", "ASSIGNED", "PICKEDUP"] }
+          status: { in: ["CREATED", "ASSIGNED", "ONDELIVERY"] }
         }
       }
     });
