@@ -43,53 +43,72 @@ export async function GET(
 
     const businessIds = businessesManaged.map(lb => lb.businessId);
 
-    const businessRaider = await prisma.businessRaider.findFirst({
-      where: {
-        raiderId: raiderId,
-        businessId: { in: businessIds },
-      },
+    // Recupera il raider con TUTTE le sue relazioni business
+    const raider = await prisma.raider.findUnique({
+      where: { id: raiderId },
       include: {
-        raider: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                email: true,
-                confirmed: true,
-                expired: true,
-                role: true,
-              }
-            }
-          }
-        },
-        business: {
+        user: {
           select: {
             id: true,
-            bussinesName: true,
+            email: true,
+            confirmed: true,
+            expired: true,
+            role: true,
+          }
+        },
+        businessRelations: {
+          where: {
+            confirmedFromBusiness: true,
+            businessId: { in: businessIds } // Mostra solo i business gestiti dalla logistica
+          },
+          include: {
+            business: {
+              select: {
+                id: true,
+                bussinesName: true,
+              }
+            }
           }
         }
       }
     });
 
-    if (!businessRaider) {
+    if (!raider) {
       return NextResponse.json(
-        { message: "Raider non trovato o non gestito dai business della tua logistica" },
+        { message: "Raider non trovato" },
         { status: StatusCodes.NotFound }
+      );
+    }
+
+    // Verifica che il raider sia associato ad almeno un business gestito dalla logistica
+    if (raider.businessRelations.length === 0) {
+      return NextResponse.json(
+        { message: "Raider non gestito dai business della tua logistica" },
+        { status: StatusCodes.Forbidden }
       );
     }
 
     return NextResponse.json(
       {
         raider: {
-          id: businessRaider.raider.id,
-          name: businessRaider.raider.name,
-          surname: businessRaider.raider.surname,
-          vehicle: businessRaider.raider.vehicle,
-          mobile: businessRaider.raider.mobile,
-          user: businessRaider.raider.user,
-          confirmedFromBusiness: businessRaider.confirmedFromBusiness,
-          business: businessRaider.business,
-          createdAt: businessRaider.createdAt,
+          id: raider.id,
+          name: raider.name,
+          surname: raider.surname,
+          vehicle: raider.vehicle,
+          mobile: raider.mobile,
+          isActive: raider.isActive,
+          inService: raider.inService,
+          email: raider.user?.email,
+          confirmed: raider.user?.confirmed,
+          expired: raider.user?.expired,
+          businesses: raider.businessRelations.map(rel => ({
+            id: rel.business.id,
+            name: rel.business.bussinesName,
+            confirmedFromBusiness: rel.confirmedFromBusiness,
+            assignedAt: rel.createdAt,
+          })),
+          totalBusinesses: raider.businessRelations.length,
+          createdAt: raider.createdAt,
         }
       },
       { status: StatusCodes.Success }

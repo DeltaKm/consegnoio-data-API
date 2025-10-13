@@ -85,7 +85,7 @@ GET /api/v2/logistics/raiders
 
 ### Request
 ```bash
-GET https://consegnoio-data-api.vercel.app/api/v2/logistics/raiders?search=mario&isActive=true&limit=10
+GET https://consegnoio-data-api.vercel.app/api/v2/logistics/raiders?name=mario&isActive=true&limit=10
 
 Headers:
 Authorization: Bearer YOUR_JWT_TOKEN
@@ -150,7 +150,7 @@ x-api-key: YOUR_API_KEY
 
 ### Parametri Query
 ```bash
-?search=mario        # Cerca per nome/cognome
+?name=mario          # Cerca per nome/cognome
 ?isActive=true       # Filtra per stato attivo
 ?raiderId=xxx        # Filtra per ID specifico
 ?dateFrom=2025-10-01 # Data inizio
@@ -177,7 +177,7 @@ GET /api/v2/admin/raiders
 
 ### Request
 ```bash
-GET https://consegnoio-data-api.vercel.app/api/v2/admin/raiders?search=carlo&isActive=true&limit=20
+GET https://consegnoio-data-api.vercel.app/api/v2/admin/raiders?name=carlo&isActive=true&limit=20
 
 Headers:
 Authorization: Bearer YOUR_JWT_TOKEN
@@ -225,7 +225,7 @@ x-api-key: YOUR_API_KEY
 
 ### Parametri Query
 ```bash
-?search=carlo        # Cerca per nome/cognome
+?name=carlo          # Cerca per nome/cognome
 ?isActive=true       # Filtra per stato attivo
 ?raiderId=xxx        # Filtra per ID specifico
 ?dateFrom=2025-10-01 # Data inizio

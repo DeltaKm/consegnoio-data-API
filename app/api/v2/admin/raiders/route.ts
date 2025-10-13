@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const limit = parseInt(searchParams.get("limit") || "50");
     const offset = parseInt(searchParams.get("offset") || "0");
-    const search = searchParams.get("search");
+    const name = searchParams.get("name");
     const isActive = searchParams.get("isActive");
     const raiderId = searchParams.get("raiderId");
     const dateFrom = searchParams.get("dateFrom");
@@ -52,10 +52,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Filtro per nome/cognome
-    if (search) {
+    if (name) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { surname: { contains: search, mode: 'insensitive' } },
+        { name: { contains: name, mode: 'insensitive' } },
+        { surname: { contains: name, mode: 'insensitive' } },
       ];
     }
 
