@@ -128,6 +128,9 @@ export async function PATCH(
     if (body.totalPaid !== undefined) updateData.totalPaid = body.totalPaid;
     if (body.mobile) updateData.mobile = body.mobile;
     if (body.phone) updateData.phone = body.phone;
+    if (body.numeroColli !== undefined) updateData.numeroColli = body.numeroColli;
+    if (body.deliveryAddress) updateData.deliveryAddress = body.deliveryAddress;
+    if (body.customerCoordinates) updateData.customerCoordinates = body.customerCoordinates;
 
     const updatedDelivery = await prisma.deliveryEA.update({
       where: { id: params.id },

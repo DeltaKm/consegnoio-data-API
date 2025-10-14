@@ -20,10 +20,7 @@ const deliverySchema = z.object({
   customerId: z.string().optional(),
   customerName: z.string(),
   customerSurname: z.string(),
-  customerAddress: z.string(),
-  customerZipcode: z.string().optional(),
-  customerProvince: z.string().optional(),
-  customerCity: z.string().optional(),
+  deliveryAddress: z.string(), // Indirizzo completo già formattato
   paymentType: z.string(),
   totalPaid: z.number(),
   mobile: z.string().optional(),
@@ -32,6 +29,7 @@ const deliverySchema = z.object({
   note: z.string().optional(),
   customerCoordinates: z.string().optional(),
   deliveryType: z.string().optional(), // Categoria: "Alimenti", "Farmaci", etc.
+  numeroColli: z.number().optional(), // Numero colli passato dal frontend
   details: z.array(
     z.object({
       id: z.string(),
@@ -199,14 +197,16 @@ export async function POST(request: NextRequest) {
     const pickupAddress = auth.business.address;
 
     const recipient = `${data.customerName} ${data.customerSurname}`;
-    const deliveryAddress = data.customerZipcode && data.customerProvince && data.customerCity
-      ? `${data.customerAddress}, ${data.customerZipcode}, ${data.customerProvince}, ${data.customerCity}`
-      : data.customerAddress;
+    const deliveryAddress = data.deliveryAddress; // Già formattato dal frontend
 
     const schedulingDeliveryDate = new Date(data.schedulingDelivery);
-    const numeroColli = data.details?.reduce((sum, detail) => sum + detail.quantity, 0) || 1;
+    
+    // Usa numeroColli dal payload, altrimenti calcola dai details, altrimenti default 1
+    const numeroColli = data.numeroColli || 
+                        data.details?.reduce((sum, detail) => sum + detail.quantity, 0) || 
+                        1;
 
-    // Calcolo distanza (placeholder - integrare con Google Maps API)
+    // Calcolo distanza (placeholder)
     const randomDistance = Math.floor(Math.random() * 10) + 1;
     const totalDistanceGenerated = `${randomDistance} KM`;
 

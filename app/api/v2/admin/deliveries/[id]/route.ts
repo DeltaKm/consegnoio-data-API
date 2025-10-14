@@ -16,6 +16,9 @@ const updateDeliverySchema = z.object({
   schedulingDelivery: z.string().optional(),
   compensation: z.number().optional(),
   assignedToRaiderId: z.string().nullable().optional(),
+  numeroColli: z.number().optional(),
+  deliveryAddress: z.string().optional(),
+  customerCoordinates: z.string().optional(),
 });
 
 // GET - Dettaglio delivery
@@ -135,7 +138,7 @@ export async function PATCH(
       );
     }
 
-    const { status, schedulingDelivery, compensation, assignedToRaiderId } = validation.data;
+    const { status, schedulingDelivery, compensation, assignedToRaiderId, numeroColli, deliveryAddress, customerCoordinates } = validation.data;
 
     // Aggiorna delivery
     const updateData: any = {
@@ -143,6 +146,9 @@ export async function PATCH(
       ...(schedulingDelivery && { schedulingDelivery: new Date(schedulingDelivery) }),
       ...(compensation !== undefined && { compensation }),
       ...(assignedToRaiderId !== undefined && { assignedToRaiderId }),
+      ...(numeroColli !== undefined && { numeroColli }),
+      ...(deliveryAddress && { deliveryAddress }),
+      ...(customerCoordinates && { customerCoordinates }),
     };
 
     // Gestione stati speciali
