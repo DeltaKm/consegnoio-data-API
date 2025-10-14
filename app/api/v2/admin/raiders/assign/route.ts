@@ -213,7 +213,7 @@ export async function PATCH(request: NextRequest) {
     const businessToAdd = businessIds.filter(id => !currentBusinessIds.includes(id));
     const businessToRemove = currentBusinessIds.filter(id => !businessIds.includes(id));
 
-    // Sincronizza in transazione
+    // Sincronizza in transazione con timeout maggiore
     await prisma.$transaction(async (tx) => {
       // 1. Rimuovi relazioni vecchie
       if (businessToRemove.length > 0) {
@@ -223,51 +223,25 @@ export async function PATCH(request: NextRequest) {
             businessId: { in: businessToRemove }
           }
         });
-
-        // Rimuovi raider da array raiderActived nei business rimossi
-        for (const businessId of businessToRemove) {
-          const business = await tx.business.findUnique({
-            where: { id: businessId },
-            select: { raiderActived: true }
-          });
-
-          if (business) {
-            const newRaiderActived = business.raiderActived.filter(id => id !== raiderId);
-            await tx.business.update({
-              where: { id: businessId },
-              data: { raiderActived: newRaiderActived }
-            });
-          }
-        }
       }
 
       // 2. Aggiungi nuove relazioni
       if (businessToAdd.length > 0) {
         for (const businessId of businessToAdd) {
-          await tx.businessRaider.create({
-            data: {
+          await tx.businessRaider.upsert({
+            where: {
+              businessId_raiderId: {
+                businessId,
+                raiderId,
+              }
+            },
+            update: {},
+            create: {
               businessId,
               raiderId,
               confirmedFromBusiness: true,
             }
           });
-
-          // Aggiungi raider a array raiderActived nei nuovi business
-          const business = await tx.business.findUnique({
-            where: { id: businessId },
-            select: { raiderActived: true }
-          });
-
-          if (business) {
-            const newRaiderActived = Array.from(new Set([
-              ...business.raiderActived,
-              raiderId
-            ]));
-            await tx.business.update({
-              where: { id: businessId },
-              data: { raiderActived: newRaiderActived }
-            });
-          }
         }
       }
 
@@ -278,6 +252,45 @@ export async function PATCH(request: NextRequest) {
           bussinesActived: businessIds,
         }
       });
+
+      // 4. Aggiorna array raiderActived nei business (batch)
+      // Rimuovi raider dai business rimossi
+      if (businessToRemove.length > 0) {
+        const businessesToUpdate = await tx.business.findMany({
+          where: { id: { in: businessToRemove } },
+          select: { id: true, raiderActived: true }
+        });
+
+        for (const business of businessesToUpdate) {
+          const newRaiderActived = business.raiderActived.filter(id => id !== raiderId);
+          await tx.business.update({
+            where: { id: business.id },
+            data: { raiderActived: newRaiderActived }
+          });
+        }
+      }
+
+      // Aggiungi raider ai nuovi business
+      if (businessToAdd.length > 0) {
+        const businessesToUpdate = await tx.business.findMany({
+          where: { id: { in: businessToAdd } },
+          select: { id: true, raiderActived: true }
+        });
+
+        for (const business of businessesToUpdate) {
+          const newRaiderActived = Array.from(new Set([
+            ...business.raiderActived,
+            raiderId
+          ]));
+          await tx.business.update({
+            where: { id: business.id },
+            data: { raiderActived: newRaiderActived }
+          });
+        }
+      }
+    }, {
+      maxWait: 10000,
+      timeout: 20000,
     });
 
     return NextResponse.json(
