@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Assegna raiders al business in transazione
+    // Assegna raiders al business in transazione con timeout maggiore
     await prisma.$transaction(async (tx) => {
       // 1. Crea relazioni BusinessRaider
       for (const raiderId of raiderIds) {
@@ -90,27 +90,28 @@ export async function POST(request: NextRequest) {
         }
       });
 
-      // 3. Aggiorna array bussinesActived nei Raider
-      for (const raiderId of raiderIds) {
-        const raider = await tx.raider.findUnique({
-          where: { id: raiderId },
-          select: { bussinesActived: true }
+      // 3. Aggiorna array bussinesActived nei Raider (batch)
+      const raidersToUpdate = await tx.raider.findMany({
+        where: { id: { in: raiderIds } },
+        select: { id: true, bussinesActived: true }
+      });
+
+      for (const raider of raidersToUpdate) {
+        const newBussinesActived = Array.from(new Set([
+          ...raider.bussinesActived,
+          auth.business.id
+        ]));
+
+        await tx.raider.update({
+          where: { id: raider.id },
+          data: {
+            bussinesActived: newBussinesActived,
+          }
         });
-
-        if (raider) {
-          const newBussinesActived = Array.from(new Set([
-            ...raider.bussinesActived,
-            auth.business.id
-          ]));
-
-          await tx.raider.update({
-            where: { id: raiderId },
-            data: {
-              bussinesActived: newBussinesActived,
-            }
-          });
-        }
       }
+    }, {
+      maxWait: 10000,
+      timeout: 20000,
     });
 
     return NextResponse.json(
@@ -182,7 +183,7 @@ export async function PATCH(request: NextRequest) {
     const raidersToAdd = raiderIds.filter(id => !currentRaiderIds.includes(id));
     const raidersToRemove = currentRaiderIds.filter(id => !raiderIds.includes(id));
 
-    // Sincronizza in transazione con timeout maggiore
+    // Sincronizza solo le relazioni critiche in transazione
     await prisma.$transaction(async (tx) => {
       // 1. Rimuovi relazioni vecchie
       if (raidersToRemove.length > 0) {
@@ -213,19 +214,21 @@ export async function PATCH(request: NextRequest) {
           });
         }
       }
+    });
 
+    // Aggiorna gli array FUORI dalla transazione per evitare deadlock
+    try {
       // 3. Aggiorna array raiderActived nel Business
-      await tx.business.update({
+      await prisma.business.update({
         where: { id: auth.business.id },
         data: {
           raiderActived: raiderIds,
         }
       });
 
-      // 4. Aggiorna array bussinesActived nei raider (batch)
-      // Rimuovi business dai raider rimossi
+      // 4. Aggiorna array bussinesActived nei raider
       if (raidersToRemove.length > 0) {
-        const raidersToUpdate = await tx.raider.findMany({
+        const raidersToUpdate = await prisma.raider.findMany({
           where: { id: { in: raidersToRemove } },
           select: { id: true, bussinesActived: true }
         });
@@ -234,16 +237,15 @@ export async function PATCH(request: NextRequest) {
           const newBussinesActived = raider.bussinesActived.filter(
             id => id !== auth.business.id
           );
-          await tx.raider.update({
+          await prisma.raider.update({
             where: { id: raider.id },
             data: { bussinesActived: newBussinesActived }
           });
         }
       }
 
-      // Aggiungi business ai nuovi raider
       if (raidersToAdd.length > 0) {
-        const raidersToUpdate = await tx.raider.findMany({
+        const raidersToUpdate = await prisma.raider.findMany({
           where: { id: { in: raidersToAdd } },
           select: { id: true, bussinesActived: true }
         });
@@ -253,16 +255,16 @@ export async function PATCH(request: NextRequest) {
             ...raider.bussinesActived,
             auth.business.id
           ]));
-          await tx.raider.update({
+          await prisma.raider.update({
             where: { id: raider.id },
             data: { bussinesActived: newBussinesActived }
           });
         }
       }
-    }, {
-      maxWait: 10000,
-      timeout: 20000,
-    });
+    } catch (arrayUpdateError) {
+      console.error('Errore aggiornamento array (non critico):', arrayUpdateError);
+      // Non blocchiamo la risposta, le relazioni sono già create
+    }
 
     return NextResponse.json(
       {
