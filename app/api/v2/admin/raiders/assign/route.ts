@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import { requireLogistics } from "@/app/lib/auth";
+import { requireAdmin } from "@/app/lib/auth";
 import { z } from "zod";
 
 enum StatusCodes {
   Success = 200,
   BadRequest = 400,
   Unauthorized = 401,
-  Forbidden = 403,
   NotFound = 404,
   InternalServerError = 500,
 }
@@ -17,12 +16,12 @@ const assignRaiderSchema = z.object({
   businessIds: z.array(z.string()).min(1),
 });
 
-// POST - Assegna raider ai business
+// POST - Assegna raider ai business (Admin può assegnare qualsiasi raider a qualsiasi business)
 export async function POST(request: NextRequest) {
-  const auth = await requireLogistics(request);
+  const auth = await requireAdmin(request);
   if (!auth) {
     return NextResponse.json(
-      { message: "Non autorizzato. Accesso riservato a Logistics." },
+      { message: "Non autorizzato. Accesso riservato agli Admin." },
       { status: StatusCodes.Unauthorized }
     );
   }
@@ -41,12 +40,11 @@ export async function POST(request: NextRequest) {
 
     const { raiderId, businessIds } = validation.data;
 
-    // Verifica che raider esista e sia creato da questo logistics
+    // Verifica che raider esista
     const raider = await prisma.raider.findUnique({
       where: { id: raiderId },
       select: {
         id: true,
-        createdByLogisticsId: true,
         bussinesActived: true,
       }
     });
@@ -58,25 +56,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verifica permessi: Logistics può assegnare solo raider creati da lui
-    if (raider.createdByLogisticsId !== auth.logistics.id) {
-      return NextResponse.json(
-        { message: "Non hai i permessi per assegnare questo raider" },
-        { status: StatusCodes.Forbidden }
-      );
-    }
+    // Verifica che tutti i business esistano
+    const businesses = await prisma.business.findMany({
+      where: { id: { in: businessIds } },
+      select: { id: true }
+    });
 
-    // Verifica che tutti i business siano assegnati a questo logistics
-    const assignedBusinessIds = auth.logistics.businessRelations.map(rel => rel.businessId);
-    const invalidBusinessIds = businessIds.filter(id => !assignedBusinessIds.includes(id));
-
-    if (invalidBusinessIds.length > 0) {
+    if (businesses.length !== businessIds.length) {
+      const foundIds = businesses.map(b => b.id);
+      const notFound = businessIds.filter(id => !foundIds.includes(id));
       return NextResponse.json(
         { 
-          message: "Alcuni business non sono assegnati a questo logistics",
-          invalidBusinessIds 
+          message: "Alcuni business non esistono",
+          notFoundBusinessIds: notFound
         },
-        { status: StatusCodes.Forbidden }
+        { status: StatusCodes.NotFound }
       );
     }
 
@@ -95,7 +89,7 @@ export async function POST(request: NextRequest) {
           create: {
             businessId,
             raiderId,
-            confirmedFromBusiness: true, // Logistics assegna già confermato
+            confirmedFromBusiness: true, // Admin assegna già confermato
           }
         });
       }
@@ -155,10 +149,10 @@ export async function POST(request: NextRequest) {
 
 // PATCH - Sincronizza assegnazioni raider (rimuove vecchie, aggiunge nuove)
 export async function PATCH(request: NextRequest) {
-  const auth = await requireLogistics(request);
+  const auth = await requireAdmin(request);
   if (!auth) {
     return NextResponse.json(
-      { message: "Non autorizzato. Accesso riservato a Logistics." },
+      { message: "Non autorizzato. Accesso riservato agli Admin." },
       { status: StatusCodes.Unauthorized }
     );
   }
@@ -177,7 +171,7 @@ export async function PATCH(request: NextRequest) {
 
     const { raiderId, businessIds } = validation.data;
 
-    // Verifica che raider esista e sia creato da questo logistics
+    // Verifica che raider esista
     const raider = await prisma.raider.findUnique({
       where: { id: raiderId },
       include: {
@@ -196,25 +190,21 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Verifica permessi
-    if (raider.createdByLogisticsId !== auth.logistics.id) {
-      return NextResponse.json(
-        { message: "Non hai i permessi per gestire questo raider" },
-        { status: StatusCodes.Forbidden }
-      );
-    }
+    // Verifica che tutti i business esistano
+    const businesses = await prisma.business.findMany({
+      where: { id: { in: businessIds } },
+      select: { id: true }
+    });
 
-    // Verifica che tutti i business siano assegnati a questo logistics
-    const assignedBusinessIds = auth.logistics.businessRelations.map(rel => rel.businessId);
-    const invalidBusinessIds = businessIds.filter(id => !assignedBusinessIds.includes(id));
-
-    if (invalidBusinessIds.length > 0) {
+    if (businesses.length !== businessIds.length) {
+      const foundIds = businesses.map(b => b.id);
+      const notFound = businessIds.filter(id => !foundIds.includes(id));
       return NextResponse.json(
         { 
-          message: "Alcuni business non sono assegnati a questo logistics",
-          invalidBusinessIds 
+          message: "Alcuni business non esistono",
+          notFoundBusinessIds: notFound
         },
-        { status: StatusCodes.Forbidden }
+        { status: StatusCodes.NotFound }
       );
     }
 
