@@ -100,20 +100,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // 2. Aggiorna array bussinesActived nel Raider
-      const newBussinesActived = Array.from(new Set([
-        ...raider.bussinesActived,
-        ...businessIds
-      ]));
-
-      await tx.raider.update({
-        where: { id: raiderId },
-        data: {
-          bussinesActived: newBussinesActived,
-        }
-      });
-
-      // 3. Aggiorna array raiderActived nei Business
+      // 2. Aggiorna array raiderActived nei Business
       for (const businessId of businessIds) {
         const business = await tx.business.findUnique({
           where: { id: businessId },
@@ -134,6 +121,19 @@ export async function POST(request: NextRequest) {
           });
         }
       }
+
+      // 3. Aggiorna array bussinesActived nel Raider (UNA SOLA VOLTA alla fine)
+      const newBussinesActived = Array.from(new Set([
+        ...raider.bussinesActived,
+        ...businessIds
+      ]));
+
+      await tx.raider.update({
+        where: { id: raiderId },
+        data: {
+          bussinesActived: newBussinesActived,
+        }
+      });
     });
 
     return NextResponse.json(
@@ -222,6 +222,14 @@ export async function PATCH(request: NextRequest) {
     const currentBusinessIds = raider.businessRelations.map(rel => rel.businessId);
     const businessToAdd = businessIds.filter(id => !currentBusinessIds.includes(id));
     const businessToRemove = currentBusinessIds.filter(id => !businessIds.includes(id));
+
+    console.log('PATCH - Sincronizzazione:', {
+      raiderId,
+      currentBusinessIds,
+      newBusinessIds: businessIds,
+      businessToAdd,
+      businessToRemove
+    });
 
     // Sincronizza in transazione
     await prisma.$transaction(async (tx) => {
