@@ -78,8 +78,8 @@ export async function GET(
   }
 }
 
-// PUT - Modifica ordine (solo se non ancora assegnato)
-export async function PUT(
+// PATCH - Modifica ordine (solo se non ancora assegnato)
+export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {

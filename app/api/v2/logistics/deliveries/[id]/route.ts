@@ -123,8 +123,8 @@ export async function GET(
   }
 }
 
-// PUT - Modifica delivery
-export async function PUT(
+// PATCH - Modifica delivery
+export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {

@@ -98,8 +98,8 @@ export async function GET(
   }
 }
 
-// PUT - Modifica delivery (Admin può modificare qualsiasi campo)
-export async function PUT(
+// PATCH - Modifica delivery (Admin può modificare qualsiasi campo)
+export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
