@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { requireLogistics } from "@/app/lib/auth";
+import { z } from "zod";
 
 enum StatusCodes {
   Success = 200,
   BadRequest = 400,
   Unauthorized = 401,
+  Forbidden = 403,
   NotFound = 404,
   InternalServerError = 500,
 }
+
+const updateBusinessSchema = z.object({
+  bussinesName: z.string().min(2).optional(),
+  address: z.string().min(2).optional(),
+  businessCord: z.string().optional(),
+});
 
 // GET - Dettaglio business
 export async function GET(
@@ -97,27 +105,41 @@ export async function PUT(
   }
 
   try {
-    const business = await prisma.business.findUnique({
-      where: { id: params.id }
-    });
+    const body = await request.json();
 
-    if (!business) {
+    // Validazione
+    const validation = updateBusinessSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { message: "Business non trovato" },
-        { status: StatusCodes.NotFound }
+        { message: "Dati non validi", errors: validation.error.errors },
+        { status: StatusCodes.BadRequest }
       );
     }
 
-    const body = await request.json();
-    const updateData: any = {};
+    // Verifica che il business sia gestito da questo logistics
+    const logisticsBusiness = await prisma.logisticsBusiness.findFirst({
+      where: {
+        logisticsId: auth.logistics.id,
+        businessId: params.id,
+      }
+    });
 
-    if (body.bussinesName) updateData.bussinesName = body.bussinesName;
-    if (body.address) updateData.address = body.address;
-    if (body.businessCord !== undefined) updateData.businessCord = body.businessCord;
+    if (!logisticsBusiness) {
+      return NextResponse.json(
+        { message: "Non hai i permessi per modificare questo business" },
+        { status: StatusCodes.Forbidden }
+      );
+    }
+
+    const { bussinesName, address, businessCord } = validation.data;
 
     const updatedBusiness = await prisma.business.update({
       where: { id: params.id },
-      data: updateData,
+      data: {
+        ...(bussinesName && { bussinesName }),
+        ...(address && { address }),
+        ...(businessCord !== undefined && { businessCord }),
+      },
     });
 
     return NextResponse.json(
