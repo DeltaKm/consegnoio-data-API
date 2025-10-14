@@ -138,14 +138,26 @@ export async function PUT(
     const { status, schedulingDelivery, compensation, assignedToRaiderId } = validation.data;
 
     // Aggiorna delivery
+    const updateData: any = {
+      ...(status && { status }),
+      ...(schedulingDelivery && { schedulingDelivery: new Date(schedulingDelivery) }),
+      ...(compensation !== undefined && { compensation }),
+      ...(assignedToRaiderId !== undefined && { assignedToRaiderId }),
+    };
+
+    // Gestione stati speciali
+    if (status === "COMPLETED") {
+      updateData.isCompleted = true;
+    }
+
+    if (status === "RELEASED") {
+      updateData.isAssigned = false;
+      updateData.assignedToRaiderId = null;
+    }
+
     const updatedDelivery = await prisma.deliveryEA.update({
       where: { id: params.id },
-      data: {
-        ...(status && { status }),
-        ...(schedulingDelivery && { schedulingDelivery: new Date(schedulingDelivery) }),
-        ...(compensation !== undefined && { compensation }),
-        ...(assignedToRaiderId !== undefined && { assignedToRaiderId }),
-      },
+      data: updateData,
       include: {
         business: {
           select: {
@@ -162,6 +174,53 @@ export async function PUT(
         }
       }
     });
+
+    // Gestione record storici
+    if (status === "COMPLETED" && delivery.assignedToRaiderId) {
+      await prisma.historyDelivery.create({
+        data: {
+          deliveryId: params.id,
+          raiderId: delivery.assignedToRaiderId,
+        },
+      });
+    }
+
+    if (status === "NOTDELIVERED" && delivery.assignedToRaiderId) {
+      await prisma.cancelledDeliveries.create({
+        data: {
+          deliveryId: params.id,
+          raiderId: delivery.assignedToRaiderId,
+          note: "Consegna non effettuata",
+        },
+      });
+    }
+
+    if (status === "RELEASED" && delivery.assignedToRaiderId) {
+      await prisma.releasedDelivery.create({
+        data: {
+          deliveryId: params.id,
+          raiderId: delivery.assignedToRaiderId,
+          note: "Rilasciata dall'admin",
+        },
+      });
+
+      await prisma.assignedDelivery.deleteMany({
+        where: {
+          deliveryId: params.id,
+          raiderId: delivery.assignedToRaiderId,
+        },
+      });
+    }
+
+    if (status === "DELETED" && delivery.assignedToRaiderId) {
+      await prisma.cancelledDeliveries.create({
+        data: {
+          deliveryId: params.id,
+          raiderId: delivery.assignedToRaiderId,
+          note: "Consegna cancellata dall'admin",
+        },
+      });
+    }
 
     return NextResponse.json(
       {

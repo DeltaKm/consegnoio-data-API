@@ -3,6 +3,7 @@ import prisma from "@/app/lib/prisma";
 import { requireBusiness } from "@/app/lib/auth";
 import { z } from "zod";
 import { sendNotification } from "@/app/lib/fcm";
+import { randomUUID } from "crypto";
 
 enum StatusCodes {
   Success = 200,
@@ -30,6 +31,7 @@ const deliverySchema = z.object({
   totalShipping: z.number(),
   note: z.string().optional(),
   customerCoordinates: z.string().optional(),
+  deliveryType: z.string().optional(), // Categoria: "Alimenti", "Farmaci", etc.
   details: z.array(
     z.object({
       id: z.string(),
@@ -211,7 +213,7 @@ export async function POST(request: NextRequest) {
     const deliveryData: any = {
       name: businessName,
       businessCoordinates: businessCoordinates,
-      orderId: data.orderId || `ORD-${Date.now()}`,
+      orderId: data.orderId || `ORD-${randomUUID().split('-')[0].toUpperCase()}`,
       businessIMG,
       pickupAddress,
       schedulingDelivery: schedulingDeliveryDate,
@@ -226,6 +228,7 @@ export async function POST(request: NextRequest) {
       customerCoordinates: data.customerCoordinates || "",
       numeroColli,
       paymentType: data.paymentType,
+      deliveryType: data.deliveryType || "Generico", // Default se non specificato
       customerAddressDetails: deliveryAddress,
       business: {
         connect: { id: auth.business.id }

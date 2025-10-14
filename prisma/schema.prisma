@@ -286,6 +286,9 @@ model DeliveryEA {
   assignedToRaiderId String? @db.ObjectId
   assignedToRaider   Raider? @relation("RaiderDeliveries", fields: [assignedToRaiderId], references: [id])
 
+  createdByLogisticsId String?     @db.ObjectId
+  createdByLogistics   Logistics?  @relation("LogisticsCreatedDeliveries", fields: [createdByLogisticsId], references: [id])
+
   assignedDeliveries  AssignedDelivery[]
   historyDeliveries   HistoryDelivery[]
   cancelledDeliveries CancelledDeliveries[]
@@ -538,6 +541,7 @@ model Logistics {
   userId String? @db.ObjectId
 
   businessRelations LogisticsBusiness[]
+  createdDeliveries DeliveryEA[]        @relation("LogisticsCreatedDeliveries")
 }
 
 // Pivot table: Logistics <-> Business (many-to-many)
