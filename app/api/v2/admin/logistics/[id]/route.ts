@@ -61,8 +61,8 @@ export async function GET(
   }
 }
 
-// PUT - Modifica logistics
-export async function PUT(
+// PATCH - Modifica logistics
+export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {

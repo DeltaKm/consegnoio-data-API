@@ -78,8 +78,8 @@ export async function GET(
   }
 }
 
-// PUT - Modifica business
-export async function PUT(
+// PATCH - Modifica business
+export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {

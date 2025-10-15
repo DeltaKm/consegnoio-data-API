@@ -92,8 +92,8 @@ export async function GET(
   }
 }
 
-// PUT - Modifica raider (Admin può modificare qualsiasi raider)
-export async function PUT(
+// PATCH - Modifica raider (Admin può modificare qualsiasi raider)
+export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {

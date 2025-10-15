@@ -89,8 +89,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PUT - Modifica profilo logistics
-export async function PUT(request: NextRequest) {
+// PATCH - Modifica profilo logistics
+export async function PATCH(request: NextRequest) {
   const auth = await requireLogistics(request);
   if (!auth) {
     return NextResponse.json(
