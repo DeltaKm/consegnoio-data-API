@@ -2447,7 +2447,7 @@ const RaidersPage = () => {
                 <td>{raider.vehicle}</td>
                 <td>
                   <button onClick={() => approveSingle(raider.raiderId)}>
-                    ✅ Approva
+                    Approva
                   </button>
                 </td>
               </tr>

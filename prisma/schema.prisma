@@ -1,59 +1,59 @@
-/**
- * - DONE  => Auth User
- * - DONE  => attivare lo stato raider Attivo / Disattivo con avviso di attivazione gps
- * - DONE  => sistemare codice app flutter nelle path corrette
- * - FIXED => RISOLVERE BUG SCHEDA STORICO
- * - FIXED => BUG NELLA MODALITA RAID ATTIVA NELLA NUOVA IMPORTAZIONE
- * - DONE  => conferma  mail per la registrazione
- * - DONE  => reinvio conferma mail per la registrazione
- * - DONE  => salvare la modlità raider nel database
- * - DONE  => reset password
- * - DONE  => fixxare errore 550 nel login penso dipenda dal fatto che si provaa loggare quando l user non ha confermato la mail
- * - DONE  => aggiungere endpoint reset password
- * - DONE  => aggiungere frontend flutter reset password
- * - DONE  => aggiungere messaggi restituiiti dal backend di conferma mail utente non confermato etc
- * - DONE  => fix refresh indicator
- * - DONE  => da fixxare un probblema con i tipi enumerati che non li prende sembra mongo ("fixato usando string in prisma e validato con zod per gli enum")
- * - DONE => URGENTE CREARE LOGICA PER LA REGISTRAZIONE UTENTE IN BASE AI PROFILI
- * - DONE => controllo messaggi di risposta e pop finestra che no si chiude e ti porta nella schermata giusta in assigned_order_details_page.dart
- * - messaggio di avviso quando si cerca di rilasciare un ordine che avvisa del rating, con un timer che non puo rilasciare ordine
- * - Gestire i datii visualizzati nelle card
- * - Fixxare il punto che rimane quando apro l' app al centro del primary swatch
- * - Migliorare la grafica delle card e del dettaglio ordine
- * - Abilitare GPS
- * - aggiungere campi profilo raider
- * - abilitare la modifica profilo raider
- * - inserire versionamento app
- * - inserire tracciamento raider
- * - abiliatre sistema di notifiche
- * - DONE => inserire sistema id consegne per dare al raider solo le consegne della sua ditta
- * - sistema di filitri per le schede consegne, consegne assegnate e storico
- * - DONE => finire gli endpoint aggiungere anche quello che invia un hook ad easyapper per lo stato della consegna
- * - crere file docker del backend
- * - Implementare sistema generatore di api key, stabilire nel databese come gestire i dati
- * - primo step Configurare sistema api key e db predisposto
- * - aggiungere validazione dati campo registrazione e login
- * - DONE => accettare orario previsto consegna
- * - DONE => implementare rotte con auth token e id nei query param
- * - implementare politica per attivare o disattivare utente raider / business
- * - aggiungere documenteazion swagger
- * - cambiare nome package
- * - DONE => controllare img loghi etc
- * - aggiungere url per collegare le foto dei bussines e delle img raider
- * - hostare su cluster italiano sia db che server o fixare datetime **urgente
- * - implementare abilitazione raider da parte delle attività
- * - aggiungere data creazione ordine nelle card ed evenutale data modifica
- * - agggiungere oltre al versionamento patch note
- * - visualizazzion costi in formato standard con ex 1,10€
- * - DONE => collegamento indirizzi a maps
- * - implementare paginazione o conectto simile per le richieste in modo da evitare il crash del server
- * - add baseurl costant client flutter
- * - add color costant
- * - DONE => aggiungere swipe tra le pagine *** Future Release ***
- * - DONE => controllare la cache che non mi prendeva lo status valure finche non ho aggiornato "da campire che ho scritto qui"
- * - DONE => La consegna creata deve avere l id del business che l ha create e quando assegnata l 'id del raider che  l ha presa in carico
- * - DONE => implementare invio stato ordine a easy appear
- */
+// /**
+//  * - DONE  => Auth User
+//  * - DONE  => attivare lo stato raider Attivo / Disattivo con avviso di attivazione gps
+//  * - DONE  => sistemare codice app flutter nelle path corrette
+//  * - FIXED => RISOLVERE BUG SCHEDA STORICO
+//  * - FIXED => BUG NELLA MODALITA RAID ATTIVA NELLA NUOVA IMPORTAZIONE
+//  * - DONE  => conferma  mail per la registrazione
+//  * - DONE  => reinvio conferma mail per la registrazione
+//  * - DONE  => salvare la modlità raider nel database
+//  * - DONE  => reset password
+//  * - DONE  => fixxare errore 550 nel login penso dipenda dal fatto che si provaa loggare quando l user non ha confermato la mail
+//  * - DONE  => aggiungere endpoint reset password
+//  * - DONE  => aggiungere frontend flutter reset password
+//  * - DONE  => aggiungere messaggi restituiiti dal backend di conferma mail utente non confermato etc
+//  * - DONE  => fix refresh indicator
+//  * - DONE  => da fixxare un probblema con i tipi enumerati che non li prende sembra mongo ("fixato usando string in prisma e validato con zod per gli enum")
+//  * - DONE => URGENTE CREARE LOGICA PER LA REGISTRAZIONE UTENTE IN BASE AI PROFILI
+//  * - DONE => controllo messaggi di risposta e pop finestra che no si chiude e ti porta nella schermata giusta in assigned_order_details_page.dart
+//  * - messaggio di avviso quando si cerca di rilasciare un ordine che avvisa del rating, con un timer che non puo rilasciare ordine
+//  * - Gestire i datii visualizzati nelle card
+//  * - Fixxare il punto che rimane quando apro l' app al centro del primary swatch
+//  * - Migliorare la grafica delle card e del dettaglio ordine
+//  * - Abilitare GPS
+//  * - aggiungere campi profilo raider
+//  * - abilitare la modifica profilo raider
+//  * - inserire versionamento app
+//  * - inserire tracciamento raider
+//  * - abiliatre sistema di notifiche
+//  * - DONE => inserire sistema id consegne per dare al raider solo le consegne della sua ditta
+//  * - sistema di filitri per le schede consegne, consegne assegnate e storico
+//  * - DONE => finire gli endpoint aggiungere anche quello che invia un hook ad easyapper per lo stato della consegna
+//  * - crere file docker del backend
+//  * - Implementare sistema generatore di api key, stabilire nel databese come gestire i dati
+//  * - primo step Configurare sistema api key e db predisposto
+//  * - aggiungere validazione dati campo registrazione e login
+//  * - DONE => accettare orario previsto consegna
+//  * - DONE => implementare rotte con auth token e id nei query param
+//  * - implementare politica per attivare o disattivare utente raider / business
+//  * - aggiungere documenteazion swagger
+//  * - cambiare nome package
+//  * - DONE => controllare img loghi etc
+//  * - aggiungere url per collegare le foto dei bussines e delle img raider
+//  * - hostare su cluster italiano sia db che server o fixare datetime **urgente
+//  * - implementare abilitazione raider da parte delle attività
+//  * - aggiungere data creazione ordine nelle card ed evenutale data modifica
+//  * - agggiungere oltre al versionamento patch note
+//  * - visualizazzion costi in formato standard con ex 1,10€
+//  * - DONE => collegamento indirizzi a maps
+//  * - implementare paginazione o conectto simile per le richieste in modo da evitare il crash del server
+//  * - add baseurl costant client flutter
+//  * - add color costant
+//  * - DONE => aggiungere swipe tra le pagine *** Future Release ***
+//  * - DONE => controllare la cache che non mi prendeva lo status valure finche non ho aggiornato "da campire che ho scritto qui"
+//  * - DONE => La consegna creata deve avere l id del business che l ha create e quando assegnata l 'id del raider che  l ha presa in carico
+//  * - DONE => implementare invio stato ordine a easy appear
+//  */
 
 generator client {
   provider = "prisma-client-js"
@@ -108,10 +108,10 @@ model Raider {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   surname         String
-  mobile          String?     // Telefono raider
+  mobile          String?     
   isActive        Boolean     @default(false)
   bussinesActived String[]    @default([])
-  inService       Boolean     @default(false) // flag per attivare la modalita raider on
+  inService       Boolean     @default(false) 
   vehicle         veichleEnum @default(CAR)
   createdAt       DateTime    @default(now())
   updateAt        DateTime    @updatedAt
@@ -304,13 +304,13 @@ model Test {
   updatedAt  DateTime  @updatedAt
 }
 
-/**
- * - schema da implementare
- * - dopo la demo vanno inseriti i seguenti campi:
- * Quanto paga il desitnatario
- * se paga alla consegna o gia pagato
- * e verificare gli altri campi
- */
+// /**
+//  * - schema da implementare
+//  * - dopo la demo vanno inseriti i seguenti campi:
+//  * Quanto paga il desitnatario
+//  * se paga alla consegna o gia pagato
+//  * e verificare gli altri campi
+//  */
 model Delivery {
   id               String           @id @default(auto()) @map("_id") @db.ObjectId
   bussinessID      String? // reference to business name
