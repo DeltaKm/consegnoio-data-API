@@ -11,7 +11,8 @@ export async function POST(req: NextRequest) {
   const userId = decoded.userId as string;
 
   const { token } = await req.json();
-  if (!token) {
+  const normalizedToken = typeof token === 'string' ? token.trim() : '';
+  if (!normalizedToken) {
     return NextResponse.json({ message: 'Missing token' }, { status: 400 });
   }
 
@@ -23,10 +24,34 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: 'Raider not found' }, { status: 404 });
   }
 
-  const existing = raider.deviceTokens || [];
-  let updatedTokens = existing;
-  if (!existing.includes(token)) {
-    updatedTokens = [...existing, token];
+  const raidersWithSameToken = await prisma.raider.findMany({
+    where: {
+      id: { not: raider.id },
+      deviceTokens: { has: normalizedToken },
+    },
+    select: { id: true, deviceTokens: true },
+  });
+
+  for (const otherRaider of raidersWithSameToken) {
+    const cleanedTokens = (otherRaider.deviceTokens || []).filter(
+      (storedToken) => storedToken !== normalizedToken
+    );
+
+    await prisma.raider.update({
+      where: { id: otherRaider.id },
+      data: {
+        deviceTokens: { set: cleanedTokens },
+      },
+    });
+  }
+
+  const currentTokens = Array.from(new Set(raider.deviceTokens || []));
+  const alreadyRegistered = currentTokens.includes(normalizedToken);
+  const updatedTokens = alreadyRegistered
+    ? currentTokens
+    : [...currentTokens, normalizedToken];
+
+  if (!alreadyRegistered || currentTokens.length !== (raider.deviceTokens || []).length) {
     await prisma.raider.update({
       where: { id: raider.id },
       data: {
@@ -37,10 +62,14 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json(
     {
-      message: existing.includes(token)
-        ? 'Token already registered'
-        : 'Token registered',
+      message:
+        raidersWithSameToken.length > 0
+          ? 'Token moved to current raider'
+          : alreadyRegistered
+          ? 'Token already registered'
+          : 'Token registered',
       deviceTokens: updatedTokens,
+      removedFromOtherRaiders: raidersWithSameToken.length,
     },
     { status: 200 }
   );
