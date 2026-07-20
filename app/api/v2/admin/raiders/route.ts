@@ -10,6 +10,7 @@ enum StatusCodes {
   BadRequest = 400,
   Unauthorized = 401,
   Conflict = 409,
+  NotFound = 404,
   InternalServerError = 500,
 }
 
@@ -187,6 +188,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verifica che tutti i business esistano (evita fallimento della transazione)
+    if (assignToBusinessIds && assignToBusinessIds.length > 0) {
+      const businesses = await prisma.business.findMany({
+        where: { id: { in: assignToBusinessIds } },
+        select: { id: true }
+      });
+
+      if (businesses.length !== assignToBusinessIds.length) {
+        const foundIds = businesses.map(b => b.id);
+        const notFound = assignToBusinessIds.filter(id => !foundIds.includes(id));
+        return NextResponse.json(
+          {
+            message: "Alcuni business non esistono",
+            notFoundBusinessIds: notFound
+          },
+          { status: StatusCodes.NotFound }
+        );
+      }
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -219,35 +240,33 @@ export async function POST(request: NextRequest) {
 
       // 3. Assegna a business se specificato
       if (assignToBusinessIds && assignToBusinessIds.length > 0) {
-        for (const businessId of assignToBusinessIds) {
-          await tx.businessRaider.create({
-            data: {
-              businessId,
-              raiderId: raider.id,
-              confirmedFromBusiness: true,
-            }
-          });
+        await tx.businessRaider.createMany({
+          data: assignToBusinessIds.map((businessId) => ({
+            businessId,
+            raiderId: raider.id,
+            confirmedFromBusiness: true,
+          })),
+        });
 
-          // Aggiorna array raiderActived nel Business
-          const business = await tx.business.findUnique({
-            where: { id: businessId },
-            select: { raiderActived: true }
-          });
-
-          if (business) {
-            await tx.business.update({
+        // Aggiorna array raiderActived nei Business (in parallelo)
+        await Promise.all(
+          assignToBusinessIds.map((businessId) =>
+            tx.business.update({
               where: { id: businessId },
               data: {
                 raiderActived: {
                   push: raider.id
                 }
               }
-            });
-          }
-        }
+            })
+          )
+        );
       }
 
       return { user, raider };
+    }, {
+      maxWait: 10000,
+      timeout: 30000,
     });
 
     return NextResponse.json(
