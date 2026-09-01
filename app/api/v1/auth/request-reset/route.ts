@@ -48,8 +48,10 @@ export async function POST(request: NextRequest) {
     });
     console.log("Utente aggiornato con token reset:", updatedUser);
 
-    const baseUrl = process.env.BASE_URL || "http://localhost:3000";
-    const resetLink = `${baseUrl}/api/v1/auth/reset?token=${resetToken}`;
+    // Il link punta al dashboard gestionale (che ha la UI per impostare la
+    // nuova password), non a questo endpoint API che accetta solo POST.
+    const dashboardUrl = process.env.DASHBOARD_URL || "http://localhost:3000";
+    const resetLink = `${dashboardUrl}/reset-password?token=${resetToken}`;
     console.log("Link di reset generato:", resetLink);
 
     const mailOptions = {
