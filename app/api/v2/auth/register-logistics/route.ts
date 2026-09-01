@@ -96,9 +96,9 @@ export async function POST(request: NextRequest) {
       await transporter.sendMail({
         from: process.env.SMTP_USER,
         to: email,
-        subject: "Conferma la tua email - Consegnoio Logistics",
+        subject: "Conferma la tua email - ItalyDelivery Logistics",
         html: `
-          <h2>Benvenuto su Consegnoio!</h2>
+          <h2>Benvenuto su ItalyDelivery!</h2>
           <p>Il tuo account Logistics è stato creato.</p>
           <p>Clicca sul seguente link per confermare la tua email:</p>
           <a href="${confirmationLink}">${confirmationLink}</a>

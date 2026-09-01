@@ -1,10 +1,9 @@
 'use client'
 import { Download, Smartphone, Shield, Wifi } from 'lucide-react';
-import Logo from '@/public/consegnoio_logo_rosso_senza_scritta.svg';
+import Logo from '@/public/branding/italydelivery-logo.png';
 import Image from 'next/image';
 import { useEffect } from 'react';
 
-//test git
 export default function Home() {
 
   const handleDownloadClick = () => {
@@ -20,10 +19,10 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
                <div className="flex justify-center mb-6">
-           <Image src={Logo} alt="Consegno.io Logo" width={80} height={80} />
+           <Image src={Logo} alt="ItalyDelivery Logo" width={80} height={80} className="rounded-2xl" />
            </div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Consegnoio
+              ItalyDelivery
             </h1>
             {/* <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Organizza le tue consegne, ricevi aggiornamenti in tempo reale e accedi a tutte le funzionalità per ottimizzare il tuo lavoro da rider, tutto in un'unica app intuitiva e veloce.
@@ -60,7 +59,7 @@ export default function Home() {
                 href="/downloads/consegnoio.apk"
                 download
                 onClick={handleDownloadClick}
-                className="inline-flex items-center gap-3 bg-[#d5184e] hover:bg-[#b51440] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                className="inline-flex items-center gap-3 bg-[#263573] hover:bg-[#1c2758] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
               >
                 <Download className="w-6 h-6" />
                 Scarica APK

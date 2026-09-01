@@ -100,10 +100,10 @@ export async function POST(request: NextRequest) {
     const mailOptions = {
       from: process.env.SMTP_USER,
       to: email,
-      subject: "Conferma la tua email - Consegnoio Business",
+      subject: "Conferma la tua email - ItalyDelivery Business",
       text: `Clicca sul seguente link per confermare la tua email: ${confirmationLink}`,
       html: `
-        <h2>Benvenuto su Consegnoio!</h2>
+        <h2>Benvenuto su ItalyDelivery!</h2>
         <p>Grazie per esserti registrato come Business.</p>
         <p>Clicca sul seguente link per confermare la tua email:</p>
         <a href="${confirmationLink}">${confirmationLink}</a>

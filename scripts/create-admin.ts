@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 
 async function createAdmin() {
   try {
-    const email = process.env.ADMIN_EMAIL || 'admin@consegnoio.it';
+    const email = process.env.ADMIN_EMAIL || 'admin@italydelivery.it';
     const password = process.env.ADMIN_PASSWORD;
 
     if (!password) {
