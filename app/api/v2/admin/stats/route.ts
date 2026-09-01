@@ -73,8 +73,24 @@ export async function GET(request: NextRequest) {
       .filter(d => d.status === "COMPLETED")
       .reduce((sum, d) => sum + (d.compensation || 0), 0);
 
-    // Top 10 business per ordini
-    const topBusinesses = await prisma.business.findMany({
+    // Top 10 business per ordini: prima si individuano i business con più ordini
+    // via groupBy a livello di DB, poi si calcolano i dettagli solo per quelli.
+    // (In precedenza si prendevano i primi 10 business dal DB in ordine arbitrario
+    // e si ordinava solo tra quelli: quasi mai erano i business realmente più attivi.)
+    const topBusinessGroups = await prisma.deliveryEA.groupBy({
+      by: ["businessId"],
+      where: { ...deliveryWhere, businessId: { not: null } },
+      _count: { id: true },
+      orderBy: { _count: { id: "desc" } },
+      take: 10,
+    });
+
+    const topBusinessIds = topBusinessGroups
+      .map(g => g.businessId)
+      .filter((id): id is string => id !== null);
+
+    const topBusinessesData = await prisma.business.findMany({
+      where: { id: { in: topBusinessIds } },
       include: {
         deliveries: {
           where: deliveryWhere,
@@ -84,10 +100,9 @@ export async function GET(request: NextRequest) {
           }
         }
       },
-      take: 10,
     });
 
-    const businessStats = topBusinesses
+    const businessStats = topBusinessesData
       .map(business => ({
         id: business.id,
         name: business.bussinesName,
@@ -95,29 +110,30 @@ export async function GET(request: NextRequest) {
         completedOrders: business.deliveries.filter(d => d.status === "COMPLETED").length,
         totalCompensation: business.deliveries.reduce((sum, d) => sum + (d.compensation || 0), 0),
       }))
-      .sort((a, b) => b.totalOrders - a.totalOrders)
-      .slice(0, 10);
+      .sort((a, b) => b.totalOrders - a.totalOrders);
 
-    // Top 10 raider per consegne completate
-    const topRaiders = await prisma.raider.findMany({
-      include: {
-        historyDeliveries: {
-          select: {
-            deliveryId: true,
-          }
-        }
-      },
-      take: 50,
+    // Top 10 raider per consegne completate: stesso fix, via groupBy su HistoryDelivery.
+    const topRaiderGroups = await prisma.historyDelivery.groupBy({
+      by: ["raiderId"],
+      _count: { id: true },
+      orderBy: { _count: { id: "desc" } },
+      take: 10,
     });
 
-    const raiderStats = topRaiders
+    const topRaiderIds = topRaiderGroups.map(g => g.raiderId);
+    const raidersData = await prisma.raider.findMany({
+      where: { id: { in: topRaiderIds } },
+      select: { id: true, name: true, surname: true },
+    });
+    const raiderCountById = new Map(topRaiderGroups.map(g => [g.raiderId, g._count.id]));
+
+    const raiderStats = raidersData
       .map(raider => ({
         id: raider.id,
         name: `${raider.name} ${raider.surname}`,
-        completedDeliveries: raider.historyDeliveries.length,
+        completedDeliveries: raiderCountById.get(raider.id) ?? 0,
       }))
-      .sort((a, b) => b.completedDeliveries - a.completedDeliveries)
-      .slice(0, 10);
+      .sort((a, b) => b.completedDeliveries - a.completedDeliveries);
 
     return NextResponse.json(
       {
