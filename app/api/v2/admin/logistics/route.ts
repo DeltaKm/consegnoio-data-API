@@ -19,6 +19,7 @@ const createLogisticsSchema = z.object({
   password: z.string().min(6),
   name: z.string().min(2),
   surname: z.string().min(2),
+  imgUrl: z.string().url().optional(),
 });
 
 // GET - Lista tutti i logistics
@@ -45,6 +46,7 @@ export async function GET(request: NextRequest) {
               email: true,
               confirmed: true,
               expired: true,
+              imgUrl: true,
             }
           },
           businessRelations: {
@@ -73,6 +75,7 @@ export async function GET(request: NextRequest) {
       email: log.user?.email,
       confirmed: log.user?.confirmed,
       expired: log.user?.expired,
+      imgUrl: log.user?.imgUrl,
       assignedBusinesses: log.businessRelations.map(rel => ({
         id: rel.business.id,
         name: rel.business.bussinesName,
@@ -127,7 +130,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, name, surname } = validation.data;
+    const { email, password, name, surname, imgUrl } = validation.data;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -147,6 +150,7 @@ export async function POST(request: NextRequest) {
         role: "LOGISTICS",
         confirmed: false,
         confirmationToken,
+        ...(imgUrl ? { imgUrl } : {}),
       },
     });
 

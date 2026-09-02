@@ -97,6 +97,13 @@ export async function PATCH(
       data: updateData,
     });
 
+    if (body.imgUrl !== undefined && logistics.userId) {
+      await prisma.user.update({
+        where: { id: logistics.userId },
+        data: { imgUrl: body.imgUrl },
+      });
+    }
+
     return NextResponse.json(
       {
         message: "Logistics aggiornato con successo",

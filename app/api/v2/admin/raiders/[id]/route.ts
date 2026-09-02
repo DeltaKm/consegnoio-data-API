@@ -17,6 +17,7 @@ const updateRaiderSchema = z.object({
   vehicle: z.enum(["CAR", "BICYCLE", "MOTORCYCLE", "VAN", "REFRIGERATEDVAN", "WITHOUTVEHICLE", "TRANSIT"]).optional(),
   mobile: z.string().optional(),
   email: z.string().email().optional(),
+  imgUrl: z.string().url().optional(),
 });
 
 // GET - Dettaglio raider completo
@@ -118,7 +119,7 @@ export async function PATCH(
       );
     }
 
-    const { email, ...raiderData } = validation.data;
+    const { email, imgUrl, ...raiderData } = validation.data;
 
     // Verifica che raider esista
     const raider = await prisma.raider.findUnique({
@@ -150,11 +151,14 @@ export async function PATCH(
         });
       }
 
-      // 2. Aggiorna email User se specificata
-      if (email && raider.user) {
+      // 2. Aggiorna email/imgUrl User se specificati
+      if ((email || imgUrl !== undefined) && raider.user) {
         await tx.user.update({
           where: { id: raider.user.id },
-          data: { email },
+          data: {
+            ...(email ? { email } : {}),
+            ...(imgUrl !== undefined ? { imgUrl } : {}),
+          },
         });
       }
     });

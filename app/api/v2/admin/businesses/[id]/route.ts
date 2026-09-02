@@ -115,6 +115,13 @@ export async function PATCH(
       data: updateData,
     });
 
+    if (body.imgUrl !== undefined && business.userId) {
+      await prisma.user.update({
+        where: { id: business.userId },
+        data: { imgUrl: body.imgUrl },
+      });
+    }
+
     return NextResponse.json(
       {
         message: "Business aggiornato con successo",

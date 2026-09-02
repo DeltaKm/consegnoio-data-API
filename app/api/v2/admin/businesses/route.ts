@@ -24,6 +24,7 @@ const createBusinessSchema = z.object({
   bussinesName: z.string().min(2),
   address: z.string().min(2),
   businessCord: z.string().optional(),
+  imgUrl: z.string().url().optional(),
 });
 
 // GET - Lista tutti i business (Admin vede tutto)
@@ -61,6 +62,7 @@ export async function GET(request: NextRequest) {
               email: true,
               confirmed: true,
               expired: true,
+              imgUrl: true,
             }
           },
           raiderRelations: {
@@ -102,6 +104,7 @@ export async function GET(request: NextRequest) {
         email: business.user?.email,
         confirmed: business.user?.confirmed,
         expired: business.user?.expired,
+        imgUrl: business.user?.imgUrl,
         activeRaiders,
         assignedLogistics: business.logisticsRelations.map(rel => ({
           id: rel.logistics.id,
@@ -160,7 +163,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, bussinesName, address, businessCord } = validation.data;
+    const { email, password, bussinesName, address, businessCord, imgUrl } = validation.data;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -180,6 +183,7 @@ export async function POST(request: NextRequest) {
         role: "BUSINESS",
         confirmed: false,
         confirmationToken,
+        ...(imgUrl ? { imgUrl } : {}),
       },
     });
 

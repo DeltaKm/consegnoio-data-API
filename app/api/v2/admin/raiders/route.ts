@@ -23,6 +23,7 @@ const createRaiderSchema = z.object({
   mobile: z.string().optional(),
   assignToBusinessIds: z.array(z.string()).optional(),
   assignToLogisticsId: z.string().optional(),
+  imgUrl: z.string().url().optional(),
 });
 
 // GET - Lista tutti i raider (Admin vede tutto)
@@ -86,6 +87,7 @@ export async function GET(request: NextRequest) {
               email: true,
               confirmed: true,
               expired: true,
+              imgUrl: true,
             }
           },
           businessRelations: {
@@ -122,6 +124,7 @@ export async function GET(request: NextRequest) {
       email: raider.user?.email,
       confirmed: raider.user?.confirmed,
       expired: raider.user?.expired,
+      imgUrl: raider.user?.imgUrl,
       businesses: raider.businessRelations.map(rel => ({
         id: rel.business.id,
         name: rel.business.bussinesName,
@@ -174,7 +177,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, name, surname, vehicle, mobile, assignToBusinessIds, assignToLogisticsId } = validation.data;
+    const { email, password, name, surname, vehicle, mobile, assignToBusinessIds, assignToLogisticsId, imgUrl } = validation.data;
 
     // Verifica email non già usata
     const existingUser = await prisma.user.findUnique({
@@ -221,6 +224,7 @@ export async function POST(request: NextRequest) {
           role: "RAIDER",
           confirmed: true,
           expired: false,
+          ...(imgUrl ? { imgUrl } : {}),
         }
       });
 
