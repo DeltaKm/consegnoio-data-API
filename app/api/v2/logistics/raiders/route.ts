@@ -20,7 +20,8 @@ const createRaiderSchema = z.object({
   surname: z.string().min(1),
   vehicle: z.enum(["CAR", "BICYCLE", "MOTORCYCLE", "VAN", "REFRIGERATEDVAN", "WITHOUTVEHICLE", "TRANSIT"]),
   mobile: z.string().optional(),
-  businessId: z.string(), // ID del business a cui assegnare il raider (OBBLIGATORIO)
+  businessIds: z.array(z.string()).min(1), // business (tra quelli gestiti) a cui assegnare il raider
+  imgUrl: z.string().url().optional(),
 });
 
 // GET - Lista tutti i raider
@@ -198,19 +199,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, name, surname, vehicle, mobile, businessId } = validation.data;
+    const { email, password, name, surname, vehicle, mobile, businessIds, imgUrl } = validation.data;
 
-    // Verifica che la logistica gestisca il business specificato
+    // Verifica che la logistica gestisca tutti i business richiesti
     const businessesManaged = await prisma.logisticsBusiness.findMany({
       where: { logisticsId: auth.logistics.id },
       select: { businessId: true }
     });
 
-    const businessIds = businessesManaged.map(lb => lb.businessId);
+    const managedBusinessIds = businessesManaged.map(lb => lb.businessId);
+    const notManaged = businessIds.filter((id) => !managedBusinessIds.includes(id));
 
-    if (!businessIds.includes(businessId)) {
+    if (notManaged.length > 0) {
       return NextResponse.json(
-        { message: "Non hai i permessi per assegnare raider a questo business" },
+        { message: "Non hai i permessi per assegnare raider a questi business", notManagedBusinessIds: notManaged },
         { status: StatusCodes.BadRequest }
       );
     }
@@ -240,6 +242,7 @@ export async function POST(request: NextRequest) {
           role: "RAIDER",
           confirmed: true,
           expired: false,
+          ...(imgUrl ? { imgUrl } : {}),
         }
       });
 
@@ -253,30 +256,30 @@ export async function POST(request: NextRequest) {
           mobile,
           isActive: true,
           createdByLogisticsId: auth.logistics.id,
-          bussinesActived: [businessId],
+          bussinesActived: businessIds,
         }
       });
 
-      // 3. Crea relazione BusinessRaider
-      const businessRaider = await tx.businessRaider.create({
-        data: {
-          businessId: businessId,
+      // 3. Crea relazioni BusinessRaider per ogni business
+      await tx.businessRaider.createMany({
+        data: businessIds.map((businessId) => ({
+          businessId,
           raiderId: raider.id,
           confirmedFromBusiness: true,
-        }
+        })),
       });
 
-      // 4. Aggiorna array raiderActived nel Business
-      await tx.business.update({
-        where: { id: businessId },
-        data: {
-          raiderActived: {
-            push: raider.id
-          }
-        }
-      });
+      // 4. Aggiorna array raiderActived nei Business
+      await Promise.all(
+        businessIds.map((businessId) =>
+          tx.business.update({
+            where: { id: businessId },
+            data: { raiderActived: { push: raider.id } }
+          })
+        )
+      );
 
-      return { user, raider, businessRaider };
+      return { user, raider };
     });
 
     return NextResponse.json(
