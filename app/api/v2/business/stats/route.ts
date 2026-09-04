@@ -72,13 +72,15 @@ export async function GET(request: NextRequest) {
       prisma.deliveryEA.count({ where: { ...where, status: "DELETED" } }),
     ]);
 
-    // Calcola costi
+    // Calcola costi (stesso risultato riusato sotto per la performance raider,
+    // per evitare un N+1 di query separate per ogni raider)
     const deliveries = await prisma.deliveryEA.findMany({
       where,
       select: {
         compensation: true,
         totalPaid: true,
         status: true,
+        assignedToRaiderId: true,
       }
     });
 
@@ -88,65 +90,36 @@ export async function GET(request: NextRequest) {
       .filter(d => d.status === "COMPLETED")
       .reduce((sum, d) => sum + (d.compensation || 0), 0);
 
-    // Performance raider
-    const raiderPerformance = await prisma.deliveryEA.groupBy({
-      by: ['assignedToRaiderId'],
-      where: {
-        ...where,
-        assignedToRaiderId: { not: null },
-      },
-      _count: {
-        id: true,
-      }
-    });
-
-    const raiderStats = await Promise.all(
-      raiderPerformance.map(async (perf) => {
-        if (!perf.assignedToRaiderId) return null;
-
-        const raider = await prisma.raider.findUnique({
-          where: { id: perf.assignedToRaiderId },
-          select: {
-            id: true,
-            name: true,
-            surname: true,
-          }
-        });
-
-        const completedDeliveries = await prisma.deliveryEA.findMany({
-          where: {
-            ...where,
-            assignedToRaiderId: perf.assignedToRaiderId,
-            status: "COMPLETED",
-          },
-          select: { compensation: true },
-        });
-
-        const notDelivered = await prisma.deliveryEA.count({
-          where: {
-            ...where,
-            assignedToRaiderId: perf.assignedToRaiderId,
-            status: "NOTDELIVERED",
-          }
-        });
-
-        const compensation = completedDeliveries.reduce((sum, d) => sum + (d.compensation || 0), 0);
-
-        return {
-          raiderId: perf.assignedToRaiderId,
-          raiderName: raider ? `${raider.name} ${raider.surname}` : "Unknown",
-          totalAssigned: perf._count.id,
-          completed: completedDeliveries.length,
-          notDelivered,
-          compensation: compensation.toFixed(2),
-          successRate: perf._count.id > 0
-            ? ((completedDeliveries.length / perf._count.id) * 100).toFixed(2) + '%'
-            : '0%',
-        };
-      })
+    // Performance raider, calcolata in memoria da `deliveries` già caricato
+    // sopra (evita un N+1 di query separate per ogni raider).
+    const involvedRaiderIds = Array.from(
+      new Set(deliveries.map(d => d.assignedToRaiderId).filter((id): id is string => id !== null))
     );
 
-    const filteredRaiderStats = raiderStats.filter(s => s !== null);
+    const raidersInfo = await prisma.raider.findMany({
+      where: { id: { in: involvedRaiderIds } },
+      select: { id: true, name: true, surname: true },
+    });
+    const raiderNameById = new Map(raidersInfo.map(r => [r.id, `${r.name} ${r.surname}`]));
+
+    const filteredRaiderStats = involvedRaiderIds.map((raiderId) => {
+      const raiderDeliveries = deliveries.filter(d => d.assignedToRaiderId === raiderId);
+      const completedDeliveries = raiderDeliveries.filter(d => d.status === "COMPLETED");
+      const notDelivered = raiderDeliveries.filter(d => d.status === "NOTDELIVERED").length;
+      const compensation = completedDeliveries.reduce((sum, d) => sum + (d.compensation || 0), 0);
+
+      return {
+        raiderId,
+        raiderName: raiderNameById.get(raiderId) ?? "Unknown",
+        totalAssigned: raiderDeliveries.length,
+        completed: completedDeliveries.length,
+        notDelivered,
+        compensation: compensation.toFixed(2),
+        successRate: raiderDeliveries.length > 0
+          ? ((completedDeliveries.length / raiderDeliveries.length) * 100).toFixed(2) + '%'
+          : '0%',
+      };
+    });
 
     return NextResponse.json(
       {

@@ -164,41 +164,42 @@ export async function GET(request: NextRequest) {
       take: 10,
     });
 
-    const raiderStats = await Promise.all(
-      topRaiderGroups.map(async (group) => {
-        const raider = await prisma.raider.findUnique({
-          where: { id: group.raiderId },
-          select: { name: true, surname: true },
-        });
+    // Batch: 2 query totali invece di ~4 per ogni singolo top raider
+    // (evita un N+1 che rischiava di far scadere il timeout della richiesta).
+    const topRaiderIds = topRaiderGroups.map(g => g.raiderId);
 
-        const totalAssigned = await prisma.deliveryEA.count({
-          where: { ...deliveryWhere, assignedToRaiderId: group.raiderId },
-        });
+    const [topRaidersInfo, topRaidersDeliveries] = await Promise.all([
+      prisma.raider.findMany({
+        where: { id: { in: topRaiderIds } },
+        select: { id: true, name: true, surname: true },
+      }),
+      prisma.deliveryEA.findMany({
+        where: { ...deliveryWhere, assignedToRaiderId: { in: topRaiderIds } },
+        select: { assignedToRaiderId: true, status: true, compensation: true },
+      }),
+    ]);
 
-        const completedDeliveriesList = await prisma.deliveryEA.findMany({
-          where: { ...deliveryWhere, assignedToRaiderId: group.raiderId, status: "COMPLETED" },
-          select: { compensation: true },
-        });
+    const raiderNameById = new Map(topRaidersInfo.map(r => [r.id, `${r.name} ${r.surname}`]));
 
-        const notDelivered = await prisma.deliveryEA.count({
-          where: { ...deliveryWhere, assignedToRaiderId: group.raiderId, status: "NOTDELIVERED" },
-        });
+    const raiderStats = topRaiderGroups.map((group) => {
+      const raiderDeliveries = topRaidersDeliveries.filter(d => d.assignedToRaiderId === group.raiderId);
+      const totalAssigned = raiderDeliveries.length;
+      const completedDeliveriesList = raiderDeliveries.filter(d => d.status === "COMPLETED");
+      const notDelivered = raiderDeliveries.filter(d => d.status === "NOTDELIVERED").length;
+      const compensation = completedDeliveriesList.reduce((sum, d) => sum + (d.compensation || 0), 0);
 
-        const compensation = completedDeliveriesList.reduce((sum, d) => sum + (d.compensation || 0), 0);
-
-        return {
-          id: group.raiderId,
-          name: raider ? `${raider.name} ${raider.surname}` : "Sconosciuto",
-          completedDeliveries: group._count.id,
-          totalAssigned,
-          notDelivered,
-          compensation: compensation.toFixed(2),
-          successRate: totalAssigned > 0
-            ? ((completedDeliveriesList.length / totalAssigned) * 100).toFixed(2) + "%"
-            : "0%",
-        };
-      })
-    );
+      return {
+        id: group.raiderId,
+        name: raiderNameById.get(group.raiderId) ?? "Sconosciuto",
+        completedDeliveries: group._count.id,
+        totalAssigned,
+        notDelivered,
+        compensation: compensation.toFixed(2),
+        successRate: totalAssigned > 0
+          ? ((completedDeliveriesList.length / totalAssigned) * 100).toFixed(2) + "%"
+          : "0%",
+      };
+    });
 
     raiderStats.sort((a, b) => b.completedDeliveries - a.completedDeliveries);
 

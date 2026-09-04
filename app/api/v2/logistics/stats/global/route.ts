@@ -107,6 +107,7 @@ export async function GET(request: NextRequest) {
         compensation: true,
         totalPaid: true,
         status: true,
+        assignedToRaiderId: true,
       }
     });
 
@@ -148,29 +149,30 @@ export async function GET(request: NextRequest) {
       _count: { id: true },
     });
 
-    const raiderStats = await Promise.all(
-      raiderAssignedCounts.map(async (perf) => {
-        if (!perf.assignedToRaiderId) return null;
+    // Solo 1 query in più (i nomi): il resto è ricavato da `deliveries` già
+    // caricato sopra, evitando un N+1 senza limite per ogni raider.
+    const involvedRaiderIds = raiderAssignedCounts
+      .map(p => p.assignedToRaiderId)
+      .filter((id): id is string => id !== null);
 
-        const raider = await prisma.raider.findUnique({
-          where: { id: perf.assignedToRaiderId },
-          select: { name: true, surname: true },
-        });
+    const raidersInfo = await prisma.raider.findMany({
+      where: { id: { in: involvedRaiderIds } },
+      select: { id: true, name: true, surname: true },
+    });
 
-        const completed = await prisma.deliveryEA.findMany({
-          where: { ...where, assignedToRaiderId: perf.assignedToRaiderId, status: "COMPLETED" },
-          select: { compensation: true },
-        });
+    const raiderNameById = new Map(raidersInfo.map(r => [r.id, `${r.name} ${r.surname}`]));
 
-        const notDelivered = await prisma.deliveryEA.count({
-          where: { ...where, assignedToRaiderId: perf.assignedToRaiderId, status: "NOTDELIVERED" },
-        });
-
+    const filteredRaiderStats = raiderAssignedCounts
+      .filter((perf): perf is typeof perf & { assignedToRaiderId: string } => perf.assignedToRaiderId !== null)
+      .map((perf) => {
+        const raiderDeliveries = deliveries.filter(d => d.assignedToRaiderId === perf.assignedToRaiderId);
+        const completed = raiderDeliveries.filter(d => d.status === "COMPLETED");
+        const notDelivered = raiderDeliveries.filter(d => d.status === "NOTDELIVERED").length;
         const compensation = completed.reduce((sum, d) => sum + (d.compensation || 0), 0);
 
         return {
           raiderId: perf.assignedToRaiderId,
-          raiderName: raider ? `${raider.name} ${raider.surname}` : "Sconosciuto",
+          raiderName: raiderNameById.get(perf.assignedToRaiderId) ?? "Sconosciuto",
           totalAssigned: perf._count.id,
           completed: completed.length,
           notDelivered,
@@ -180,10 +182,6 @@ export async function GET(request: NextRequest) {
             : "0%",
         };
       })
-    );
-
-    const filteredRaiderStats = raiderStats
-      .filter((s): s is NonNullable<typeof s> => s !== null)
       .sort((a, b) => b.completed - a.completed);
 
     return NextResponse.json(
