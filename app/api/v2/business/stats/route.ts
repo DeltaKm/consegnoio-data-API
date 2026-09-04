@@ -95,12 +95,13 @@ export async function GET(request: NextRequest) {
           }
         });
 
-        const completed = await prisma.deliveryEA.count({
+        const completedDeliveries = await prisma.deliveryEA.findMany({
           where: {
             ...where,
             assignedToRaiderId: perf.assignedToRaiderId,
             status: "COMPLETED",
-          }
+          },
+          select: { compensation: true },
         });
 
         const notDelivered = await prisma.deliveryEA.count({
@@ -111,14 +112,17 @@ export async function GET(request: NextRequest) {
           }
         });
 
+        const compensation = completedDeliveries.reduce((sum, d) => sum + (d.compensation || 0), 0);
+
         return {
           raiderId: perf.assignedToRaiderId,
           raiderName: raider ? `${raider.name} ${raider.surname}` : "Unknown",
           totalAssigned: perf._count.id,
-          completed,
+          completed: completedDeliveries.length,
           notDelivered,
-          successRate: perf._count.id > 0 
-            ? ((completed / perf._count.id) * 100).toFixed(2) + '%'
+          compensation: compensation.toFixed(2),
+          successRate: perf._count.id > 0
+            ? ((completedDeliveries.length / perf._count.id) * 100).toFixed(2) + '%'
             : '0%',
         };
       })

@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const where: any = {
       businessId: { in: assignedBusinessIds } // ← SOLO BUSINESS ASSEGNATI
     };
-    
+
     if (dateFrom || dateTo) {
       where.createdAt = dateFilter;
     }
@@ -47,11 +47,11 @@ export async function GET(request: NextRequest) {
       prisma.business.count({ where: { id: { in: assignedBusinessIds } } }),
       prisma.deliveryEA.count({ where }),
       prisma.deliveryEA.count({ where: { ...where, status: "COMPLETED" } }),
-      prisma.deliveryEA.count({ 
-        where: { 
-          ...where, 
-          status: { in: ["ASSIGNED", "ONDELIVERY"] } 
-        } 
+      prisma.deliveryEA.count({
+        where: {
+          ...where,
+          status: { in: ["ASSIGNED", "ONDELIVERY"] }
+        }
       }),
     ]);
 
@@ -66,6 +66,84 @@ export async function GET(request: NextRequest) {
 
     const totalRevenue = deliveries.reduce((sum, d) => sum + (d.totalPaid || 0), 0);
     const totalCompensation = deliveries.reduce((sum, d) => sum + (d.compensation || 0), 0);
+    const completedCompensation = deliveries
+      .filter(d => d.status === "COMPLETED")
+      .reduce((sum, d) => sum + (d.compensation || 0), 0);
+
+    // Scomposizione per singola attività gestita
+    const businessesData = await prisma.business.findMany({
+      where: { id: { in: assignedBusinessIds } },
+      select: {
+        id: true,
+        bussinesName: true,
+        deliveries: {
+          where,
+          select: { status: true, compensation: true },
+        }
+      }
+    });
+
+    const businessStats = businessesData
+      .map(business => ({
+        id: business.id,
+        name: business.bussinesName,
+        totalOrders: business.deliveries.length,
+        completedOrders: business.deliveries.filter(d => d.status === "COMPLETED").length,
+        totalCompensation: business.deliveries.reduce((sum, d) => sum + (d.compensation || 0), 0),
+      }))
+      .sort((a, b) => b.totalOrders - a.totalOrders);
+
+    // Performance/compensi dei raider collegati alle attività gestite
+    const raiderRelations = await prisma.businessRaider.findMany({
+      where: { businessId: { in: assignedBusinessIds } },
+      select: { raiderId: true },
+      distinct: ["raiderId"],
+    });
+    const managedRaiderIds = raiderRelations.map(r => r.raiderId);
+
+    const raiderAssignedCounts = await prisma.deliveryEA.groupBy({
+      by: ["assignedToRaiderId"],
+      where: { ...where, assignedToRaiderId: { in: managedRaiderIds } },
+      _count: { id: true },
+    });
+
+    const raiderStats = await Promise.all(
+      raiderAssignedCounts.map(async (perf) => {
+        if (!perf.assignedToRaiderId) return null;
+
+        const raider = await prisma.raider.findUnique({
+          where: { id: perf.assignedToRaiderId },
+          select: { name: true, surname: true },
+        });
+
+        const completed = await prisma.deliveryEA.findMany({
+          where: { ...where, assignedToRaiderId: perf.assignedToRaiderId, status: "COMPLETED" },
+          select: { compensation: true },
+        });
+
+        const notDelivered = await prisma.deliveryEA.count({
+          where: { ...where, assignedToRaiderId: perf.assignedToRaiderId, status: "NOTDELIVERED" },
+        });
+
+        const compensation = completed.reduce((sum, d) => sum + (d.compensation || 0), 0);
+
+        return {
+          raiderId: perf.assignedToRaiderId,
+          raiderName: raider ? `${raider.name} ${raider.surname}` : "Sconosciuto",
+          totalAssigned: perf._count.id,
+          completed: completed.length,
+          notDelivered,
+          compensation: compensation.toFixed(2),
+          successRate: perf._count.id > 0
+            ? ((completed.length / perf._count.id) * 100).toFixed(2) + "%"
+            : "0%",
+        };
+      })
+    );
+
+    const filteredRaiderStats = raiderStats
+      .filter((s): s is NonNullable<typeof s> => s !== null)
+      .sort((a, b) => b.completed - a.completed);
 
     return NextResponse.json(
       {
@@ -82,8 +160,11 @@ export async function GET(request: NextRequest) {
         financial: {
           totalRevenue: totalRevenue.toFixed(2),
           totalCompensation: totalCompensation.toFixed(2),
-          netProfit: (totalRevenue - totalCompensation).toFixed(2),
-        }
+          completedCompensation: completedCompensation.toFixed(2),
+          netProfit: (totalRevenue - completedCompensation).toFixed(2),
+        },
+        businesses: businessStats,
+        raiders: filteredRaiderStats,
       },
       { status: StatusCodes.Success }
     );
