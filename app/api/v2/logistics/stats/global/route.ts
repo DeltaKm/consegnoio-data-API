@@ -4,6 +4,7 @@ import { requireLogistics } from "@/app/lib/auth";
 
 enum StatusCodes {
   Success = 200,
+  BadRequest = 400,
   Unauthorized = 401,
   InternalServerError = 500,
 }
@@ -22,6 +23,8 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const dateFrom = searchParams.get("dateFrom");
     const dateTo = searchParams.get("dateTo");
+    const businessIdFilter = searchParams.get("businessId");
+    const raiderIdFilter = searchParams.get("raiderId");
 
     const dateFilter: any = {};
     if (dateFrom) dateFilter.gte = new Date(dateFrom);
@@ -30,12 +33,41 @@ export async function GET(request: NextRequest) {
     // Ottieni IDs dei business assegnati
     const assignedBusinessIds = auth.logistics.businessRelations.map((rel: any) => rel.businessId);
 
+    if (businessIdFilter && !assignedBusinessIds.includes(businessIdFilter)) {
+      return NextResponse.json(
+        { message: "Non gestisci questa attività" },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+    // Raider collegati alle attività gestite (prima del filtro data, serve per validare raiderId)
+    const raiderRelations = await prisma.businessRaider.findMany({
+      where: { businessId: { in: assignedBusinessIds } },
+      select: { raiderId: true },
+      distinct: ["raiderId"],
+    });
+    const managedRaiderIds = raiderRelations.map(r => r.raiderId);
+
+    if (raiderIdFilter && !managedRaiderIds.includes(raiderIdFilter)) {
+      return NextResponse.json(
+        { message: "Questo raider non è collegato alle tue attività" },
+        { status: StatusCodes.BadRequest }
+      );
+    }
+
+    // Se filtrato per una singola attività, restringi lo scope; altrimenti tutte quelle gestite
+    const scopedBusinessIds = businessIdFilter ? [businessIdFilter] : assignedBusinessIds;
+
     const where: any = {
-      businessId: { in: assignedBusinessIds } // ← SOLO BUSINESS ASSEGNATI
+      businessId: { in: scopedBusinessIds }
     };
 
     if (dateFrom || dateTo) {
       where.createdAt = dateFilter;
+    }
+
+    if (raiderIdFilter) {
+      where.assignedToRaiderId = raiderIdFilter;
     }
 
     const [
@@ -49,14 +81,14 @@ export async function GET(request: NextRequest) {
       completedDeliveries,
       notDeliveredDeliveries,
     ] = await Promise.all([
-      prisma.business.count({ where: { id: { in: assignedBusinessIds } } }),
+      prisma.business.count({ where: { id: { in: scopedBusinessIds } } }),
       prisma.raider.count({
-        where: { businessRelations: { some: { businessId: { in: assignedBusinessIds } } } }
+        where: { businessRelations: { some: { businessId: { in: scopedBusinessIds } } } }
       }),
       prisma.raider.count({
         where: {
           isActive: true,
-          businessRelations: { some: { businessId: { in: assignedBusinessIds } } }
+          businessRelations: { some: { businessId: { in: scopedBusinessIds } } }
         }
       }),
       prisma.deliveryEA.count({ where }),
@@ -86,7 +118,7 @@ export async function GET(request: NextRequest) {
 
     // Scomposizione per singola attività gestita
     const businessesData = await prisma.business.findMany({
-      where: { id: { in: assignedBusinessIds } },
+      where: { id: { in: scopedBusinessIds } },
       select: {
         id: true,
         bussinesName: true,
@@ -107,17 +139,12 @@ export async function GET(request: NextRequest) {
       }))
       .sort((a, b) => b.totalOrders - a.totalOrders);
 
-    // Performance/compensi dei raider collegati alle attività gestite
-    const raiderRelations = await prisma.businessRaider.findMany({
-      where: { businessId: { in: assignedBusinessIds } },
-      select: { raiderId: true },
-      distinct: ["raiderId"],
-    });
-    const managedRaiderIds = raiderRelations.map(r => r.raiderId);
-
+    // Performance/compensi dei raider collegati alle attività (nello scope corrente)
     const raiderAssignedCounts = await prisma.deliveryEA.groupBy({
       by: ["assignedToRaiderId"],
-      where: { ...where, assignedToRaiderId: { in: managedRaiderIds } },
+      where: raiderIdFilter
+        ? { ...where }
+        : { ...where, assignedToRaiderId: { in: managedRaiderIds } },
       _count: { id: true },
     });
 
