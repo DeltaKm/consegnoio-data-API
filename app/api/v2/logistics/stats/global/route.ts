@@ -40,20 +40,34 @@ export async function GET(request: NextRequest) {
 
     const [
       totalBusinesses,
+      totalRaiders,
+      activeRaiders,
       totalDeliveries,
+      createdDeliveries,
+      assignedDeliveries,
+      onDeliveryDeliveries,
       completedDeliveries,
-      ongoingDeliveries,
+      notDeliveredDeliveries,
     ] = await Promise.all([
       prisma.business.count({ where: { id: { in: assignedBusinessIds } } }),
-      prisma.deliveryEA.count({ where }),
-      prisma.deliveryEA.count({ where: { ...where, status: "COMPLETED" } }),
-      prisma.deliveryEA.count({
+      prisma.raider.count({
+        where: { businessRelations: { some: { businessId: { in: assignedBusinessIds } } } }
+      }),
+      prisma.raider.count({
         where: {
-          ...where,
-          status: { in: ["ASSIGNED", "ONDELIVERY"] }
+          isActive: true,
+          businessRelations: { some: { businessId: { in: assignedBusinessIds } } }
         }
       }),
+      prisma.deliveryEA.count({ where }),
+      prisma.deliveryEA.count({ where: { ...where, status: "CREATED" } }),
+      prisma.deliveryEA.count({ where: { ...where, status: "ASSIGNED" } }),
+      prisma.deliveryEA.count({ where: { ...where, status: "ONDELIVERY" } }),
+      prisma.deliveryEA.count({ where: { ...where, status: "COMPLETED" } }),
+      prisma.deliveryEA.count({ where: { ...where, status: "NOTDELIVERED" } }),
     ]);
+
+    const ongoingDeliveries = assignedDeliveries + onDeliveryDeliveries;
 
     const deliveries = await prisma.deliveryEA.findMany({
       where,
@@ -153,9 +167,21 @@ export async function GET(request: NextRequest) {
         },
         overview: {
           totalBusinesses,
+          totalRaiders,
+          activeRaiders,
           totalDeliveries,
           completedDeliveries,
           ongoingDeliveries,
+        },
+        deliveries: {
+          total: totalDeliveries,
+          byStatus: {
+            created: createdDeliveries,
+            assigned: assignedDeliveries,
+            onDelivery: onDeliveryDeliveries,
+            completed: completedDeliveries,
+            notDelivered: notDeliveredDeliveries,
+          }
         },
         financial: {
           totalRevenue: totalRevenue.toFixed(2),
