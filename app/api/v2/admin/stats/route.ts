@@ -115,6 +115,7 @@ export async function GET(request: NextRequest) {
     // Top 10 raider per consegne completate: stesso fix, via groupBy su HistoryDelivery.
     const topRaiderGroups = await prisma.historyDelivery.groupBy({
       by: ["raiderId"],
+      where: dateFrom || dateTo ? { createdAt: dateFilter } : undefined,
       _count: { id: true },
       orderBy: { _count: { id: "desc" } },
       take: 10,
