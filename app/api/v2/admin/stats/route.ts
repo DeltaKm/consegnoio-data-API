@@ -4,6 +4,7 @@ import { requireAdmin } from "@/app/lib/auth";
 
 enum StatusCodes {
   Success = 200,
+  BadRequest = 400,
   Unauthorized = 401,
   InternalServerError = 500,
 }
@@ -22,14 +23,50 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const dateFrom = searchParams.get("dateFrom");
     const dateTo = searchParams.get("dateTo");
+    const logisticsIdFilter = searchParams.get("logisticsId");
+    const businessIdFilter = searchParams.get("businessId");
+    const raiderIdFilter = searchParams.get("raiderId");
 
     const dateFilter: any = {};
     if (dateFrom) dateFilter.gte = new Date(dateFrom);
     if (dateTo) dateFilter.lte = new Date(dateTo);
 
+    // Se filtrato per logistica, restringi alle sue attività (e valida businessId se presente insieme)
+    let scopedBusinessIds: string[] | null = null;
+    if (logisticsIdFilter) {
+      const rels = await prisma.logisticsBusiness.findMany({
+        where: { logisticsId: logisticsIdFilter },
+        select: { businessId: true },
+      });
+      const managedIds = rels.map(r => r.businessId);
+      if (businessIdFilter && !managedIds.includes(businessIdFilter)) {
+        return NextResponse.json(
+          { message: "Questa attività non è gestita da questa logistica" },
+          { status: StatusCodes.BadRequest }
+        );
+      }
+      scopedBusinessIds = businessIdFilter ? [businessIdFilter] : managedIds;
+    } else if (businessIdFilter) {
+      scopedBusinessIds = [businessIdFilter];
+    }
+
     const deliveryWhere: any = {};
     if (dateFrom || dateTo) {
       deliveryWhere.createdAt = dateFilter;
+    }
+    if (scopedBusinessIds) {
+      deliveryWhere.businessId = { in: scopedBusinessIds };
+    }
+    if (raiderIdFilter) {
+      deliveryWhere.assignedToRaiderId = raiderIdFilter;
+    }
+
+    const raiderScopeWhere: any = {};
+    if (scopedBusinessIds) {
+      raiderScopeWhere.businessRelations = { some: { businessId: { in: scopedBusinessIds } } };
+    }
+    if (raiderIdFilter) {
+      raiderScopeWhere.id = raiderIdFilter;
     }
 
     const [
@@ -46,10 +83,10 @@ export async function GET(request: NextRequest) {
       notDeliveredDeliveries,
     ] = await Promise.all([
       prisma.user.count(),
-      prisma.business.count(),
+      prisma.business.count({ where: scopedBusinessIds ? { id: { in: scopedBusinessIds } } : undefined }),
       prisma.logistics.count(),
-      prisma.raider.count(),
-      prisma.raider.count({ where: { isActive: true } }),
+      prisma.raider.count({ where: raiderScopeWhere }),
+      prisma.raider.count({ where: { ...raiderScopeWhere, isActive: true } }),
       prisma.deliveryEA.count({ where: deliveryWhere }),
       prisma.deliveryEA.count({ where: { ...deliveryWhere, status: "CREATED" } }),
       prisma.deliveryEA.count({ where: { ...deliveryWhere, status: "ASSIGNED" } }),
@@ -79,7 +116,7 @@ export async function GET(request: NextRequest) {
     // e si ordinava solo tra quelli: quasi mai erano i business realmente più attivi.)
     const topBusinessGroups = await prisma.deliveryEA.groupBy({
       by: ["businessId"],
-      where: { ...deliveryWhere, businessId: { not: null } },
+      where: { ...deliveryWhere, businessId: scopedBusinessIds ? { in: scopedBusinessIds } : { not: null } },
       _count: { id: true },
       orderBy: { _count: { id: "desc" } },
       take: 10,
@@ -112,29 +149,58 @@ export async function GET(request: NextRequest) {
       }))
       .sort((a, b) => b.totalOrders - a.totalOrders);
 
-    // Top 10 raider per consegne completate: stesso fix, via groupBy su HistoryDelivery.
+    // Top 10 raider per consegne completate, via groupBy su HistoryDelivery,
+    // scomposto anche per logistica/attività/raider se filtrato.
+    const historyWhere: any = {};
+    if (dateFrom || dateTo) historyWhere.createdAt = dateFilter;
+    if (raiderIdFilter) historyWhere.raiderId = raiderIdFilter;
+    if (scopedBusinessIds) historyWhere.delivery = { businessId: { in: scopedBusinessIds } };
+
     const topRaiderGroups = await prisma.historyDelivery.groupBy({
       by: ["raiderId"],
-      where: dateFrom || dateTo ? { createdAt: dateFilter } : undefined,
+      where: historyWhere,
       _count: { id: true },
       orderBy: { _count: { id: "desc" } },
       take: 10,
     });
 
-    const topRaiderIds = topRaiderGroups.map(g => g.raiderId);
-    const raidersData = await prisma.raider.findMany({
-      where: { id: { in: topRaiderIds } },
-      select: { id: true, name: true, surname: true },
-    });
-    const raiderCountById = new Map(topRaiderGroups.map(g => [g.raiderId, g._count.id]));
+    const raiderStats = await Promise.all(
+      topRaiderGroups.map(async (group) => {
+        const raider = await prisma.raider.findUnique({
+          where: { id: group.raiderId },
+          select: { name: true, surname: true },
+        });
 
-    const raiderStats = raidersData
-      .map(raider => ({
-        id: raider.id,
-        name: `${raider.name} ${raider.surname}`,
-        completedDeliveries: raiderCountById.get(raider.id) ?? 0,
-      }))
-      .sort((a, b) => b.completedDeliveries - a.completedDeliveries);
+        const totalAssigned = await prisma.deliveryEA.count({
+          where: { ...deliveryWhere, assignedToRaiderId: group.raiderId },
+        });
+
+        const completedDeliveriesList = await prisma.deliveryEA.findMany({
+          where: { ...deliveryWhere, assignedToRaiderId: group.raiderId, status: "COMPLETED" },
+          select: { compensation: true },
+        });
+
+        const notDelivered = await prisma.deliveryEA.count({
+          where: { ...deliveryWhere, assignedToRaiderId: group.raiderId, status: "NOTDELIVERED" },
+        });
+
+        const compensation = completedDeliveriesList.reduce((sum, d) => sum + (d.compensation || 0), 0);
+
+        return {
+          id: group.raiderId,
+          name: raider ? `${raider.name} ${raider.surname}` : "Sconosciuto",
+          completedDeliveries: group._count.id,
+          totalAssigned,
+          notDelivered,
+          compensation: compensation.toFixed(2),
+          successRate: totalAssigned > 0
+            ? ((completedDeliveriesList.length / totalAssigned) * 100).toFixed(2) + "%"
+            : "0%",
+        };
+      })
+    );
+
+    raiderStats.sort((a, b) => b.completedDeliveries - a.completedDeliveries);
 
     return NextResponse.json(
       {

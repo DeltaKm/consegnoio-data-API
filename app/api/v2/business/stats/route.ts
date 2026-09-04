@@ -4,6 +4,7 @@ import { requireBusiness } from "@/app/lib/auth";
 
 enum StatusCodes {
   Success = 200,
+  BadRequest = 400,
   Unauthorized = 401,
   InternalServerError = 500,
 }
@@ -22,10 +23,23 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const dateFrom = searchParams.get("dateFrom");
     const dateTo = searchParams.get("dateTo");
+    const raiderIdFilter = searchParams.get("raiderId");
 
     const dateFilter: any = {};
     if (dateFrom) dateFilter.gte = new Date(dateFrom);
     if (dateTo) dateFilter.lte = new Date(dateTo);
+
+    if (raiderIdFilter) {
+      const relation = await prisma.businessRaider.findFirst({
+        where: { businessId: auth.business.id, raiderId: raiderIdFilter },
+      });
+      if (!relation) {
+        return NextResponse.json(
+          { message: "Questo raider non è collegato alla tua attività" },
+          { status: StatusCodes.BadRequest }
+        );
+      }
+    }
 
     const where: any = {
       businessId: auth.business.id,
@@ -33,6 +47,10 @@ export async function GET(request: NextRequest) {
 
     if (dateFrom || dateTo) {
       where.createdAt = dateFilter;
+    }
+
+    if (raiderIdFilter) {
+      where.assignedToRaiderId = raiderIdFilter;
     }
 
     // Conta ordini per status
