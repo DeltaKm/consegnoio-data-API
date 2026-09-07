@@ -9,8 +9,8 @@ enum StatusCodes {
   InternalServerError = 500,
 }
 
-// PUT - Segna come pagate le consegne completate e non ancora pagate di un
-// raider, nello stesso scope (data/attività/logistica) usato dalle statistiche.
+// PUT - Annulla il pagamento delle consegne segnate come pagate nello stesso
+// scope (data/attività/logistica) usato dalle statistiche.
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -53,22 +53,22 @@ export async function PUT(
     const where: any = {
       assignedToRaiderId: raiderId,
       status: "COMPLETED",
-      OR: [{ raiderPaidAt: { isSet: false } }, { raiderPaidAt: null }],
+      raiderPaidAt: { isSet: true, not: null },
     };
     if (dateFrom || dateTo) where.createdAt = dateFilter;
     if (scopedBusinessIds) where.businessId = { in: scopedBusinessIds };
 
     const result = await prisma.deliveryEA.updateMany({
       where,
-      data: { raiderPaidAt: new Date() },
+      data: { raiderPaidAt: null },
     });
 
     return NextResponse.json(
-      { message: `Segnate come pagate ${result.count} consegne`, count: result.count },
+      { message: `Annullato il pagamento di ${result.count} consegne`, count: result.count },
       { status: StatusCodes.Success }
     );
   } catch (error: any) {
-    console.error("Errore segnalazione pagamento raider:", error);
+    console.error("Errore annullamento pagamento raider:", error);
     return NextResponse.json(
       { message: "Errore interno", error: error.message },
       { status: StatusCodes.InternalServerError }
