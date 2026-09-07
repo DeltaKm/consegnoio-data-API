@@ -273,6 +273,7 @@ model DeliveryEA {
   phone                  String?
   compensation           Float?
   paymentType            String?
+  raiderPaidAt           DateTime?
   note                   String?   @default("")
   schedulingDelivery     DateTime? @default(now())
   status                 String?   @default("CREATED")

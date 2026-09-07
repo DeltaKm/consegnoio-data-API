@@ -134,6 +134,7 @@ export async function GET(request: NextRequest) {
           select: {
             status: true,
             compensation: true,
+            totalPaid: true,
           }
         }
       },
@@ -145,6 +146,7 @@ export async function GET(request: NextRequest) {
         name: business.bussinesName,
         totalOrders: business.deliveries.length,
         completedOrders: business.deliveries.filter(d => d.status === "COMPLETED").length,
+        totalRevenue: business.deliveries.reduce((sum, d) => sum + (d.totalPaid || 0), 0),
         totalCompensation: business.deliveries.reduce((sum, d) => sum + (d.compensation || 0), 0),
       }))
       .sort((a, b) => b.totalOrders - a.totalOrders);
@@ -175,7 +177,7 @@ export async function GET(request: NextRequest) {
       }),
       prisma.deliveryEA.findMany({
         where: { ...deliveryWhere, assignedToRaiderId: { in: topRaiderIds } },
-        select: { assignedToRaiderId: true, status: true, compensation: true },
+        select: { assignedToRaiderId: true, status: true, compensation: true, raiderPaidAt: true },
       }),
     ]);
 
@@ -186,7 +188,12 @@ export async function GET(request: NextRequest) {
       const totalAssigned = raiderDeliveries.length;
       const completedDeliveriesList = raiderDeliveries.filter(d => d.status === "COMPLETED");
       const notDelivered = raiderDeliveries.filter(d => d.status === "NOTDELIVERED").length;
-      const compensation = completedDeliveriesList.reduce((sum, d) => sum + (d.compensation || 0), 0);
+      const unpaidCompensation = completedDeliveriesList
+        .filter(d => !d.raiderPaidAt)
+        .reduce((sum, d) => sum + (d.compensation || 0), 0);
+      const paidCompensation = completedDeliveriesList
+        .filter(d => d.raiderPaidAt)
+        .reduce((sum, d) => sum + (d.compensation || 0), 0);
 
       return {
         id: group.raiderId,
@@ -194,7 +201,8 @@ export async function GET(request: NextRequest) {
         completedDeliveries: group._count.id,
         totalAssigned,
         notDelivered,
-        compensation: compensation.toFixed(2),
+        compensation: unpaidCompensation.toFixed(2),
+        paidCompensation: paidCompensation.toFixed(2),
         successRate: totalAssigned > 0
           ? ((completedDeliveriesList.length / totalAssigned) * 100).toFixed(2) + "%"
           : "0%",

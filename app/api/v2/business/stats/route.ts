@@ -81,6 +81,7 @@ export async function GET(request: NextRequest) {
         totalPaid: true,
         status: true,
         assignedToRaiderId: true,
+        raiderPaidAt: true,
       }
     });
 
@@ -106,7 +107,12 @@ export async function GET(request: NextRequest) {
       const raiderDeliveries = deliveries.filter(d => d.assignedToRaiderId === raiderId);
       const completedDeliveries = raiderDeliveries.filter(d => d.status === "COMPLETED");
       const notDelivered = raiderDeliveries.filter(d => d.status === "NOTDELIVERED").length;
-      const compensation = completedDeliveries.reduce((sum, d) => sum + (d.compensation || 0), 0);
+      const unpaidCompensation = completedDeliveries
+        .filter(d => !d.raiderPaidAt)
+        .reduce((sum, d) => sum + (d.compensation || 0), 0);
+      const paidCompensation = completedDeliveries
+        .filter(d => d.raiderPaidAt)
+        .reduce((sum, d) => sum + (d.compensation || 0), 0);
 
       return {
         raiderId,
@@ -114,7 +120,8 @@ export async function GET(request: NextRequest) {
         totalAssigned: raiderDeliveries.length,
         completed: completedDeliveries.length,
         notDelivered,
-        compensation: compensation.toFixed(2),
+        compensation: unpaidCompensation.toFixed(2),
+        paidCompensation: paidCompensation.toFixed(2),
         successRate: raiderDeliveries.length > 0
           ? ((completedDeliveries.length / raiderDeliveries.length) * 100).toFixed(2) + '%'
           : '0%',

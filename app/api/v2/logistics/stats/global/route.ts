@@ -108,6 +108,7 @@ export async function GET(request: NextRequest) {
         totalPaid: true,
         status: true,
         assignedToRaiderId: true,
+        raiderPaidAt: true,
       }
     });
 
@@ -125,7 +126,7 @@ export async function GET(request: NextRequest) {
         bussinesName: true,
         deliveries: {
           where,
-          select: { status: true, compensation: true },
+          select: { status: true, compensation: true, totalPaid: true },
         }
       }
     });
@@ -136,6 +137,7 @@ export async function GET(request: NextRequest) {
         name: business.bussinesName,
         totalOrders: business.deliveries.length,
         completedOrders: business.deliveries.filter(d => d.status === "COMPLETED").length,
+        totalRevenue: business.deliveries.reduce((sum, d) => sum + (d.totalPaid || 0), 0),
         totalCompensation: business.deliveries.reduce((sum, d) => sum + (d.compensation || 0), 0),
       }))
       .sort((a, b) => b.totalOrders - a.totalOrders);
@@ -168,7 +170,12 @@ export async function GET(request: NextRequest) {
         const raiderDeliveries = deliveries.filter(d => d.assignedToRaiderId === perf.assignedToRaiderId);
         const completed = raiderDeliveries.filter(d => d.status === "COMPLETED");
         const notDelivered = raiderDeliveries.filter(d => d.status === "NOTDELIVERED").length;
-        const compensation = completed.reduce((sum, d) => sum + (d.compensation || 0), 0);
+        const unpaidCompensation = completed
+          .filter(d => !d.raiderPaidAt)
+          .reduce((sum, d) => sum + (d.compensation || 0), 0);
+        const paidCompensation = completed
+          .filter(d => d.raiderPaidAt)
+          .reduce((sum, d) => sum + (d.compensation || 0), 0);
 
         return {
           raiderId: perf.assignedToRaiderId,
@@ -176,7 +183,8 @@ export async function GET(request: NextRequest) {
           totalAssigned: perf._count.id,
           completed: completed.length,
           notDelivered,
-          compensation: compensation.toFixed(2),
+          compensation: unpaidCompensation.toFixed(2),
+          paidCompensation: paidCompensation.toFixed(2),
           successRate: perf._count.id > 0
             ? ((completed.length / perf._count.id) * 100).toFixed(2) + "%"
             : "0%",
