@@ -47,7 +47,7 @@ export async function PUT(
       assignedToRaiderId: raiderId,
       businessId: auth.business.id,
       status: "COMPLETED",
-      raiderPaidAt: null,
+      raiderPaidAt: { isSet: false },
     };
     if (dateFrom || dateTo) where.createdAt = dateFilter;
 

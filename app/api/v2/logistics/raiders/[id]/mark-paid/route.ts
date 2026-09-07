@@ -66,7 +66,7 @@ export async function PUT(
     const where: any = {
       assignedToRaiderId: raiderId,
       status: "COMPLETED",
-      raiderPaidAt: null,
+      raiderPaidAt: { isSet: false },
       businessId: { in: scopedBusinessIds },
     };
     if (dateFrom || dateTo) where.createdAt = dateFilter;
