@@ -69,12 +69,18 @@ export async function GET(request: NextRequest) {
     }
 
     const where: any = {
-      // Filtra solo raider associati ai business gestiti dalla logistica
-      businessRelations: {
-        some: {
-          businessId: { in: businessIds }
-        }
-      }
+      // Mostra i raider associati ai business gestiti dalla logistica, più
+      // quelli creati da questa logistica anche se al momento non collegati
+      // a nessuno dei suoi business (altrimenti, rimuovendo l'ultima
+      // attività, il raider sparirebbe e non sarebbe più recuperabile).
+      AND: [
+        {
+          OR: [
+            { businessRelations: { some: { businessId: { in: businessIds } } } },
+            { createdByLogisticsId: auth.logistics.id },
+          ],
+        },
+      ],
     };
 
     // Filtro per ID raider specifico
@@ -84,10 +90,12 @@ export async function GET(request: NextRequest) {
 
     // Filtro per nome/cognome
     if (name) {
-      where.OR = [
-        { name: { contains: name, mode: 'insensitive' } },
-        { surname: { contains: name, mode: 'insensitive' } },
-      ];
+      where.AND.push({
+        OR: [
+          { name: { contains: name, mode: 'insensitive' } },
+          { surname: { contains: name, mode: 'insensitive' } },
+        ],
+      });
     }
 
     // Filtro per stato attivo

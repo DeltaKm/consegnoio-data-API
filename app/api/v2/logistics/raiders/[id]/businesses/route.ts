@@ -63,7 +63,15 @@ export async function PATCH(
     const raider = await prisma.raider.findFirst({
       where: {
         id: raiderId,
-        businessRelations: { some: { businessId: { in: managedBusinessIds } } },
+        // Oltre ai raider già collegati a un'attività gestita, permette
+        // l'accesso anche a quelli creati da questa logistica ma
+        // attualmente senza nessuna attività assegnata — altrimenti,
+        // una volta rimossa l'ultima, non sarebbe più possibile
+        // riassegnargliene una da qui.
+        OR: [
+          { businessRelations: { some: { businessId: { in: managedBusinessIds } } } },
+          { createdByLogisticsId: auth.logistics.id },
+        ],
       },
       include: {
         businessRelations: {

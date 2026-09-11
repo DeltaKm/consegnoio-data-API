@@ -80,8 +80,11 @@ export async function GET(
       );
     }
 
-    // Verifica che il raider sia associato ad almeno un business gestito dalla logistica
-    if (raider.businessRelations.length === 0) {
+    // Verifica che il raider sia associato ad almeno un business gestito dalla
+    // logistica, oppure sia stato creato da questa logistica (anche se al
+    // momento non ha nessuna attività assegnata — altrimenti, rimuovendo
+    // l'ultima attività, il raider sparirebbe e non sarebbe più recuperabile).
+    if (raider.businessRelations.length === 0 && raider.createdByLogisticsId !== auth.logistics.id) {
       return NextResponse.json(
         { message: "Raider non gestito dai business della tua logistica" },
         { status: StatusCodes.Forbidden }
