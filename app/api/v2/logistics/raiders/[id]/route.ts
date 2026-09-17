@@ -243,6 +243,54 @@ export async function DELETE(
     });
 
     if (!businessRaider) {
+      // Nessuna relazione da rimuovere tra quelle gestite: se il raider è
+      // orfano (nessuna attività assegnata in generale, non solo tra quelle
+      // gestite da questa logistica) ed è stato creato da questa logistica,
+      // non c'è nulla da "rimuovere dal business" — l'unica azione sensata
+      // è eliminarlo del tutto, altrimenti resterebbe bloccato per sempre
+      // (visibile solo a questa logistica, ma senza modo di liberarsene).
+      const raider = await prisma.raider.findUnique({
+        where: { id: raiderId },
+        include: { user: true },
+      });
+
+      const totalBusinessRelations = raider
+        ? await prisma.businessRaider.count({ where: { raiderId } })
+        : 0;
+
+      if (raider && raider.createdByLogisticsId === auth.logistics.id && totalBusinessRelations === 0) {
+        const activeDeliveries = await prisma.assignedDelivery.count({
+          where: {
+            raiderId: raiderId,
+            delivery: { status: { in: ["CREATED", "ASSIGNED", "ONDELIVERY"] } }
+          }
+        });
+
+        if (activeDeliveries > 0) {
+          return NextResponse.json(
+            {
+              message: "Impossibile eliminare il raider. Ha ancora consegne attive.",
+              activeDeliveries
+            },
+            { status: StatusCodes.BadRequest }
+          );
+        }
+
+        await prisma.$transaction(async (tx) => {
+          await tx.assignedDelivery.deleteMany({ where: { raiderId } });
+          await tx.historyDelivery.deleteMany({ where: { raiderId } });
+          await tx.raider.delete({ where: { id: raiderId } });
+          if (raider.user) {
+            await tx.user.delete({ where: { id: raider.user.id } });
+          }
+        });
+
+        return NextResponse.json(
+          { message: "Raider eliminato con successo (non aveva più attività assegnate)" },
+          { status: StatusCodes.Success }
+        );
+      }
+
       return NextResponse.json(
         { message: "Raider non trovato o non gestito dai business della tua logistica" },
         { status: StatusCodes.NotFound }
@@ -262,9 +310,9 @@ export async function DELETE(
 
     if (activeDeliveries > 0) {
       return NextResponse.json(
-        { 
+        {
           message: "Impossibile rimuovere il raider. Ha ancora consegne attive.",
-          activeDeliveries 
+          activeDeliveries
         },
         { status: StatusCodes.BadRequest }
       );
