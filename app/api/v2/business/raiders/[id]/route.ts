@@ -59,9 +59,40 @@ export async function GET(
     });
 
     if (!businessRaider) {
+      // Nessuna relazione con questo business: se il raider è stato creato
+      // da questo business (ma al momento senza nessuna attività assegnata,
+      // es. dopo una rimozione), resta comunque visibile — coerente con il
+      // PATCH, che già permette la modifica in questo caso.
+      const orphanRaider = await prisma.raider.findFirst({
+        where: { id: raiderId, createdByBusinessId: auth.business.id },
+        include: {
+          user: {
+            select: { id: true, email: true, confirmed: true, expired: true, role: true }
+          }
+        }
+      });
+
+      if (!orphanRaider) {
+        return NextResponse.json(
+          { message: "Raider non trovato o non associato al tuo business" },
+          { status: StatusCodes.NotFound }
+        );
+      }
+
       return NextResponse.json(
-        { message: "Raider non trovato o non associato al tuo business" },
-        { status: StatusCodes.NotFound }
+        {
+          raider: {
+            id: orphanRaider.id,
+            name: orphanRaider.name,
+            surname: orphanRaider.surname,
+            vehicle: orphanRaider.vehicle,
+            mobile: orphanRaider.mobile,
+            user: orphanRaider.user,
+            confirmedFromBusiness: false,
+            createdAt: orphanRaider.createdAt,
+          }
+        },
+        { status: StatusCodes.Success }
       );
     }
 
@@ -232,10 +263,52 @@ export async function DELETE(
       );
     }
 
-    // Rimuovi solo la relazione BusinessRaider
+    // Rimuovi la relazione BusinessRaider
     await prisma.businessRaider.delete({
       where: { id: businessRaider.id }
     });
+
+    // Se il raider era stato creato da questo business e questa era la sua
+    // ultima attività assegnata (non gestito da nessun altro business), non
+    // ha più senso lasciarlo "orfano" e irraggiungibile: lo eliminiamo del
+    // tutto insieme al suo account, come fa l'Admin.
+    const raider = await prisma.raider.findUnique({
+      where: { id: raiderId },
+      include: { user: true },
+    });
+    const remainingRelations = await prisma.businessRaider.count({ where: { raiderId } });
+
+    if (raider && raider.createdByBusinessId === auth.business.id && remainingRelations === 0) {
+      // Ricontrolla su TUTTE le consegne (non solo quelle di questo business):
+      // senza più relazioni verso nessuna attività, il raider potrebbe avere
+      // comunque una consegna attiva assegnata altrove in precedenza.
+      const otherActiveDeliveries = await prisma.assignedDelivery.count({
+        where: {
+          raiderId,
+          delivery: { status: { in: ["CREATED", "ASSIGNED", "ONDELIVERY"] } }
+        }
+      });
+      if (otherActiveDeliveries > 0) {
+        return NextResponse.json(
+          { message: "Raider rimosso dal business con successo" },
+          { status: StatusCodes.Success }
+        );
+      }
+
+      await prisma.$transaction(async (tx) => {
+        await tx.assignedDelivery.deleteMany({ where: { raiderId } });
+        await tx.historyDelivery.deleteMany({ where: { raiderId } });
+        await tx.raider.delete({ where: { id: raiderId } });
+        if (raider.user) {
+          await tx.user.delete({ where: { id: raider.user.id } });
+        }
+      });
+
+      return NextResponse.json(
+        { message: "Raider eliminato con successo (non aveva più attività assegnate)" },
+        { status: StatusCodes.Success }
+      );
+    }
 
     return NextResponse.json(
       { message: "Raider rimosso dal business con successo" },
